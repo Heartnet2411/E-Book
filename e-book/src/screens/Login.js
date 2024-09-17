@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Lottie from 'react-lottie';
-import loginanimation from '../lotties/login';
+import loginanimation from '../lotties/register.json';
 import { FaFacebookSquare } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { IoMdEye } from 'react-icons/io';
@@ -27,9 +27,9 @@ const Login = () => {
         <div
             style={{
                 background:
-                    'linear-gradient(0deg, #2b2738 0%, #2f2a3f 50%, #24202e 100%)',
+                    'linear-gradient(0deg, #2b2738 0%, #191721 50%, #181620 100%)',
             }}
-            className="grid grid-cols-2 grid-rows-[20vh_40vh_40vh]  px-16 bg-[#2B2738] max-h-screen"
+            className="grid grid-cols-2 grid-rows-[15vh_42.5vh_42.5vh]  px-16 bg-[#2B2738] max-h-screen"
         >
             <div className="col-span-2 h-auto">
                 <div className="h-1/5">
@@ -43,13 +43,13 @@ const Login = () => {
                 </div>
             </div>
 
-            <div className="row-start-2 w-auto max-h-4/5 h-4/5 flex align-middle">
+            <div className="row-start-2 w-auto h-full flex align-top justify-start">
                 <div className="mt-auto mb-auto">
-                    <Lottie options={defaultOptions} height="80%" width="80%" />
+                    <Lottie options={defaultOptions} height="90%" width="90%" />
                 </div>
             </div>
             <div className="row-start-2 w-auto  px-12">
-                <h1 className="text-7xl leading-loose font-bold text-white ">
+                <h1 className="text-7xl leading-loose font-bold text-white mt-4">
                     Đăng nhập
                 </h1>
                 <div className="flex flex-col w-10/12 mb-4 mt-2">
@@ -61,7 +61,7 @@ const Login = () => {
                     <div className="relative my-2">
                         <input
                             type={passwordVisible ? 'text' : 'password'}
-                            placeholder="password"
+                            placeholder="mật khẩu"
                             className="border-white w-full px-6 py-2 rounded-2xl bg-slate-200 mt-4 focus:outline-none"
                         />
                         <button
@@ -77,7 +77,7 @@ const Login = () => {
                         </button>
                     </div>
                 </div>
-                <p className="text-white mb-4s">
+                <p className="text-white mb-4">
                     Chưa có tài khoản?{' '}
                     <Link
                         to="/register"
