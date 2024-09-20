@@ -1,0 +1,26 @@
+.slick-prev::before,.slick-next::before{
+    display:none;
+     
+     }
+     .slick-arrow.slick-next,
+     .slick-arrow.slick-prev{
+     background-color: #428cff;
+     justify-self:center;
+     display: flex;
+     align-items: center;
+     border-radius: 50%;
+     opacity: 0.8;
+     height:40px;
+     width:40px;
+     z-index: 1;
+     }
+     
+     .slick-arrow.slick-next:hover,
+     .slick-arrow.slick-prev:hover
+     {
+         background-color: #213048;
+         opacity:1;
+     }
+     
+
+
