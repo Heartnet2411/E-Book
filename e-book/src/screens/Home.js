@@ -7,8 +7,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import '../Home.css';
-import GOOGLE_API_KEY from '../config/config';
-
+import GOOGLE_API_KEY from "../config/config.js"
 const NextArrow = (props) => {
     const { className, style, onClick } = props;
     return (
