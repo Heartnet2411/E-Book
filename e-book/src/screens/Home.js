@@ -6,8 +6,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-//import home.css
 import '../Home.css';
+import GOOGLE_API_KEY from '../config/config';
 
 const NextArrow = (props) => {
     const { className, style, onClick } = props;
@@ -48,7 +48,7 @@ export default function Home() {
     useEffect(() => {
         axios
             .get(
-                'https://www.googleapis.com/books/v1/volumes?q=javascrpit&key=AIzaSyBEeDBvkeeH0nFc_-0w9dbdOv9M0LfT9sA'
+                `https://www.googleapis.com/books/v1/volumes?q=javascrpit&key=${GOOGLE_API_KEY}`
             )
             .then((res) => setBooks(res.data.items))
             .catch((err) => console.log(err));
