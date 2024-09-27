@@ -6,9 +6,18 @@ import { FaFacebookSquare } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { IoMdEye } from 'react-icons/io';
 import { IoEyeOff } from 'react-icons/io5';
+import Notification from '../components/Notification';
+import { host, port } from '../utils/constatn';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../utils/firebase';
 
 const Login = () => {
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [modalMessage, setModalMessage] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
@@ -21,6 +30,52 @@ const Login = () => {
         rendererSettings: {
             preserveAspectRatio: 'xMidYMid slice',
         },
+    };
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        if (!email || !password) {
+            setModalMessage('Vui lòng nhập thông tin đăng nhập!');
+            setShowModal(true);
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                'http://' + host + ':' + port + '/api/user/login',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                    }),
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error('Đăng nhập thất bại: ' + result.message);
+            }
+
+            const data = await response.json();
+            console.log('Đăng nhập thành công:');
+            setModalMessage('Đăng nhập thành công!');
+            setShowModal(true);
+
+            // Xử lý tiếp theo sau khi đăng nhập thành công, ví dụ: lưu token hoặc chuyển hướng
+        } catch (error) {
+            setModalMessage('Có lỗi xảy ra khi đăng nhập: ' + error.message);
+            setShowModal(true);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -56,12 +111,16 @@ const Login = () => {
                     <input
                         type="email"
                         placeholder="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="border-white w-full px-6 py-2 rounded-2xl bg-slate-200 focus:outline-none "
                     />
                     <div className="relative my-2">
                         <input
                             type={passwordVisible ? 'text' : 'password'}
                             placeholder="mật khẩu"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             className="border-white w-full px-6 py-2 rounded-2xl bg-slate-200 mt-4 focus:outline-none"
                         />
                         <button
@@ -86,8 +145,12 @@ const Login = () => {
                         Đăng ký.
                     </Link>
                 </p>
-                <button className=" w-10/12 px-6 py-2 rounded-2xl bg-sky-600 hover:bg-sky-700 mt-4 text-white font-medium text-xl">
-                    Đăng nhập
+                <button
+                    disabled={isLoading}
+                    onClick={handleLogin}
+                    className=" w-10/12 px-6 py-2 rounded-2xl bg-sky-600 hover:bg-sky-700 mt-4 text-white font-medium text-xl"
+                >
+                    {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </button>
 
                 <div className="w-10/12 flex items-center my-8">
@@ -111,6 +174,14 @@ const Login = () => {
                         </p>
                     </button>
                 </div>
+
+                {/* Hiển thị modal nếu showModal là true */}
+                {showModal && (
+                    <Notification
+                        message={modalMessage}
+                        onClose={() => setShowModal(false)}
+                    />
+                )}
             </div>
         </div>
     );
