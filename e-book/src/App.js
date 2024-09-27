@@ -3,7 +3,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './screens/Login';
 import Register from './screens/Register';
-
+import Home from './screens/Home'; 
+import BookDetails from './components/BookDetails';
+import BookViewer from './screens/BookViewer';
 function App() {
     return (
         <Router>

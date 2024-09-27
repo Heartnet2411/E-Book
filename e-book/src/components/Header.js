@@ -34,8 +34,8 @@ const Header = () => {
             </div>
             <div className='pl-28 flex flex-row'>
             <CiSearch size={30} color='white' />
-            <button className='text-black w-28 bg-blue-200 rounded-xl ml-9'>Đăng ký</button>
-            <button className='text-white w-28 bg-blue-800 rounded-xl ml-9'>Đăng nhập</button>
+            <button className='text-black w-28 bg-blue-200 rounded-xl ml-9'  onClick={() => navigate('/register')}>Đăng ký</button>
+            <button className='text-white w-28 bg-blue-800 rounded-xl ml-9'  onClick={() => navigate('/login')}>Đăng nhập</button>
             </div>
         </div>
     );
