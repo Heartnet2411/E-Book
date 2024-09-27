@@ -1,6 +1,8 @@
 import React from 'react';
 import { CiSearch } from 'react-icons/ci';
+import { useNavigate } from 'react-router-dom';
 const Header = () => {
+    const navigate = useNavigate();
     return (
         <div
             className="w-full h-16 flex flex-row px-8 items-center  "
@@ -13,6 +15,7 @@ const Header = () => {
                 <img
                     src="..\..\TheBookLounge.png"
                     className=" w-16 cursor-pointer"
+                    onClick={() => navigate('/')}
                 />
             </a>
             <div className="grid grid-cols-4 gap-4 ml-56 items-center flex space-x-10 ">

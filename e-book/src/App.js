@@ -4,18 +4,19 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import Home from './screens/Home';
+import BookDetails from './components/BookDetails';
+import BookViewer from './screens/BookViewer';
 
 function App() {
     return (
         <Router>
-            <div>
-                {/* Define route */}
-                <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/" element={<Home/>}/>
-                </Routes>
-            </div>
+            <Routes>
+                <Route path="/login" Component={Login} />
+                <Route path="/register" Component={Register} />
+                <Route path="/" Component={Home} />
+                <Route path="/book/:id" Component={BookDetails} />
+                <Route path="/read/:id" Component={BookViewer} />
+            </Routes>
         </Router>
     );
 }

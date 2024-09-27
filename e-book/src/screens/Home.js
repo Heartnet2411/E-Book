@@ -7,7 +7,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import '../Home.css';
-import GOOGLE_API_KEY from "../config/config.js"
+import {GOOGLE_API_KEY} from "../config/config"
 const NextArrow = (props) => {
     const { className, style, onClick } = props;
     return (
@@ -47,7 +47,7 @@ export default function Home() {
     useEffect(() => {
         axios
             .get(
-                `https://www.googleapis.com/books/v1/volumes?q=javascrpit&key=${GOOGLE_API_KEY}`
+                `https://www.googleapis.com/books/v1/volumes?q=Lập+trình+web&key=${GOOGLE_API_KEY}`
             )
             .then((res) => setBooks(res.data.items))
             .catch((err) => console.log(err));
