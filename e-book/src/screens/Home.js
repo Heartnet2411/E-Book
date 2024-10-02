@@ -2,48 +2,52 @@ import axios from 'axios';
 import Header from '../components/Header';
 import Book from '../components/Book';
 import { useEffect, useState } from 'react';
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io';
 import '../Home.css';
-import {GOOGLE_API_KEY} from "../config/config"
+import { GOOGLE_API_KEY } from '../config/config';
+
 const NextArrow = (props) => {
     const { className, style, onClick } = props;
     return (
         <div
-            className={`slick-arrow ${className}`}
+            className={`slick-arrow ${className} mr-16`}
             style={{ ...style }}
             onClick={onClick}
         >
-           <IoIosArrowForward color='white' size={40}/>
-            </div>
+            <IoIosArrowForward color="white" size={40} />
+        </div>
     );
 };
+
 const PrevArrow = (props) => {
     const { className, style, onClick } = props;
     return (
         <div
-            className={`arrow ${className}`}
+            className={`arrow ${className} ml-16`}
             style={{ ...style }}
             onClick={onClick}
         >
-           <IoIosArrowBack color='white' size={40}/>
-            </div>
+            <IoIosArrowBack color="white" size={40} />
+        </div>
     );
 };
 
 export default function Home() {
-    var setting={
+    var setting = {
         // dots: true,
         infinite: true,
-        speed: 500,
-        slidesToShow: 6,
-        slidesToScroll:3,
-        nextArrow: <NextArrow to="next"/>,
-        prevArrow: <PrevArrow to="prev"/>,
-    }
+        speed: 700,
+        slidesToShow: 5,
+        slidesToScroll: 5,
+        nextArrow: <NextArrow to="next" />,
+        prevArrow: <PrevArrow to="prev" />,
+    };
+
     const [books, setBooks] = useState([]);
+
     useEffect(() => {
         axios
             .get(
@@ -53,55 +57,59 @@ export default function Home() {
             .catch((err) => console.log(err));
     }, []);
     console.log(books);
+
     return (
         <div
             style={{
                 background:
-                    'linear-gradient(0deg, #2b2738 0%, #2f2a3f 50%, #24202e 100%)',
+                    'linear-gradient(0deg, #2b2738 0%, #191721 50%, #181620 100%)',
             }}
         >
             <Header />
-            <div className="popular p-8 ">
-                <div className="title text-gray-400 text-6xl px-8">
+            <div className="popular px-8 mt-16 ">
+                <div className="title text-white font-semibold text-6xl px-8 text-center">
                     Đọc nhiều trong tuần
                 </div>
-                <Slider {...setting}>
+                <Slider {...setting} className="px-20 mt-8">
                     {books.map((book) => (
-                        <Book className="flex-shrink-0 w-1/5" book={book} key={book.id} />
+                        <Book
+                            className="flex-shrink-0 w-1/5"
+                            book={book}
+                            key={book.id}
+                        />
                     ))}
                 </Slider>
-
+            </div>
+            <div className="recommend px-8 mt-8">
+                <div className="title text-white font-semibold text-4xl px-8">
+                    Đề xuất cho bạn
                 </div>
-            <div className="recommend p-8">
-    <div className="title text-gray-400 text-4xl px-8">
-        Đề xuất cho bạn
-    </div>
-        <Slider {...setting} >
-        {books.map((book) => (
-            <Book book={book} key={book.id} />
-        ))}
-        </Slider>
-</div>
-<div className="p-8">
-    <div className="title text-gray-400 text-4xl px-8">
-       Sách đời sống
-    </div>
-    <Slider {...setting}>
-        {books.map((book) => (
-            <Book book={book} key={book.id} />
-        ))}
-        </Slider>
-</div>
-<div className="p-8">
-    <div className="title text-gray-400 text-4xl px-8">
-       Sách khoa học
-    </div>
-    <Slider {...setting}>
-    {books.map((book) => (
-        <Book book={book} key={book.id} />
-    ))}
-    </Slider>
-</div>
+                <Slider {...setting} className="px-20">
+                    {books.map((book) => (
+                        <Book book={book} key={book.id} />
+                    ))}
+                </Slider>
+            </div>
+            <div className="px-8 mt-8">
+                <div className="title text-white font-semibold text-4xl px-8">
+                    Sách đời sống
+                </div>
+                <Slider {...setting} className="px-20">
+                    {books.map((book) => (
+                        <Book book={book} key={book.id} />
+                    ))}
+                </Slider>
+            </div>
+            <div className="px-8 mt-8">
+                <div className="title text-white font-semibold text-4xl px-8">
+                    Sách khoa học
+                </div>
+                <Slider {...setting} className="px-20">
+                    {books.map((book) => (
+                        <Book book={book} key={book.id} />
+                    ))}
+                </Slider>
+            </div>
         </div>
     );
 }

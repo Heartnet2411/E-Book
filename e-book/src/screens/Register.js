@@ -203,7 +203,7 @@ const Login = () => {
                 background:
                     'linear-gradient(0deg, #2b2738 0%, #191721 50%, #181620 100%)',
             }}
-            className="grid grid-cols-2 grid-rows-[20vh_40vh_40vh]  px-16 bg-[#2B2738] max-h-screen"
+            className="grid grid-cols-2 grid-rows-[15vh_42.5vh_42.5vh]  px-16 bg-[#2B2738] max-h-screen"
         >
             <div className="col-span-2 h-auto">
                 <div className="h-1/5">

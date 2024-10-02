@@ -64,8 +64,7 @@ const Login = () => {
                 throw new Error('Đăng nhập thất bại: ' + result.message);
             }
 
-            const data = await response.json();
-            console.log('Đăng nhập thành công:');
+            console.log('Đăng nhập thành công');
             setModalMessage('Đăng nhập thành công!');
             setShowModal(true);
 
@@ -84,7 +83,7 @@ const Login = () => {
                 background:
                     'linear-gradient(0deg, #2b2738 0%, #191721 50%, #181620 100%)',
             }}
-            className="grid grid-cols-2 grid-rows-[15vh_42.5vh_42.5vh]  px-16 bg-[#2B2738] max-h-screen"
+            className="grid grid-cols-2 grid-rows-[20vh_40vh_40vh]  px-16 bg-[#2B2738] max-h-screen"
         >
             <div className="col-span-2 h-auto">
                 <div className="h-1/5">
@@ -99,12 +98,12 @@ const Login = () => {
             </div>
 
             <div className="row-start-2 w-auto h-full flex align-top justify-start">
-                <div className="mt-auto mb-auto">
-                    <Lottie options={defaultOptions} height="90%" width="90%" />
+                <div className="mt-auto mb-auto flex align-top">
+                    <Lottie options={defaultOptions} height="80%" width="80%" />
                 </div>
             </div>
             <div className="row-start-2 w-auto  px-12">
-                <h1 className="text-7xl leading-loose font-bold text-white mt-4">
+                <h1 className="text-7xl leading-loose font-bold text-white ">
                     Đăng nhập
                 </h1>
                 <div className="flex flex-col w-10/12 mb-4 mt-2">

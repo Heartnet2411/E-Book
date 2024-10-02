@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import { ReactReader } from 'react-reader';
 import { IoIosArrowBack } from 'react-icons/io';
-import {getUrlReadBook} from "../config/config"
+import { getUrlReadBook } from '../config/config';
 
 export default function BookViewer() {
     const navigate = useNavigate();

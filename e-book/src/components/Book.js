@@ -21,7 +21,7 @@ export default function Book({ book }) {
                 alt={title}
                 className="w-52 h-80 mb-2 rounded-lg"
             />
-            <h3 className="text-white">{title}</h3>
+            <h3 className="text-white text-lg">{title}</h3>
         </div>
     );
 }
