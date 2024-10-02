@@ -1,6 +1,8 @@
 import axios from 'axios';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 import Book from '../components/Book';
+import BookMin from '../components/BookMin';
 import { useEffect, useState } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -17,7 +19,10 @@ const NextArrow = (props) => {
             style={{ ...style }}
             onClick={onClick}
         >
-            <IoIosArrowForward color="white" size={40} />
+            <IoIosArrowForward
+                className="text-black dark:text-white"
+                size={40}
+            />
         </div>
     );
 };
@@ -30,7 +35,7 @@ const PrevArrow = (props) => {
             style={{ ...style }}
             onClick={onClick}
         >
-            <IoIosArrowBack color="white" size={40} />
+            <IoIosArrowBack className="text-black dark:text-white" size={40} />
         </div>
     );
 };
@@ -60,14 +65,12 @@ export default function Home() {
 
     return (
         <div
-            style={{
-                background:
-                    'linear-gradient(0deg, #2b2738 0%, #191721 50%, #181620 100%)',
-            }}
+            className="bg-gradient-to-b from-slate-50 via-slate-100 to-white 
+             dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black"
         >
             <Header />
             <div className="popular px-8 mt-16 ">
-                <div className="title text-white font-semibold text-6xl px-8 text-center">
+                <div className="title text-black dark:text-white font-semibold text-6xl px-8 text-center">
                     Đọc nhiều trong tuần
                 </div>
                 <Slider {...setting} className="px-20 mt-8">
@@ -81,35 +84,37 @@ export default function Home() {
                 </Slider>
             </div>
             <div className="recommend px-8 mt-8">
-                <div className="title text-white font-semibold text-4xl px-8">
+                <div className="title text-black dark:text-white font-semibold text-4xl px-8">
                     Đề xuất cho bạn
                 </div>
-                <Slider {...setting} className="px-20">
+                <Slider {...setting} className="px-28">
                     {books.map((book) => (
-                        <Book book={book} key={book.id} />
+                        <BookMin book={book} key={book.id} />
                     ))}
                 </Slider>
             </div>
             <div className="px-8 mt-8">
-                <div className="title text-white font-semibold text-4xl px-8">
+                <div className="title text-black dark:text-white font-semibold text-4xl px-8">
                     Sách đời sống
                 </div>
-                <Slider {...setting} className="px-20">
+                <Slider {...setting} className="px-28">
                     {books.map((book) => (
-                        <Book book={book} key={book.id} />
+                        <BookMin book={book} key={book.id} />
                     ))}
                 </Slider>
             </div>
             <div className="px-8 mt-8">
-                <div className="title text-white font-semibold text-4xl px-8">
+                <div className="title text-black dark:text-white font-semibold text-4xl px-8">
                     Sách khoa học
                 </div>
-                <Slider {...setting} className="px-20">
+                <Slider {...setting} className="px-28">
                     {books.map((book) => (
-                        <Book book={book} key={book.id} />
+                        <BookMin book={book} key={book.id} />
                     ))}
                 </Slider>
             </div>
+
+            <Footer />
         </div>
     );
 }

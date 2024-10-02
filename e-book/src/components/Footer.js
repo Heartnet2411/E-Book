@@ -2,7 +2,7 @@ import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa';
 
 const Footer = () => {
     return (
-        <footer className="dark:bg-black dark:text-white text-black  py-16 mt-4">
+        <footer className=" dark:text-white text-black  py-16 mt-4">
             <div className="container mx-auto flex justify-center gap-8">
                 {/* Cột 1: Về chúng tôi */}
                 <div className="w-1/5">
