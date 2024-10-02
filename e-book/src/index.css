@@ -15,3 +15,36 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+html {
+  transition: background-color 0.6s, color 0.6s;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  /* Độ rộng của scrollbar */
+  height: 10px;
+  /* Độ cao của scrollbar nếu là thanh ngang */
+}
+
+/* Track của scrollbar */
+::-webkit-scrollbar-track {
+  background: #ffffff;
+  /* Màu nền của track */
+  border-radius: 10px;
+  /* Bo tròn track */
+}
+
+/* Thumb (phần kéo của scrollbar) */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  /* Màu của thumb */
+  border-radius: 10px;
+  /* Bo tròn thumb */
+}
+
+/* Khi hover vào scrollbar */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Màu khi hover */
+}

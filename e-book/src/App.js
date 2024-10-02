@@ -1,11 +1,11 @@
 // App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './index.css';
 import Login from './screens/Login';
 import Register from './screens/Register';
-import Home from './screens/Home'; 
-import BookDetails from './components/BookDetails';
-import BookViewer from './screens/BookViewer';
+import Home from './screens/Home';
+
 function App() {
     return (
         <Router>
