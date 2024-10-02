@@ -5,6 +5,8 @@ import './index.css';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import Home from './screens/Home';
+import BookViewer from './screens/BookViewer';
+import BookDetails from './components/BookDetails';
 
 function App() {
     return (
