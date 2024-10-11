@@ -7,7 +7,8 @@ import Register from './screens/Register';
 import Home from './screens/Home';
 import BookViewer from './screens/BookViewer';
 import BookDetails from './components/BookDetails';
-
+import BookReader from './screens/BookReader/BookReader';
+import UploadEpub from './utils/UploadEbook';
 function App() {
     return (
         <Router>
@@ -17,6 +18,8 @@ function App() {
                 <Route path="/" Component={Home} />
                 <Route path="/book/:id" Component={BookDetails} />
                 <Route path="/read/:id" Component={BookViewer} />
+                <Route path='/reader' Component={BookReader} />
+                <Route path='/upload' Component={UploadEpub} />
             </Routes>
         </Router>
     );
