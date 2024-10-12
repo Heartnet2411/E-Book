@@ -10,6 +10,8 @@ import BookViewer from './screens/BookViewer';
 import BookDetails from './components/BookDetails';
 import MyAccount from './screens/MyAccount';
 
+import BookReader from './screens/BookReader/BookReader';
+import UploadEpub from './utils/UploadEbook';
 function App() {
     return (
         <Router>
@@ -21,6 +23,8 @@ function App() {
                 <Route path="/read/:id" Component={BookViewer} />
                 <Route path="/forum" Component={Forum} />
                 <Route path="/myaccount" Component={MyAccount} />
+                <Route path="/reader/:id" Component={BookReader} />
+                <Route path="/upload" Component={UploadEpub} />
             </Routes>
         </Router>
     );

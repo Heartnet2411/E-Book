@@ -6,6 +6,9 @@ import {
     GoogleAuthProvider,
     FacebookAuthProvider,
 } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
+
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -24,9 +27,10 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-
+const storage = getStorage(app)
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
+// download file epub up firebase
 
-export { auth, googleProvider, facebookProvider };
+export { auth, googleProvider, facebookProvider,storage };

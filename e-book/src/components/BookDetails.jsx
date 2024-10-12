@@ -1,25 +1,89 @@
-import Header from './Header';
+import Header from './Header.js';
 import Footer from './Footer.js';
 import { FaBookOpen, FaHeart, FaShareAlt } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getLanguageName } from '../locales/vi/vi.js';
+import BookImage from '../assets/book.jpg';
+import { storage } from '../utils/firebase.js'
+
+import axios from 'axios';
+import { ref,getMetadata,getDownloadURL,uploadBytes } from 'firebase/storage';
+
 export default function BookDetails() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { book } = location.state || {};
+    const  {book}  = location.state || {};
     console.log(book);
-    const bookInfo = book.volumeInfo;
-    console.log(bookInfo);
+    // const bookInfo = book.volumeInfo;
+    // console.log(bookInfo);
     const handleAuthorClick = (author) => {
         navigate(`/author/${author}`);
     };
     const handleClickCategories = (category) => {
         navigate(`/category/${category}`);
     };
-    const handleClickRead = (id) => {
-        navigate(`/read/${id}`, { state: { book } });
+    const handleClickRead = async (id) => {
+        try {
+            // const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            const targetUrl = book.formats["application/epub+zip"]; // Link EPUB từ thông tin sách\
+            const epubUrl = targetUrl;
+            const url = await handleUploadFileToFirebaseStorage(
+                epubUrl,
+                book.id
+            ); // Gọi hàm upload
+            navigate(`/reader/${id}`, { state: {url, book } });
+        } catch (error) {
+            console.error('Lỗi khi tải sách:', error);
+        }
     };
-    return (
+    const handleUploadFileToFirebaseStorage = async (epubUrl, bookId) => {
+
+        const fileName = `epub/${bookId}.epub`;
+        // const storageRef = ref(storage);
+        const fileRef = ref(storage,fileName);
+        try {
+            await getMetadata(fileRef); // Kiểm tra metadata
+            console.log(`File ${fileName} đã tồn tại.`);
+            return getDownloadURL(fileRef); // Trả về URL nếu file đã tồn tại
+        } catch (error) {
+            if (error.code === 'storage/object-not-found') {
+                console.log('File chưa tồn tại, tiến hành upload...');
+            } else {
+                console.error('Lỗi khi kiểm tra file:', error);
+                throw error;
+            }
+        }
+        try {
+            const response = await axios({
+                url: epubUrl,
+                method: 'GET',
+                contentType: "application/epub+zip",
+                responseType: 'blob',
+                
+                 // Lấy dữ liệu dưới dạng blob
+            });
+            // Upload file lên Firebase Storage
+    const uploadTask = uploadBytes(fileRef, response.data, {
+        contentType: "application/epub+zip",
+      });
+  
+      return new Promise((resolve, reject) => {
+        uploadTask.then(() => {
+          getDownloadURL(fileRef).then((downloadURL) => {
+            console.log('Upload thành công:', downloadURL);
+            resolve(downloadURL);
+          });
+        }).catch((error) => {
+          console.error('Lỗi khi upload file:', error);
+          reject(error);
+        });
+      });
+    } catch (error) {
+      console.error('Lỗi khi tải EPUB từ URL:', error);
+      throw error;
+    }
+    }
+        return (
         book && (
             <div
                 className="book-details from-slate-50 via-slate-100 to-white 
@@ -32,9 +96,9 @@ export default function BookDetails() {
                         <div className="w-1/3 flex justify-end pr-8 relative">
                             <img
                                 src={
-                                    bookInfo.imageLinks
-                                        ? bookInfo.imageLinks.thumbnail
-                                        : 'default-thumbnail.jpg'
+                                    book.formats
+                                        ? book.formats['image/jpeg']
+                                        : BookImage
                                 }
                                 alt="Book Cover"
                                 className=" w-60 h-96 rounded-lg shadow-lg sticky top-8"
@@ -44,67 +108,59 @@ export default function BookDetails() {
                         {/* Book Information */}
                         <div className="w-2/3">
                             <h1 className="text-4xl text-black dark:text-white font-bold mb-4">
-                                {bookInfo.title}
+                                {book.title}
                             </h1>
                             <div className="text-lg dark:text-gray-300 text-gray-500 mb-4">
                                 <p>
                                     Tác giả:{' '}
-                                    {bookInfo.authors &&
-                                        bookInfo.authors.map(
-                                            (author, index) => (
-                                                <span
-                                                    key={index}
-                                                    className="text-black dark:text-white cursor-pointer"
-                                                    onClick={() =>
-                                                        handleAuthorClick(
-                                                            author
-                                                        )
-                                                    }
-                                                >
-                                                    {author}
-                                                    {index <
-                                                    bookInfo.authors.length - 1
-                                                        ? ', '
-                                                        : ''}
-                                                </span>
-                                            )
-                                        )}
+                                    {book.authors &&
+                                        book.authors.map((author, index) => (
+                                            <span
+                                                key={index}
+                                                className="text-black dark:text-white cursor-pointer"
+                                                onClick={() =>
+                                                    handleAuthorClick(author)
+                                                }
+                                            >
+                                                {author.name}
+                                                {index < book.authors.length - 1
+                                                    ? ', '
+                                                    : ''}
+                                            </span>
+                                        ))}
                                 </p>
                                 <p>
                                     Thể loại:{' '}
-                                    {bookInfo.categories &&
-                                        bookInfo.categories.map(
-                                            (category, index) => (
-                                                <span
-                                                    key={index}
-                                                    className="text-black dark:text-white cursor-pointer"
-                                                    onClick={() =>
-                                                        handleClickCategories(
-                                                            category
-                                                        )
-                                                    }
-                                                >
-                                                    {category}
-                                                    {index <
-                                                    bookInfo.categories.length -
-                                                        1
-                                                        ? ', '
-                                                        : ''}
-                                                </span>
-                                            )
-                                        )}
+                                    {book.subjects &&
+                                        book.subjects.map((subject, index) => (
+                                            <span
+                                                key={index}
+                                                className="text-black dark:text-white cursor-pointer"
+                                                onClick={() =>
+                                                    handleClickCategories(
+                                                        subject
+                                                    )
+                                                }
+                                            >
+                                                {subject}
+                                                {index <
+                                                book.subjects.length - 1
+                                                    ? ', '
+                                                    : ''}
+                                            </span>
+                                        ))}
                                 </p>
                                 <p>
                                     Ngôn ngữ:{' '}
                                     <span className="text-black dark:text-white">
-                                        {getLanguageName(bookInfo.language)}
+                                        {getLanguageName(book.languages)}
                                     </span>
                                 </p>
                                 <p>
                                     Nhà xuất bản:{' '}
-                                    {bookInfo.publisher && (
+                                    {book.publisher && (
                                         <span className="text-black dark:text-white">
-                                            {bookInfo.publisher}
+                                            {book.publisher}
                                         </span>
                                     )}
                                 </p>
@@ -130,7 +186,7 @@ export default function BookDetails() {
                                 </button>
                             </div>
                             <p className="mt-8 dark:text-gray-300 text-gray-500 w-3/4">
-                                {bookInfo.description}
+                                {book.description}
                             </p>
                             {/* Reviews Section */}
                             <div className="mt-8 w-3/4">
