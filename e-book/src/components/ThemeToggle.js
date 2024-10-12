@@ -36,7 +36,6 @@ const ThemeToggle = () => {
         }
         setDarkMode(!darkMode);
     };
-
     return (
         <button onClick={toggleTheme} className="focus:outline-none ml-4">
             {darkMode ? (

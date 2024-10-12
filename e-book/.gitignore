@@ -11,7 +11,8 @@
 
 # production
 /build
-
+# Ignore Firebase Admin SDK JSON file
+adminsdk.json
 # misc
 .DS_Store
 .env.local

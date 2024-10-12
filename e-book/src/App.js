@@ -18,8 +18,9 @@ function App() {
                 <Route path="/" Component={Home} />
                 <Route path="/book/:id" Component={BookDetails} />
                 <Route path="/read/:id" Component={BookViewer} />
-                <Route path='/reader' Component={BookReader} />
+                <Route path='/reader/:id' Component={BookReader} />
                 <Route path='/upload' Component={UploadEpub} />
+                
             </Routes>
         </Router>
     );
