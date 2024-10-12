@@ -8,10 +8,10 @@ import { IoMdEye } from 'react-icons/io';
 import { IoEyeOff } from 'react-icons/io5';
 import Notification from '../components/Notification';
 import { host, port } from '../utils/constatn';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../utils/firebase';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+    const navigate = useNavigate();
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -59,6 +59,7 @@ const Login = () => {
             );
 
             const result = await response.json();
+            console.log(result);
 
             if (!response.ok) {
                 throw new Error('Đăng nhập thất bại: ' + result.message);
@@ -69,6 +70,14 @@ const Login = () => {
             setShowModal(true);
 
             // Xử lý tiếp theo sau khi đăng nhập thành công, ví dụ: lưu token hoặc chuyển hướng
+            localStorage.setItem('token', result.accessToken);
+            localStorage.setItem('user', JSON.stringify(result.user));
+            localStorage.setItem(
+                'refreshToken',
+                JSON.stringify(result.refreshToken)
+            );
+
+            navigate('/');
         } catch (error) {
             setModalMessage('Có lỗi xảy ra khi đăng nhập: ' + error.message);
             setShowModal(true);
