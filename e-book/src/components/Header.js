@@ -141,17 +141,6 @@ const Header = ({ user, onClickSearch }) => {
                     className="text-black dark:text-white cursor-pointer"
                     onClick={handleSearchClick}
                 />
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-
                 <ThemeToggle />
                 {currentUser ? (
                     <div
