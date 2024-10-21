@@ -5,7 +5,6 @@ import './index.css';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import Home from './screens/Home';
-import Forum from './screens/Forum';
 import BookViewer from './screens/BookViewer';
 import BookDetails from './components/BookDetails';
 import MyAccount from './screens/MyAccount';
@@ -21,8 +20,6 @@ function App() {
                 <Route path="/" Component={Home} />
                 <Route path="/book/:id" Component={BookDetails} />
                 <Route path="/read/:id" Component={BookViewer} />
-                <Route path="/forum" Component={Forum} />
-                <Route path="/myaccount" Component={MyAccount} />
                 <Route path="/reader/:id" Component={BookReader} />
                 <Route path="/upload" Component={UploadEpub} />
             </Routes>

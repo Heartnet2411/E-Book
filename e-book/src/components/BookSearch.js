@@ -9,10 +9,10 @@ const BookSearch = (books,searchTerm,loadingSearch,setLoadingSearch) => {
             Kết quả tìm kiếm cho {books.searchTerm}
         </div>
         {loadingSearch ? (
-                <div className="loading text-center mt-8">Đang tải...</div>
+                <div className="loading text-center mt-8 text-xl">Đang tải...</div>
             ) : (
             <div className="grid grid-cols-5 gap-4 mt-8">
-                {books.books.length > 0 ? (
+                {books?.books?.length > 0 ? (
                     books.books.map((book, index) => (
                         <Book className="m-4"
                         book={book}

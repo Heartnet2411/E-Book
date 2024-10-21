@@ -9,10 +9,10 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io';
 import '../Home.css';
-import { GOOGLE_API_KEY } from '../config/config';
 import SkeletonBook from '../components/SkeletonBook';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BookSearch from '../components/BookSearch';
+import { url } from '../config/config';
 
 const NextArrow = (props) => {
     const { className, style, onClick } = props;
@@ -64,11 +64,10 @@ export default function Home() {
     const location = useLocation();
     useEffect(() => {
         axios
-            .get(
-                `https://gutendex.com/books/?page=2&page_size=10&topic=Science`
-            )
+            .get(url + `/book`)
             .then((res) => {
-                setBooks(res.data.results);
+                console.log(res.data);
+                setBooks(res.data);
                 setLoading(false);
             })
             .catch((err) => console.log(err));
@@ -78,9 +77,9 @@ export default function Home() {
         setSearchTerm(searchTerm);
         console.log(searchTerm);
         axios
-            .get(`https://gutendex.com/books/?search=${searchTerm}`)
+            .get(url + `/book/search?search=${searchTerm}`)
             .then((response) => {
-                setBookSearchs(response.data.results);
+                setBookSearchs(response.data);
                 setLoadingSearch(false);
 
                 console.log(response.data.results);

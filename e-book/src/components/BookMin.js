@@ -16,13 +16,13 @@ const ImageWithFallback = ({ src, alt, fallbackSrc }) => {
     );
 };
 
-export default function     BookMin({ book }) {
+export default function BookMin({ book }) {
     const navigate = useNavigate();
     const { title,formats } = book;
     const thumbnail = formats["image/jpeg"];
     const handleClick = () => {
         console.log(book);
-        navigate(`/book/${book.id}`, { state: { book } });
+        navigate(`/book/${book.id}`);
     };
 
     return (
