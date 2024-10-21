@@ -1,21 +1,40 @@
 import Header from './Header.js';
 import Footer from './Footer.js';
 import { FaBookOpen, FaHeart, FaShareAlt } from 'react-icons/fa';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { getLanguageName } from '../locales/vi/vi.js';
 import BookImage from '../assets/book.jpg';
 import { storage } from '../utils/firebase.js'
+import { useState, useEffect } from 'react';
 
 import axios from 'axios';
-import { ref,getMetadata,getDownloadURL,uploadBytes } from 'firebase/storage';
+import { url } from '../config/config.js';
 
 export default function BookDetails() {
     const location = useLocation();
     const navigate = useNavigate();
-    const  {book}  = location.state || {};
+    const { id } = useParams();
+    const [book, setBook] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [showFullDescription, setShowFullDescription] = useState(false);
     console.log(book);
-    // const bookInfo = book.volumeInfo;
-    // console.log(bookInfo);
+    useEffect(() => {
+        if (!book) {
+            fetchBook(id);
+        }
+    }, [id]);
+    const fetchBook = async (id) => {
+        try {
+            const response = await axios.get(
+                url + `/book/${id}`
+            );
+            console.log(response.data);
+            setBook(response.data);
+            setLoading(false);
+        } catch (error) {
+            console.error(error);
+        }
+    };
     const handleAuthorClick = (author) => {
         navigate(`/author/${author}`);
     };
@@ -24,66 +43,19 @@ export default function BookDetails() {
     };
     const handleClickRead = async (id) => {
         try {
-            // const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-            const targetUrl = book.formats["application/epub+zip"]; // Link EPUB từ thông tin sách\
-            const epubUrl = targetUrl;
-            const url = await handleUploadFileToFirebaseStorage(
-                epubUrl,
-                book.id
-            ); // Gọi hàm upload
-            navigate(`/reader/${id}`, { state: {url, book } });
+            navigate(`/reader/${id}`);
         } catch (error) {
             console.error('Lỗi khi tải sách:', error);
         }
     };
-    const handleUploadFileToFirebaseStorage = async (epubUrl, bookId) => {
-
-        const fileName = `epub/${bookId}.epub`;
-        // const storageRef = ref(storage);
-        const fileRef = ref(storage,fileName);
-        try {
-            await getMetadata(fileRef); // Kiểm tra metadata
-            console.log(`File ${fileName} đã tồn tại.`);
-            return getDownloadURL(fileRef); // Trả về URL nếu file đã tồn tại
-        } catch (error) {
-            if (error.code === 'storage/object-not-found') {
-                console.log('File chưa tồn tại, tiến hành upload...');
-            } else {
-                console.error('Lỗi khi kiểm tra file:', error);
-                throw error;
-            }
-        }
-        try {
-            const response = await axios({
-                url: epubUrl,
-                method: 'GET',
-                contentType: "application/epub+zip",
-                responseType: 'blob',
-                
-                 // Lấy dữ liệu dưới dạng blob
-            });
-            // Upload file lên Firebase Storage
-    const uploadTask = uploadBytes(fileRef, response.data, {
-        contentType: "application/epub+zip",
-      });
-  
-      return new Promise((resolve, reject) => {
-        uploadTask.then(() => {
-          getDownloadURL(fileRef).then((downloadURL) => {
-            console.log('Upload thành công:', downloadURL);
-            resolve(downloadURL);
-          });
-        }).catch((error) => {
-          console.error('Lỗi khi upload file:', error);
-          reject(error);
-        });
-      });
-    } catch (error) {
-      console.error('Lỗi khi tải EPUB từ URL:', error);
-      throw error;
+    const toggleDescription = () => {
+        setShowFullDescription(!showFullDescription);
+    };
+    const truncatedDescription = book?.description.substring(0, 542) + '...';
+    if (loading) {
+        return <div>Loading...</div>;
     }
-    }
-        return (
+    return (
         book && (
             <div
                 className="book-details from-slate-50 via-slate-100 to-white 
@@ -96,8 +68,8 @@ export default function BookDetails() {
                         <div className="w-1/3 flex justify-end pr-8 relative">
                             <img
                                 src={
-                                    book.formats
-                                        ? book.formats['image/jpeg']
+                                    book.imageUrl
+                                        ? book.imageUrl
                                         : BookImage
                                 }
                                 alt="Book Cover"
@@ -108,43 +80,46 @@ export default function BookDetails() {
                         {/* Book Information */}
                         <div className="w-2/3">
                             <h1 className="text-4xl text-black dark:text-white font-bold mb-4">
-                                {book.title}
+                                {book.bookName}
                             </h1>
                             <div className="text-lg dark:text-gray-300 text-gray-500 mb-4">
                                 <p>
                                     Tác giả:{' '}
-                                    {book.authors &&
-                                        book.authors.map((author, index) => (
+                                    {book.author
+                                        ? (
                                             <span
-                                                key={index}
                                                 className="text-black dark:text-white cursor-pointer"
                                                 onClick={() =>
-                                                    handleAuthorClick(author)
+                                                    handleAuthorClick(
+                                                        book.author
+                                                    )
                                                 }
                                             >
-                                                {author.name}
-                                                {index < book.authors.length - 1
-                                                    ? ', '
-                                                    : ''}
+                                                {book.author}
                                             </span>
-                                        ))}
+                                        )
+                                        : (
+                                            <span className="text-black dark:text-white">
+                                                Không rõ
+                                            </span>
+                                        )}
                                 </p>
                                 <p>
                                     Thể loại:{' '}
-                                    {book.subjects &&
-                                        book.subjects.map((subject, index) => (
+                                    {book.categories &&
+                                        book.categories.map((category, index) => (
                                             <span
                                                 key={index}
                                                 className="text-black dark:text-white cursor-pointer"
                                                 onClick={() =>
                                                     handleClickCategories(
-                                                        subject
+                                                        category
                                                     )
                                                 }
                                             >
-                                                {subject}
+                                                {category.name}
                                                 {index <
-                                                book.subjects.length - 1
+                                                    book.categories.length - 1
                                                     ? ', '
                                                     : ''}
                                             </span>
@@ -153,7 +128,7 @@ export default function BookDetails() {
                                 <p>
                                     Ngôn ngữ:{' '}
                                     <span className="text-black dark:text-white">
-                                        {getLanguageName(book.languages)}
+                                        {book.country}
                                     </span>
                                 </p>
                                 <p>
@@ -170,7 +145,7 @@ export default function BookDetails() {
                                 {/* Đọc sách Button */}
                                 <button
                                     className="bg-green-500 text-black dark:text-white flex items-center gap-2 px-6 py-2 rounded-full hover:bg-green-600 transition"
-                                    onClick={() => handleClickRead(book.id)}
+                                    onClick={() => handleClickRead(book.bookId)}
                                 >
                                     <FaBookOpen /> Đọc sách
                                 </button>
@@ -185,9 +160,15 @@ export default function BookDetails() {
                                     <FaShareAlt />
                                 </button>
                             </div>
-                            <p className="mt-8 dark:text-gray-300 text-gray-500 w-3/4">
-                                {book.description}
-                            </p>
+                            <div className="mt-8 dark:text-gray-300 text-gray-500 w-3/4" dangerouslySetInnerHTML={{
+                                __html: showFullDescription ? book.description : truncatedDescription,
+                            }}>
+                            </div>
+                            {book.description.length > 542 && (
+                                <button className="text-blue-300" onClick={toggleDescription}>
+                                    {showFullDescription ? 'Ẩn bớt' : 'Xem thêm'}
+                                </button>
+                            )}
                             {/* Reviews Section */}
                             <div className="mt-8 w-3/4">
                                 <h2 className="text-2xl text-black dark:text-white font-bold mb-4">

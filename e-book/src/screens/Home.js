@@ -9,10 +9,10 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io';
 import '../Home.css';
-import { GOOGLE_API_KEY } from '../config/config';
 import SkeletonBook from '../components/SkeletonBook';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BookSearch from '../components/BookSearch';
+import { url } from '../config/config';
 
 const NextArrow = (props) => {
     const { className, style, onClick } = props;
@@ -57,16 +57,17 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [loadingSearch,setLoadingSearch] = useState(true)
     const [bookSearchs, setBookSearchs] = useState([]);
-     const [searchTerm, setSearchTerm] = useState('');
+     const [searchTerm, setSearchTerm] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     useEffect(() => {
         axios
             .get(
-                `https://gutendex.com/books/?page=2&page_size=10&topic=Science`
+                url +`/book`
             )
             .then((res) => {
-                setBooks(res.data.results);
+                console.log(res.data);
+                 setBooks(res.data);
                 setLoading(false);
             })
             .catch((err) => console.log(err));
@@ -76,9 +77,9 @@ export default function Home() {
          setSearchTerm(searchTerm)
         console.log(searchTerm)
         axios
-            .get(`https://gutendex.com/books/?search=${searchTerm}`)
+            .get(url+`/book/search?search=${searchTerm}`)
             .then((response) => {
-                setBookSearchs(response.data.results);
+                setBookSearchs(response.data);
                 setLoadingSearch(false);
                
                 console.log(response.data.results)
@@ -101,7 +102,7 @@ export default function Home() {
                     <BookSearch books={bookSearchs} searchTerm={searchTerm} loadingSearch={loadingSearch} setLoadingSearch={setLoadingSearch} />
                 ) : (
                     <>
-                        <Slider {...setting} className="px-20 mt-8">
+                        {/* <Slider {...setting} className="px-20 mt-8">
                             {loading
                                 ? Array.from({ length: 5 }).map((_, index) => (
                                       <SkeletonBook
@@ -116,7 +117,7 @@ export default function Home() {
                                           key={book.id}
                                       />
                                   ))}
-                        </Slider>
+                        </Slider> */}
                         <div className="recommend px-8 mt-8">
                             <div className="title text-black dark:text-white font-semibold text-4xl px-8">
                                 Đề xuất cho bạn
@@ -138,8 +139,31 @@ export default function Home() {
                                       ))}
                             </Slider>
                         </div>
+                        <div className="recommend px-8 mt-8">
+                            <div className="title text-black dark:text-white font-semibold text-4xl px-8">
+                                Sách mới
+                            </div>
+                            <Slider {...setting} className="px-28">
+                                {loading
+                                    ? Array.from({ length: 5 }).map((_, index) => (
+                                          <SkeletonBook
+                                              key={index}
+                                              className="flex-shrink-0 w-1/5"
+                                          />
+                                      ))
+                                    : books.map((book) => (
+                                          <Book
+                                              className="flex-shrink-0 w-1/5"
+                                              book={book}
+                                              key={book.id}
+                                          />
+                                      ))}
+                            </Slider>
+                        </div>
+     
                     </>
                 )}
+                <Footer /> 
             </div>
         </div>
     );

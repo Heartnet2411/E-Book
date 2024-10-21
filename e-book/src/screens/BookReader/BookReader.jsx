@@ -9,15 +9,18 @@ import { Rendition, Contents } from 'epubjs';
 import { useCallback } from 'react';
 import { useMemo } from 'react';
 import ControlModal from '../../components/BookHeader/ControlModal';
-import { useLocation } from 'react-router-dom';
+import { useLocation,useParams } from 'react-router-dom';
+import { url } from '../../config/config';
+
 
 const BookReader = () => {
     const [location, setLocation] = useLocalStorageState('persist-location', {
         defaultValue: 0,
     });
+    const {id} = useParams();
+    const [book, setBook] = useState(null);
+    const [loading, setLoading] = useState(true);
     const locationState = useLocation();
-    const { book, url } = locationState.state || {};
-    // console.log(book,url)
     const [page, setPage] = useState('');
     const [size, setSize] = useState(100);
     const [selectedFont, setSelectedFont] = useState(`Arial`);
@@ -53,6 +56,24 @@ const BookReader = () => {
             document.exitFullscreen();
         }
     };
+    useEffect(() => {
+        if (!book) {
+            fetchBook(id);
+        }
+    }, [id]);
+    const fetchBook = async (id) => {
+        try {
+            const response = await axios.get(
+                url+`/book/${id}`
+            );
+            console.log(response.data);
+            setBook(response.data);
+            setLoading(false);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+                
     const handleSettingsClick = () => {
         setIsSettingModalOpen(true);
     };
@@ -287,13 +308,13 @@ const BookReader = () => {
                 onSettings={handleSettingsClick}
                 onFullScreen={toggleFullScreen}
                 onControl={handleControlClick}
-                title={book.title}
+                title={book?.bookName}
             />
             <div className="flex-grow">
                 <ReactReader
                     className="h-full"
                     ref={reactReaderRef}
-                    url={url}
+                    url={book?.epubUrl}
                     location={location}
                     tocChanged={(_toc) => (toc.current = _toc)}
                     locationChanged={locationChanged}

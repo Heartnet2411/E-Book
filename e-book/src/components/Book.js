@@ -18,12 +18,12 @@ const ImageWithFallback = ({ src, alt, fallbackSrc }) => {
 
 export default function Book({ book }) {
     const navigate = useNavigate();
-    const { title,formats } = book;
-    const thumbnail = formats["image/jpeg"];
+    // const { title,formats } = book;
+    // const thumbnail = formats["image/jpeg"];
     const handleClick = () => {
         console.log(book);
         if(book){
-        navigate(`/book/${book.id}`, { state: { book } });
+        navigate(`/book/${book.bookId}`);
         }
     };
 
@@ -33,11 +33,11 @@ export default function Book({ book }) {
             onClick={handleClick}
         >
             <ImageWithFallback
-                src={thumbnail} // Link hình ảnh bị lỗi
+                src={book.imageUrl} // Link hình ảnh bị lỗi
                 alt="Example"
                 fallbackSrc={BookImage} // Hình ảnh mặc định
             />
-            <h3 className="text-ellipsis text-black dark:text-white text-lg max-h-14 leading-6">{title}</h3>
+            <h3 className="text-ellipsis text-black dark:text-white text-lg max-h-14 leading-6">{book.bookName}</h3>
         </div>
     );
 }
