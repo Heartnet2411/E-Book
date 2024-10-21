@@ -9,6 +9,8 @@
     "axios": "^1.7.7",
     "classnames": "^2.5.1",
     "dotenv": "^16.4.5",
+    "draft-js": "^0.11.7",
+    "draft-js-export-html": "^1.4.1",
     "e-book": "file:",
     "epubjs": "^0.3.93",
     "firebase": "^10.13.2",
@@ -25,7 +27,6 @@
     "react-swipeable": "^7.0.1",
     "react-switch": "^7.0.0",
     "slick-carousel": "^1.8.1",
-    "styled-components": "^6.1.13",
     "styled-components-breakpoint": "^3.0.0-preview.20",
     "use-local-storage-state": "^19.4.0",
     "web-vitals": "^2.1.4"

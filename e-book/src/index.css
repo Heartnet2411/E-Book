@@ -48,3 +48,22 @@ html {
   background: #555;
   /* Màu khi hover */
 }
+
+
+
+/* Đảm bảo rằng không có viền hoặc bất kỳ loại outline nào làm mất thẩm mỹ */
+.editor-container {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  min-height: 200px;
+}
+
+/* Đây là phần chính của nội dung Editor, nơi văn bản được nhập */
+.public-DraftEditor-content {
+  max-height: 150px;
+  background-color: #ffffff;
+  border: none;
+  outline: none;
+  overflow: scroll;
+}

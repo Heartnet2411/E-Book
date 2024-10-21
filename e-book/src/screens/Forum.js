@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Post from '../components/Post';
+import CreatePostModal from '../components/CreatePostModal';
 import { AiFillHome } from 'react-icons/ai';
 import { BsChatFill } from 'react-icons/bs';
 import { FaBookmark, FaPlus } from 'react-icons/fa6';
@@ -14,8 +15,8 @@ function Forum() {
     const [posts, setPosts] = useState([]);
     const [totalTopic, setTotalTopic] = useState(0);
     const [selectedTopic, setSelectedTopic] = useState(-1);
-
     const [isTopicOpen, setisTopicOpen] = useState(true);
+    const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
 
     const toggleCurrentCourses = () => {
         setisTopicOpen(!isTopicOpen);
@@ -27,6 +28,7 @@ function Forum() {
             if (response.ok) {
                 const data = await response.json();
                 setTopics(data);
+                console.log('aaa', data);
                 const totalTopics = data.length;
                 setTotalTopic(totalTopics);
             } else {
@@ -152,6 +154,7 @@ function Forum() {
             <Header user={user} />
 
             <div className="grid grid-cols-10 px-16">
+                {/* Left page */}
                 <div className="col-span-3 p-4 flex flex-col items-center mt-8">
                     <div className="w-4/6">
                         <button
@@ -270,8 +273,12 @@ function Forum() {
                     </div>
                 </div>
 
+                {/* Right page */}
                 <div className="col-span-7 p-4 pr-16 h-auto">
-                    <div className="bg-white dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-xl flex justify-between p-2 pl-6 items-center rounded-lg mt-8">
+                    <div
+                        onClick={() => setIsCreatePostOpen(true)}
+                        className="bg-white cursor-pointer hover:bg-gray-100 dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-xl flex justify-between p-2 pl-6 items-center rounded-lg mt-8"
+                    >
                         <span className="font-medium text-base dark:text-white">
                             Thêm bài viết
                         </span>
@@ -294,6 +301,12 @@ function Forum() {
             </div>
 
             <Footer />
+
+            <CreatePostModal
+                isOpen={isCreatePostOpen}
+                onClose={() => setIsCreatePostOpen(false)}
+                topics={topics}
+            />
         </div>
     );
 }

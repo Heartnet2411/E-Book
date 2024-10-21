@@ -57,9 +57,9 @@ export default function Home() {
 
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [loadingSearch,setLoadingSearch] = useState(true)
+    const [loadingSearch, setLoadingSearch] = useState(true);
     const [bookSearchs, setBookSearchs] = useState([]);
-     const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
     useEffect(() => {
@@ -75,15 +75,15 @@ export default function Home() {
     }, []);
     const handleSearch = (searchTerm) => {
         setLoadingSearch(true);
-         setSearchTerm(searchTerm)
-        console.log(searchTerm)
+        setSearchTerm(searchTerm);
+        console.log(searchTerm);
         axios
             .get(`https://gutendex.com/books/?search=${searchTerm}`)
             .then((response) => {
                 setBookSearchs(response.data.results);
                 setLoadingSearch(false);
-               
-                console.log(response.data.results)
+
+                console.log(response.data.results);
             })
             .catch((error) => {
                 console.error('Error searching books:', error);
@@ -97,54 +97,31 @@ export default function Home() {
             className="bg-gradient-to-b from-slate-50 via-slate-100 to-white 
              dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black"
         >
-            <Header user={user} />
+            <Header user={user} onClickSearch={handleSearch} />
             <div className="popular px-8 mt-16 ">
-                <div className="title text-black dark:text-white font-semibold text-6xl px-8 text-center">
-                    Đọc nhiều trong tuần
-                </div>
-                <Slider {...setting} className="px-20 mt-8">
-                    {books.map((book) => (
-                        <Book
-                            className="flex-shrink-0 w-1/5"
-                            book={book}
-                            key={book.id}
+                <div>
+                    {searchTerm ? (
+                        <BookSearch
+                            books={bookSearchs}
+                            searchTerm={searchTerm}
+                            loadingSearch={loadingSearch}
+                            setLoadingSearch={setLoadingSearch}
                         />
-                    ))}
-                </Slider>
-            <Header onClickSearch={handleSearch} />
-            <div>
-                { searchTerm ?(
-                    <BookSearch books={bookSearchs} searchTerm={searchTerm} loadingSearch={loadingSearch} setLoadingSearch={setLoadingSearch} />
-                ) : (
-                    <>
-                        <Slider {...setting} className="px-20 mt-8">
-                            {loading
-                                ? Array.from({ length: 5 }).map((_, index) => (
-                                      <SkeletonBook
-                                          key={index}
-                                          className="flex-shrink-0 w-1/5"
-                                      />
-                                  ))
-                                : books.map((book) => (
-                                      <Book
-                                          className="flex-shrink-0 w-1/5"
-                                          book={book}
-                                          key={book.id}
-                                      />
-                                  ))}
-                        </Slider>
-                        <div className="recommend px-8 mt-8">
-                            <div className="title text-black dark:text-white font-semibold text-4xl px-8">
-                                Đề xuất cho bạn
+                    ) : (
+                        <>
+                            <div className="title text-black dark:text-white font-semibold text-6xl px-8 text-left ">
+                                Đọc nhiều trong tuần
                             </div>
-                            <Slider {...setting} className="px-28">
+                            <Slider {...setting} className="px-20 mt-8">
                                 {loading
-                                    ? Array.from({ length: 5 }).map((_, index) => (
-                                          <SkeletonBook
-                                              key={index}
-                                              className="flex-shrink-0 w-1/5"
-                                          />
-                                      ))
+                                    ? Array.from({ length: 5 }).map(
+                                          (_, index) => (
+                                              <SkeletonBook
+                                                  key={index}
+                                                  className="flex-shrink-0 w-1/5"
+                                              />
+                                          )
+                                      )
                                     : books.map((book) => (
                                           <Book
                                               className="flex-shrink-0 w-1/5"
@@ -153,11 +130,33 @@ export default function Home() {
                                           />
                                       ))}
                             </Slider>
-                        </div>
-                    </>
-                )}
+                            <div className="recommend px-8 mt-8">
+                                <div className="title text-black dark:text-white font-semibold text-4xl px-8">
+                                    Đề xuất cho bạn
+                                </div>
+                                <Slider {...setting} className="px-28">
+                                    {loading
+                                        ? Array.from({ length: 5 }).map(
+                                              (_, index) => (
+                                                  <SkeletonBook
+                                                      key={index}
+                                                      className="flex-shrink-0 w-1/5"
+                                                  />
+                                              )
+                                          )
+                                        : books.map((book) => (
+                                              <Book
+                                                  className="flex-shrink-0 w-1/5"
+                                                  book={book}
+                                                  key={book.id}
+                                              />
+                                          ))}
+                                </Slider>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
-};
-
+}
