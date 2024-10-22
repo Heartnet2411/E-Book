@@ -35,7 +35,7 @@ function Discovery() {
         } else {
             // Nếu trang hiện tại nằm trong khoảng đầu
             if (currentPage <= 3) {
-                for (let i = 1; i <= 3; i++) {
+                for (let i = 1; i <= 4; i++) {
                     pages.push(i);
                 }
                 pages.push('...');
