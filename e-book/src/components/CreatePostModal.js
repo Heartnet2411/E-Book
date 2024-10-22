@@ -83,7 +83,7 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
     return (
         <div
             id="modal-overlay"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 max-w-screen-2xl"
             onMouseDown={handleOutsideClick} // Dùng onMouseDown thay vì onClick
         >
             <div
@@ -95,7 +95,7 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
                 </p>
 
                 <div className="mb-2">
-                    <label className="block text-gray-700 text-base font-bold mb-1">
+                    <label className="block text-gray-700 text-base font-bold mb-1 dark:text-gray-200">
                         Tiêu đề
                     </label>
                     <input
@@ -108,7 +108,7 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
                 </div>
 
                 <div className="mb-2">
-                    <label className="block text-gray-700 text-base font-bold mb-1">
+                    <label className="block text-gray-700 dark:text-gray-200 text-base font-bold mb-1">
                         Chủ đề bài viết
                     </label>
                     <select
@@ -127,7 +127,7 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
                     </select>
                 </div>
 
-                <label className="block text-gray-700 text-base font-bold mb-1">
+                <label className="block text-gray-700 text-base font-bold mb-1 dark:text-gray-200">
                     Thêm nội dung
                 </label>
 
@@ -209,7 +209,7 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
                     </div>
 
                     {/* Trình soạn thảo Draft.js */}
-                    <div className="border border-gray-300 rounded-lg px-4 py-1 bg-white dark:bg-gray-800 dark:text-white">
+                    <div className="border border-gray-300 rounded-lg px-4 py-1 bg-white">
                         <Editor
                             editorState={editorState}
                             handleKeyCommand={RichUtils.handleKeyCommand}
@@ -222,19 +222,19 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
                 {/* Input tải lên hình ảnh */}
                 <div className="">
                     <div className="image-upload mb-2">
-                        <label className="block text-gray-700 text-base font-bold mb-2">
+                        <label className="block text-gray-700 text-base font-bold mb-2 dark:text-gray-200">
                             Tải lên hình ảnh
                         </label>
                         <input
                             type="file"
                             accept="image/*"
                             onChange={handleImageUpload}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg dark:text-white"
                         />
                     </div>
                     {/* Hiển thị hình ảnh nếu có */}
                     {imageUrl && (
-                        <div className="image-preview mb-4 max-h-32  overflow-scroll flex px-4">
+                        <div className="image-preview mb-4 max-h-32  overflow-scroll flex px-4 ">
                             <div className="flex-1  ">
                                 <img
                                     src={imageUrl}

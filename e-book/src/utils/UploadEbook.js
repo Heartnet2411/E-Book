@@ -9,9 +9,7 @@ const UploadEpub = () => {
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
     };
-    const handleImageChange = (e) => {
-        setImageFile(e.target.files[0]);
-    };
+    const handleImageChange = (e) => {};
     const handleUploadEpub = () => {
         if (!file) return;
 
@@ -33,7 +31,7 @@ const UploadEpub = () => {
     return (
         <div>
             <input type="file" onChange={handleFileChange} />
-            <button onClick={handleUpload}>Upload EPUB</button>
+            <button>Upload EPUB</button>
             {fileUrl && (
                 <p>
                     File URL:{' '}

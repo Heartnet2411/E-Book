@@ -153,7 +153,7 @@ function Forum() {
         >
             <Header user={user} />
 
-            <div className="grid grid-cols-10 px-16">
+            <div className="grid grid-cols-10 px-16 max-w-screen-2xl mx-auto">
                 {/* Left page */}
                 <div className="col-span-3 p-4 flex flex-col items-center mt-8">
                     <div className="w-4/6">

@@ -31,7 +31,7 @@ function MyAccount() {
              dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black min-h-screen"
         >
             <Header user={user} />
-            <div className="px-16">
+            <div className="px-16 max-w-screen-2xl">
                 <div className="mx-auto ">
                     <div className="flex justify-center relative">
                         <img

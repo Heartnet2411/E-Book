@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { IoSearch } from 'react-icons/io5';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import { CgMenu } from 'react-icons/cg';
 import { IoLogOutOutline } from 'react-icons/io5';
 
-const Header = ({ user, onClickSearch }) => {
+const Header = ({ user }) => {
     const navigate = useNavigate();
     const [currentUser, setCurrentUser] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,37 +41,11 @@ const Header = ({ user, onClickSearch }) => {
         // Điều hướng về trang đăng nhập hoặc trang chủ
         navigate('/login');
     };
-    const [showSearch, setShowSearch] = useState(false);
-    const searchRef = useRef(null);
+
     useEffect(() => {
         setCurrentUser(user);
         console.log(user);
     }, [user]);
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                searchRef.current &&
-                !searchRef.current.contains(event.target)
-            ) {
-                setShowSearch(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [searchRef]);
-
-    const handleSearchClick = () => {
-        setShowSearch(true);
-    };
-    const handleKeyPress = (event) => {
-        if (event.key === 'Enter') {
-            onClickSearch(event.target.value);
-            // setShowSearch(false);
-        }
-    };
 
     return (
         <div
@@ -90,26 +63,34 @@ const Header = ({ user, onClickSearch }) => {
                 <div>
                     <Link
                         to={'/'}
-                        className="text-black hover:text-gray-500 dark:text-white dark:hover:text-gray-400 text-xl font-medium"
+                        className={`text-black h-16  text-xl font-medium ${
+                            location.pathname === '/'
+                                ? ' text-blue-600 hover:text-blue-800 dark:text-blue-600 dark:hover:text-blue-800'
+                                : 'hover:text-gray-500 dark:text-white dark:hover:text-gray-400'
+                        }`}
                     >
-                        Sách điện tử
+                        Trang chủ
                     </Link>
                 </div>
                 <div>
                     <Link
-                        to={'/'}
-                        className="text-black hover:text-gray-500 dark:text-white dark:hover:text-gray-400 text-xl font-medium"
+                        to={'/discovery'}
+                        className={`text-black h-16  text-xl font-medium ${
+                            location.pathname === '/discovery'
+                                ? ' text-blue-600 hover:text-blue-800 dark:text-blue-600 dark:hover:text-blue-800'
+                                : 'hover:text-gray-500 dark:text-white dark:hover:text-gray-400'
+                        }`}
                     >
-                        Sách nói
+                        Khám phá
                     </Link>
                 </div>
                 <div>
                     <Link
                         to={'/forum'}
-                        className={`text-black h-16 hover:text-gray-500 dark:text-white dark:hover:text-gray-400 text-xl font-medium ${
+                        className={`text-black h-16  text-xl font-medium ${
                             location.pathname === '/forum'
-                                ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-600'
-                                : ''
+                                ? ' text-blue-600 hover:text-blue-800 dark:text-blue-600 dark:hover:text-blue-800'
+                                : 'hover:text-gray-500 dark:text-white dark:hover:text-gray-400'
                         }`}
                     >
                         Diễn đàn
@@ -125,23 +106,7 @@ const Header = ({ user, onClickSearch }) => {
                 </div>
             </div>
             <div className="flex items-center">
-                <IoSearch
-                    size={30}
-                    onClick={handleSearchClick}
-                    className="text-black dark:text-white cursor-pointer "
-                />
                 <div className="flex">
-                    {showSearch && (
-                        <div ref={searchRef}>
-                            <input
-                                type="text"
-                                placeholder="Nhập từ khóa tìm kiếm"
-                                onKeyPress={handleKeyPress}
-                                className="mr-2 rounded-lg text-black h-8"
-                            />
-                        </div>
-                    )}
-
                     <ThemeToggle />
                     {currentUser ? (
                         <div
@@ -153,7 +118,10 @@ const Header = ({ user, onClickSearch }) => {
                                 className="w-11 h-11 rounded-full object-cover"
                                 alt="user avt"
                             />
-                            <button className="px-2 py-1 bg-gray-200 dark:bg-gray-600 ml-2 rounded-lg">
+                            <span className="ml-3 text-lg font-semibold">
+                                {user.firstName + ' ' + user.lastName}
+                            </span>
+                            <button className="px-2 py-1 bg-gray-200 dark:bg-gray-600 ml-3 rounded-lg">
                                 <CgMenu
                                     size={30}
                                     className="text-black dark:text-white"

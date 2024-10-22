@@ -4,13 +4,14 @@ import { FaBookOpen, FaHeart, FaShareAlt } from 'react-icons/fa';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { getLanguageName } from '../locales/vi/vi.js';
 import BookImage from '../assets/book.jpg';
-import { storage } from '../utils/firebase.js'
+import { storage } from '../utils/firebase.js';
 import { useState, useEffect } from 'react';
 
 import axios from 'axios';
 import { url } from '../config/config.js';
 
 export default function BookDetails() {
+    const user = JSON.parse(localStorage.getItem('user'));
     const location = useLocation();
     const navigate = useNavigate();
     const { id } = useParams();
@@ -25,9 +26,7 @@ export default function BookDetails() {
     }, [id]);
     const fetchBook = async (id) => {
         try {
-            const response = await axios.get(
-                url + `/book/${id}`
-            );
+            const response = await axios.get(url + `/book/${id}`);
             console.log(response.data);
             setBook(response.data);
             setLoading(false);
@@ -59,74 +58,68 @@ export default function BookDetails() {
         book && (
             <div
                 className="book-details from-slate-50 via-slate-100 to-white 
-             dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black"
+             dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black "
             >
-                <Header />
-                <div className="container mx-auto p-8">
-                    <div className="flex gap-8">
+                <Header user={user} />
+                <div className="container mx-auto p-8 max-w-screen-2xl">
+                    <div className="flex gap-8  ">
                         {/* Book Image */}
-                        <div className="w-1/3 flex justify-end pr-8 relative">
+                        <div className="w-1/3 flex justify-end pr-8 relative ">
                             <img
-                                src={
-                                    book.imageUrl
-                                        ? book.imageUrl
-                                        : BookImage
-                                }
+                                src={book.imageUrl ? book.imageUrl : BookImage}
                                 alt="Book Cover"
                                 className=" w-60 h-96 rounded-lg shadow-lg sticky top-8"
                             />
                         </div>
 
                         {/* Book Information */}
-                        <div className="w-2/3">
-                            <h1 className="text-4xl text-black dark:text-white font-bold mb-4">
+                        <div className="w-2/3 ">
+                            <h1 className="text-4xl text-black dark:text-white font-bold mb-4 mr-32 ">
                                 {book.bookName}
                             </h1>
                             <div className="text-lg dark:text-gray-300 text-gray-500 mb-4">
                                 <p>
                                     Tác giả:{' '}
-                                    {book.author
-                                        ? (
-                                            <span
-                                                className="text-black dark:text-white cursor-pointer"
-                                                onClick={() =>
-                                                    handleAuthorClick(
-                                                        book.author
-                                                    )
-                                                }
-                                            >
-                                                {book.author}
-                                            </span>
-                                        )
-                                        : (
-                                            <span className="text-black dark:text-white">
-                                                Không rõ
-                                            </span>
-                                        )}
+                                    {book.author ? (
+                                        <span
+                                            className="text-black dark:text-white cursor-pointer"
+                                            onClick={() =>
+                                                handleAuthorClick(book.author)
+                                            }
+                                        >
+                                            {book.author}
+                                        </span>
+                                    ) : (
+                                        <span className="text-black dark:text-white">
+                                            Không rõ
+                                        </span>
+                                    )}
                                 </p>
                                 <p>
                                     Thể loại:{' '}
                                     {book.categories &&
-                                        book.categories.map((category, index) => (
-                                            <span
-                                                key={index}
-                                                className="text-black dark:text-white cursor-pointer"
-                                                onClick={() =>
-                                                    handleClickCategories(
-                                                        category
-                                                    )
-                                                }
-                                            >
-                                                {category.name}
-                                                {index <
+                                        book.categories.map(
+                                            (category, index) => (
+                                                <span
+                                                    key={index}
+                                                    className="text-black dark:text-white cursor-pointer"
+                                                    onClick={() =>
+                                                        handleClickCategories(
+                                                            category
+                                                        )
+                                                    }
+                                                >
+                                                    {category.name}
+                                                    {index <
                                                     book.categories.length - 1
-                                                    ? ', '
-                                                    : ''}
-                                            </span>
-                                        ))}
+                                                        ? ', '
+                                                        : ''}
+                                                </span>
+                                            )
+                                        )}
                                 </p>
                                 <p>
-                                    Ngôn ngữ:{' '}
+                                    Quốc gia:{' '}
                                     <span className="text-black dark:text-white">
                                         {book.country}
                                     </span>
@@ -160,13 +153,22 @@ export default function BookDetails() {
                                     <FaShareAlt />
                                 </button>
                             </div>
-                            <div className="mt-8 dark:text-gray-300 text-gray-500 w-3/4" dangerouslySetInnerHTML={{
-                                __html: showFullDescription ? book.description : truncatedDescription,
-                            }}>
-                            </div>
+                            <div
+                                className="mt-8 dark:text-gray-300 text-gray-500 w-3/4"
+                                dangerouslySetInnerHTML={{
+                                    __html: showFullDescription
+                                        ? book.description
+                                        : truncatedDescription,
+                                }}
+                            ></div>
                             {book.description.length > 542 && (
-                                <button className="text-blue-300" onClick={toggleDescription}>
-                                    {showFullDescription ? 'Ẩn bớt' : 'Xem thêm'}
+                                <button
+                                    className="text-blue-300"
+                                    onClick={toggleDescription}
+                                >
+                                    {showFullDescription
+                                        ? 'Ẩn bớt'
+                                        : 'Xem thêm'}
                                 </button>
                             )}
                             {/* Reviews Section */}
