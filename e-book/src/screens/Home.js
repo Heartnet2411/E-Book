@@ -43,6 +43,8 @@ const PrevArrow = (props) => {
     );
 };
 export default function Home() {
+    const user = JSON.parse(localStorage.getItem('user'));
+
     var setting = {
         // dots: true,
         infinite: true,
@@ -96,6 +98,20 @@ export default function Home() {
             className="bg-gradient-to-b from-slate-50 via-slate-100 to-white 
              dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black"
         >
+            <Header user={user} />
+            <div className="popular px-8 mt-16 ">
+                <div className="title text-black dark:text-white font-semibold text-6xl px-8 text-center">
+                    Đọc nhiều trong tuần
+                </div>
+                <Slider {...setting} className="px-20 mt-8">
+                    {books.map((book) => (
+                        <Book
+                            className="flex-shrink-0 w-1/5"
+                            book={book}
+                            key={book.id}
+                        />
+                    ))}
+                </Slider>
             <Header onClickSearch={handleSearch} />
             <div>
                 { searchTerm ?(

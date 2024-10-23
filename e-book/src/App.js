@@ -5,7 +5,10 @@ import './index.css';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import Home from './screens/Home';
+import Forum from './screens/Forum';
 import BookDetails from './components/BookDetails';
+import MyAccount from './screens/MyAccount';
+
 import BookReader from './screens/BookReader/BookReader';
 import UploadEpub from './utils/UploadEbook';
 function App() {
