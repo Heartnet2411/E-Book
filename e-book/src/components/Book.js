@@ -22,11 +22,10 @@ export default function Book({ book }) {
     // const thumbnail = formats["image/jpeg"];
     const handleClick = () => {
         console.log(book);
-        if(book){
-        navigate(`/book/${book.bookId}`);
+        if (book) {
+            navigate(`/book/${book.bookId}`);
         }
     };
-
     return (
         <div
             className="book flex flex-col items-center p-4 cursor-pointer"
@@ -37,7 +36,9 @@ export default function Book({ book }) {
                 alt="Example"
                 fallbackSrc={BookImage} // Hình ảnh mặc định
             />
-            <h3 className="text-ellipsis text-black dark:text-white text-lg max-h-14 leading-6">{book.bookName}</h3>
+            <h3 className="text-black dark:text-white text-lg max-w-52 line-clamp-3">
+                {book.bookName}
+            </h3>
         </div>
     );
 }
