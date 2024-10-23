@@ -5,7 +5,7 @@ import { MdFullscreen } from 'react-icons/md';
 import { RiHeadphoneFill } from 'react-icons/ri';
 import { useState } from 'react';
 import { BsThreeDotsVertical, BsBookmarkPlusFill } from 'react-icons/bs';
-const Navbar = ({ onBookmark, onSettings, onFullScreen, onControl,title,onSearch}) => {
+const Navbar = ({onShowBookmark, onBookmark, onSettings, onFullScreen, onControl,title,onSearch}) => {
      const [searchQuery, setSearchQuery] = useState('');
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
@@ -32,7 +32,7 @@ const Navbar = ({ onBookmark, onSettings, onFullScreen, onControl,title,onSearch
             <ul className="flex items-center space-x-6">
                 <li>
                     {/* <RiHeadphoneFill size={24} className="hover:cursor-pointer"/> */}
-                    <IoIosListBox size={24} className="hover:cursor-pointer" />
+                    <IoIosListBox size={24} className="hover:cursor-pointer"  onClick={onShowBookmark}/>
                 </li>
                 <li>
                     <BsBookmarkPlusFill

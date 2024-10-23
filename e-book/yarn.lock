@@ -4730,9 +4730,10 @@ duplexify@^4.0.0, duplexify@^4.1.3:
     axios "^1.7.7"
     classnames "^2.5.1"
     dotenv "^16.4.5"
-    e-book "file:C:/Users/MrVinh/AppData/Local/Yarn/Cache/v6/npm-e-book-0.1.0-7976dcc0-5fde-40c9-be4a-8893e54e6bfb-1728322365586/node_modules/e-book"
+    e-book "file:../../../../Library/Caches/Yarn/v6/npm-e-book-0.1.0-5d25c1a8-2555-4b60-b958-eb7d88088c30-1729521732092/node_modules/e-book"
     epubjs "^0.3.93"
     firebase "^10.13.2"
+    firebase-admin "^12.6.0"
     jw-epub-parser "^3.24.2"
     react "^18.3.1"
     react-dom "^18.3.1"
@@ -9261,7 +9262,7 @@ react-lottie@^1.2.4:
 
 react-reader@^2.0.11:
   version "2.0.11"
-  resolved "https://registry.npmjs.org/react-reader/-/react-reader-2.0.11.tgz"
+  resolved "https://registry.yarnpkg.com/react-reader/-/react-reader-2.0.11.tgz#f9c95e91a2b702d205a77b2a40e732a253d97284"
   integrity sha512-4PZoRc0x9d4OzE1C8XRvgAbAH8KFBxid982XMVD1RgVhN6IGtQ8F8w0GX56UuV63vQgaYoHLFR6Qmj2wcoy4Fw==
   dependencies:
     epubjs "^0.3.93"
