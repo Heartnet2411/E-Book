@@ -4,6 +4,7 @@ import { FaRegHeart, FaRegComment, FaBookmark } from 'react-icons/fa';
 import { PiWarningOctagonBold } from 'react-icons/pi';
 
 function Post({ post }) {
+    console.log('posst', post);
     const [savedPost, setSavedPost] = useState([]);
     const user = JSON.parse(localStorage.getItem('user'));
 
@@ -114,12 +115,12 @@ function Post({ post }) {
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center">
                         <img
-                            src={post.userAvatar}
+                            src={post.user.avatar}
                             alt="Avatar"
                             className="w-12 h-12 rounded-full object-cover mr-4"
                         />
                         <span className="text-lg font-semibold dark:text-white">
-                            {post.userName}
+                            {post.user.firstname + ' ' + post.user.lastname}
                         </span>
                     </div>
                     <div className="flex items-center">

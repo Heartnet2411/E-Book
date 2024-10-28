@@ -10,6 +10,8 @@ import {
     FaListOl,
     FaQuoteRight,
 } from 'react-icons/fa';
+import axios from 'axios';
+import { url } from '../config/config';
 
 const CreatePostModal = ({ isOpen, onClose, topics }) => {
     const [editorState, setEditorState] = useState(() =>
@@ -19,6 +21,8 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
     const [selectedTopicId, setSelectedTopicId] = useState('');
     console.log(selectedTopicId);
     const [imageUrl, setImageUrl] = useState('');
+    const [imageFile, setImageFile] = useState('');
+    const token = localStorage.getItem('token');
 
     const handleEditorChange = (newState) => {
         setEditorState(newState);
@@ -27,9 +31,15 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Vui lòng chọn một file hình ảnh.');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImageUrl(reader.result); // Lưu trữ URL của ảnh sau khi đọc file
+                setImageUrl(reader.result); // Lưu trữ URL của ảnh tạm thời
+                setImageFile(file); // Lưu file ảnh để gửi lên server
             };
             reader.readAsDataURL(file); // Đọc file ảnh
         }
@@ -51,18 +61,33 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
         setEditorState(RichUtils.toggleBlockType(editorState, blockType));
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const contentState = editorState.getCurrentContent();
         const htmlContent = stateToHTML(contentState);
 
         // Log tất cả dữ liệu đã nhập
-        console.log('Tiêu đề:', title);
-        console.log('Chủ đề đã chọn (ID):', selectedTopicId);
-        console.log('Nội dung HTML:', htmlContent);
-        console.log('URL Hình ảnh:', imageUrl);
 
-        // Bạn có thể gửi các thông tin này đến backend nếu cần
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('content', htmlContent);
+        formData.append('topicId', selectedTopicId);
+        if (imageFile) {
+            formData.append('image', imageFile); // Thêm file ảnh vào FormData
+        }
+
+        try {
+            const response = await axios.post(url + '/post', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data', // Thiết lập Content-Type cho FormData
+                },
+            });
+
+            console.log('Bài viết đã được tạo thành công:', response.data);
+        } catch (error) {
+            console.error('Có lỗi xảy ra khi tạo bài viết:', error.message);
+        }
     };
 
     const myBlockStyleFn = (block) => {
@@ -257,14 +282,14 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
                 <div className="flex justify-end">
                     <button
                         type="button"
-                        className="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2"
+                        className="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2 hover:bg-gray-400"
                         onClick={onClose}
                     >
                         Đóng
                     </button>
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                         onClick={handleSubmit}
                     >
                         Đăng bài viết
