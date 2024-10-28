@@ -23,10 +23,72 @@
     opacity: 1;
 }
 
-.custom-blockquote {
+blockquote {
     margin: 10px 20px;
     padding-left: 10px;
     border-left: 3px solid #ccc;
     color: #666;
     font-style: italic;
+}
+
+/* Định dạng chung cho cả ul và ol */
+ul,
+ol {
+    margin: 0;
+    padding: 0;
+    list-style-position: inside;
+    /* Đặt bullet hoặc số thứ tự bên trong */
+    margin-bottom: 1rem;
+    /* Thêm khoảng cách bên dưới */
+}
+
+/* Style cho ul (unordered list) */
+ul {
+    padding-left: 20px;
+    /* Thêm khoảng cách lề trái */
+    list-style-type: disc;
+    /* Sử dụng bullet kiểu "disc" */
+}
+
+ul li {
+    padding: 5px 0;
+    /* Thêm khoảng cách giữa các mục */
+    line-height: 1.5;
+    /* Đặt chiều cao dòng */
+}
+
+/* Style cho ol (ordered list) */
+ol {
+    padding-left: 20px;
+    /* Thêm khoảng cách lề trái */
+    list-style-type: decimal;
+    /* Hiển thị số */
+}
+
+ol li {
+    padding: 5px 0;
+    /* Thêm khoảng cách giữa các mục */
+    line-height: 1.5;
+    /* Đặt chiều cao dòng */
+}
+
+/* Các kiểu danh sách khác */
+ul.square {
+    list-style-type: square;
+    /* Bullet hình vuông */
+}
+
+ul.circle {
+    list-style-type: circle;
+    /* Bullet hình tròn rỗng */
+}
+
+ol.upper-roman {
+    list-style-type: upper-roman;
+    /* Số la mã in hoa */
+}
+
+ol.lower-alpha {
+    list-style-type: lower-alpha;
+    /* Chữ cái thường (a, b, c) */
 }

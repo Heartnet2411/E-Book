@@ -7,6 +7,9 @@ import { AiFillHome } from 'react-icons/ai';
 import { BsChatFill } from 'react-icons/bs';
 import { FaBookmark, FaPlus } from 'react-icons/fa6';
 import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
+import Lottie from 'react-lottie';
+import loadingAnimation from '../lotties/loading.json';
+import nothing from '../lotties/nothing.json';
 
 function Forum() {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -17,6 +20,7 @@ function Forum() {
     const [selectedTopic, setSelectedTopic] = useState(-1);
     const [isTopicOpen, setisTopicOpen] = useState(true);
     const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const toggleCurrentCourses = () => {
         setisTopicOpen(!isTopicOpen);
@@ -46,7 +50,7 @@ function Forum() {
                 const data = await response.json();
                 // Gắn dữ liệu lấy được vào state
                 setPosts(data);
-                console.log(data);
+                setLoading(false);
             } else {
                 console.error('Failed to fetch posts');
             }
@@ -63,7 +67,7 @@ function Forum() {
             if (response.ok) {
                 const data = await response.json();
                 setPosts(data);
-                return data;
+                setLoading(false);
             } else {
                 console.error('Failed to fetch the post');
             }
@@ -80,6 +84,7 @@ function Forum() {
             if (response.ok) {
                 const data = await response.json();
                 setPosts(data);
+                setLoading(false);
             } else {
                 console.error('Failed to fetch posts by topic');
             }
@@ -105,6 +110,7 @@ function Forum() {
                 const data = await response.json();
                 const postMap = data.map((item) => item.post);
                 setPosts(postMap);
+                setLoading(false);
             } else {
                 console.error('Failed to fetch saved posts by user ID');
             }
@@ -119,31 +125,51 @@ function Forum() {
     }, []);
 
     const handleFindFavoritePost = () => {
+        setLoading(true);
         setSelected('saved');
         const token = localStorage.getItem('token');
         fetchSavedPostsByUserId(user.userId, token);
     };
 
     const handleSelectTopic = (index, topicId) => {
+        setLoading(true);
         setSelectedTopic(index);
         if (index === -1) {
             fetchPosts();
-            console.log('ok');
         } else {
             fetchPostsByTopicId(topicId);
-            console.log('no');
         }
     };
 
     const handleFindMyPost = () => {
+        setLoading(true);
         setSelected('posts');
         // Gọi hàm với id cụ thể
         fetchPostById(user.userId);
     };
 
     const handleFindAllPost = () => {
+        setLoading(true);
         setSelected('home');
         fetchPosts();
+    };
+
+    const nothingOptions = {
+        loop: true,
+        autoplay: true,
+        animationData: nothing,
+        rendererSettings: {
+            preserveAspectRatio: 'xMidYMid slice',
+        },
+    };
+
+    const loadingOption = {
+        loop: true,
+        autoplay: true,
+        animationData: loadingAnimation,
+        rendererSettings: {
+            preserveAspectRatio: 'xMidYMid slice',
+        },
     };
 
     return (
@@ -291,10 +317,27 @@ function Forum() {
                     </div>
 
                     <div className="mt-4">
-                        {posts ? (
+                        {loading ? (
+                            <div className="">
+                                <Lottie
+                                    options={loadingOption}
+                                    height="50%"
+                                    width="50%"
+                                />
+                            </div>
+                        ) : posts.length > 0 ? (
                             posts.map((post) => <Post post={post} />)
                         ) : (
-                            <span>Không có bài viết</span>
+                            <div>
+                                <Lottie
+                                    options={nothingOptions}
+                                    height="50%"
+                                    width="50%"
+                                />
+                                <p className="text-center text-lg">
+                                    Không có bài viết nào
+                                </p>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -306,6 +349,7 @@ function Forum() {
                 isOpen={isCreatePostOpen}
                 onClose={() => setIsCreatePostOpen(false)}
                 topics={topics}
+                post={fetchPosts}
             />
         </div>
     );

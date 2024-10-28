@@ -13,7 +13,7 @@ import {
 import axios from 'axios';
 import { url } from '../config/config';
 
-const CreatePostModal = ({ isOpen, onClose, topics }) => {
+const CreatePostModal = ({ isOpen, onClose, topics, post }) => {
     const [editorState, setEditorState] = useState(() =>
         EditorState.createEmpty()
     );
@@ -83,7 +83,8 @@ const CreatePostModal = ({ isOpen, onClose, topics }) => {
                     'Content-Type': 'multipart/form-data', // Thiết lập Content-Type cho FormData
                 },
             });
-
+            onClose();
+            post();
             console.log('Bài viết đã được tạo thành công:', response.data);
         } catch (error) {
             console.error('Có lỗi xảy ra khi tạo bài viết:', error.message);

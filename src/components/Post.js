@@ -117,7 +117,7 @@ function Post({ post }) {
                         <img
                             src={post.user.avatar}
                             alt="Avatar"
-                            className="w-12 h-12 rounded-full object-cover mr-4"
+                            className="w-11 h-11 rounded-full object-cover mr-4"
                         />
                         <span className="text-lg font-semibold dark:text-white">
                             {post.user.firstname + ' ' + post.user.lastname}
@@ -171,20 +171,22 @@ function Post({ post }) {
                         </div>
                     </div>
                 </div>
-                <div>
+                <div className="my-4">
                     <div
                         dangerouslySetInnerHTML={{
                             __html: post.content,
                         }}
                         className="dark:text-white"
                     />
-                    <img
-                        src={post.image}
-                        alt="user post"
-                        className="h-60 my-3"
-                    />
+                    {post.image !== null ? (
+                        <img
+                            src={post.image}
+                            alt="user post"
+                            className="h-60 my-3"
+                        />
+                    ) : null}
                 </div>
-                <div className="flex py-2">
+                <div className="flex pb-2">
                     <button className="flex font-semibold bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl cursor-pointer">
                         <FaRegHeart
                             size={24}

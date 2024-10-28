@@ -8,6 +8,9 @@ import { FaAngleLeft } from 'react-icons/fa';
 import { FaAngleRight } from 'react-icons/fa';
 import { FaAngleDoubleRight } from 'react-icons/fa';
 import { FaAngleDoubleLeft } from 'react-icons/fa';
+import Lottie from 'react-lottie';
+import loadingAnimation from '../lotties/loading.json';
+import nothing from '../lotties/nothing.json';
 
 function Discovery() {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -73,6 +76,24 @@ function Discovery() {
     useEffect(() => {
         fetchBooks(currentPage);
     }, [currentPage]);
+
+    const loadingOption = {
+        loop: true,
+        autoplay: true,
+        animationData: loadingAnimation,
+        rendererSettings: {
+            preserveAspectRatio: 'xMidYMid slice',
+        },
+    };
+
+    const nothingOption = {
+        loop: true,
+        autoplay: true,
+        animationData: nothing,
+        rendererSettings: {
+            preserveAspectRatio: 'xMidYMid slice',
+        },
+    };
 
     useEffect(() => {
         // Hàm để lấy danh sách thể loại từ API
@@ -246,9 +267,13 @@ function Discovery() {
                 <div ref={bookRef}>
                     {loading ? (
                         <div className="flex justify-center items-center min-h-screen dark:text-white font-medium text-3xl">
-                            <p>Đang tải...</p>
+                            <Lottie
+                                options={loadingOption}
+                                height="50%"
+                                width="50%"
+                            />
                         </div>
-                    ) : (
+                    ) : books.length > 0 ? (
                         rows.map((row, rowIndex) => (
                             <div
                                 key={rowIndex}
@@ -259,68 +284,81 @@ function Discovery() {
                                 ))}
                             </div>
                         ))
+                    ) : (
+                        <div>
+                            <Lottie
+                                options={nothingOption}
+                                height="30%"
+                                width="30%"
+                            />
+                            <p className="text-center text-lg">
+                                Không có sách nào
+                            </p>
+                        </div>
                     )}
                 </div>
 
                 {/* Pagination */}
-                <div className="flex justify-center mt-4">
-                    <button
-                        onClick={() => handlePageChange(1)}
-                        disabled={currentPage === 1}
-                        className="px-5 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-500"
-                    >
-                        <FaAngleDoubleLeft size={22} />
-                    </button>
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="px-5 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-500"
-                    >
-                        <FaAngleLeft size={22} />
-                    </button>
+                {books.length > 0 ? (
+                    <div className="flex justify-center mt-4">
+                        <button
+                            onClick={() => handlePageChange(1)}
+                            disabled={currentPage === 1}
+                            className="px-5 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-500"
+                        >
+                            <FaAngleDoubleLeft size={22} />
+                        </button>
+                        <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="px-5 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-500"
+                        >
+                            <FaAngleLeft size={22} />
+                        </button>
 
-                    {paginationPages.map((page, index) =>
-                        page === '...' ? (
-                            <span
-                                key={index}
-                                className="px-4 pt-4 mx-1 font-extrabold dark:text-white"
-                            >
-                                . . . .
-                            </span> // Hiển thị dấu "..."
-                        ) : (
-                            <button
-                                key={index}
-                                onClick={() =>
-                                    typeof page === 'number' &&
-                                    handlePageChange(page)
-                                }
-                                className={`px-4 py-2 mx-1 rounded-lg ${
-                                    page === currentPage
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-200 dark:bg-gray-700 dark:text-white'
-                                }`}
-                                disabled={page === '...'}
-                            >
-                                {page}
-                            </button>
-                        )
-                    )}
+                        {paginationPages.map((page, index) =>
+                            page === '...' ? (
+                                <span
+                                    key={index}
+                                    className="px-4 pt-4 mx-1 font-extrabold dark:text-white"
+                                >
+                                    . . . .
+                                </span> // Hiển thị dấu "..."
+                            ) : (
+                                <button
+                                    key={index}
+                                    onClick={() =>
+                                        typeof page === 'number' &&
+                                        handlePageChange(page)
+                                    }
+                                    className={`px-4 py-2 mx-1 rounded-lg ${
+                                        page === currentPage
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-200 dark:bg-gray-700 dark:text-white'
+                                    }`}
+                                    disabled={page === '...'}
+                                >
+                                    {page}
+                                </button>
+                            )
+                        )}
 
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="px-5 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-400"
-                    >
-                        <FaAngleRight size={22} />
-                    </button>
-                    <button
-                        onClick={() => handlePageChange(totalPages)}
-                        disabled={currentPage === totalPages}
-                        className="px-5 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-400"
-                    >
-                        <FaAngleDoubleRight size={22} />
-                    </button>
-                </div>
+                        <button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="px-5 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-400"
+                        >
+                            <FaAngleRight size={22} />
+                        </button>
+                        <button
+                            onClick={() => handlePageChange(totalPages)}
+                            disabled={currentPage === totalPages}
+                            className="px-5 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-400"
+                        >
+                            <FaAngleDoubleRight size={22} />
+                        </button>
+                    </div>
+                ) : null}
             </div>
             <Footer />
         </div>
