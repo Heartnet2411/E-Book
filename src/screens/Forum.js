@@ -96,7 +96,7 @@ function Forum() {
     const fetchSavedPostsByUserId = async (userId, token) => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/saved/users/${userId}`,
+                `http://localhost:8080/api/post/saved/${userId}`,
                 {
                     method: 'GET', // Phương thức GET
                     headers: {
