@@ -1,57 +1,31 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { FaRegBookmark } from 'react-icons/fa6';
-import { FaRegHeart, FaHeart, FaRegComment, FaBookmark } from 'react-icons/fa';
+import {
+    FaRegBookmark,
+    FaRegHeart,
+    FaHeart,
+    FaRegComment,
+} from 'react-icons/fa';
 import { PiWarningOctagonBold } from 'react-icons/pi';
 import { toast, Slide } from 'react-toastify';
-import ReportModal from './ReportModal';
-import PostModal from './PostModal';
 
-function Post({ post }) {
-    console.log('posst', post);
+function PostModal({ post, onClose }) {
     const [savedPost, setSavedPost] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [showReadMore, setShowReadMore] = useState(false);
     const contentRef = useRef(null);
-    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-    const [selectedReason, setSelectedReason] = useState(null); // State lưu lý do đã chọn
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleOpenModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
-
-    const openReportModal = () => {
-        setIsReportModalOpen(true);
-    };
-
-    const closeReportModal = () => {
-        setIsReportModalOpen(false);
-    };
-
-    const handleReasonSelect = (reason) => {
-        setSelectedReason(reason); // Lưu lý do đã chọn vào state của Post
-        console.log('Reason selected in Post component:', reason);
-        closeReportModal();
-    };
-
-    const maxHeight = 144; // Set desired max height in pixels (e.g., 160px for around max-h-40)
+    const maxHeight = 144;
 
     useEffect(() => {
         if (contentRef.current.scrollHeight > maxHeight) {
             setShowReadMore(true);
         }
-    }, []);
+    }, [post.content]);
 
     const toggleExpand = () => {
         setIsExpanded((prev) => !prev);
     };
-
-    const user = JSON.parse(localStorage.getItem('user'));
 
     function showToast(type, message) {
         const options = {
@@ -261,12 +235,25 @@ function Post({ post }) {
         removeFavoritePost(post.postId, token);
     };
 
+    const handleOutsideClick = (event) => {
+        if (event.target.id === 'modal-overlay') {
+            onClose(); // Đóng modal khi click ra ngoài modal
+        }
+    };
+
     return (
         <div
-            key={post.postId}
-            className=" bg-white dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-xl flex justify-between p-2 px-8 items-center rounded-lg mt-4 "
+            id="modal-overlay"
+            onMouseDown={handleOutsideClick}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
         >
-            <div className="w-full">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 w-11/12 md:w-3/4 lg:w-3/5 px-8 min-h-[90vh] overflow-scroll">
+                <button
+                    onClick={onClose}
+                    className="absolute top-2 right-2 text-gray-500"
+                >
+                    &times; {/* Icon đóng */}
+                </button>
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center">
                         <img
@@ -279,54 +266,29 @@ function Post({ post }) {
                         </span>
                     </div>
                     <div className="flex items-center">
-                        <div className="relative group">
-                            {savedPost ? (
-                                <div>
-                                    <button
-                                        onClick={() => handleRemoveSavePost()}
-                                        className="cursor-pointer"
-                                    >
-                                        <FaBookmark
-                                            size={22}
-                                            className="text-base rounded-md text-yellow-400"
-                                        />
-                                    </button>
-                                    <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 dark:bg-gray-200 dark:text-black text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        Bỏ lưu bài viết
-                                    </span>
-                                </div>
-                            ) : (
-                                <div>
-                                    <button
-                                        onClick={() => handleSavePost()}
-                                        className="cursor-pointer"
-                                    >
-                                        <FaRegBookmark
-                                            size={22}
-                                            className="text-base rounded-md text-black dark:text-white"
-                                        />
-                                    </button>
-                                    <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 dark:bg-gray-200 dark:text-black text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        Lưu bài viết
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                        <div className="relative group">
-                            {' '}
-                            <button
-                                onClick={openReportModal}
-                                className="cursor-pointer"
-                            >
-                                <PiWarningOctagonBold
-                                    size={26}
-                                    className="ml-4 text-base rounded-md text-red-500 "
+                        {/* Đã lưu / Chưa lưu */}
+                        {savedPost ? (
+                            <button onClick={handleRemoveSavePost}>
+                                <FaRegBookmark
+                                    size={22}
+                                    className="text-yellow-400"
                                 />
                             </button>
-                            <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 text-white dark:bg-gray-200 dark:text-black text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                Báo cáo bài viết
-                            </span>
-                        </div>
+                        ) : (
+                            <button onClick={handleSavePost}>
+                                <FaRegBookmark
+                                    size={22}
+                                    className="text-black dark:text-white"
+                                />
+                            </button>
+                        )}
+                        {/* Icon báo cáo */}
+                        <button className="ml-4">
+                            <PiWarningOctagonBold
+                                size={26}
+                                className="text-red-500"
+                            />
+                        </button>
                     </div>
                 </div>
                 <div className="my-4">
@@ -351,48 +313,41 @@ function Post({ post }) {
                             {isExpanded ? 'Thu gọn' : 'Xem thêm'}
                         </button>
                     )}
-                    {post.image !== null ? (
+                    {post.image && (
                         <img
                             src={post.image}
                             alt="user post"
                             className="h-60 my-3"
                         />
-                    ) : null}
+                    )}
                 </div>
                 <div className="flex pb-2">
                     {isFavorite ? (
                         <button
-                            onClick={() => handleRemoveFavoritePost()}
+                            onClick={handleRemoveFavoritePost}
                             className="flex font-semibold bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl cursor-pointer"
                         >
-                            <FaHeart
-                                size={24}
-                                className=" text-base rounded-md  text-red-500"
-                            />
+                            <FaHeart size={24} className="text-red-500" />
                             <span className="ml-2 dark:text-white">
                                 Bỏ Thích
                             </span>
                         </button>
                     ) : (
                         <button
-                            onClick={() => handleSaveFavoritePost()}
+                            onClick={handleSaveFavoritePost}
                             className="flex font-semibold bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl cursor-pointer"
                         >
                             <FaRegHeart
                                 size={24}
-                                className=" text-base rounded-md  text-black dark:text-white"
+                                className="text-black dark:text-white"
                             />
                             <span className="ml-2 dark:text-white">Thích</span>
                         </button>
                     )}
-
-                    <button
-                        onClick={handleOpenModal}
-                        className="flex font-semibold bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl ml-4 cursor-pointer"
-                    >
+                    <button className="flex font-semibold bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl ml-4 cursor-pointer">
                         <FaRegComment
                             size={24}
-                            className="ml-4 text-base rounded-md  text-black dark:text-white"
+                            className="text-black dark:text-white"
                         />
                         <span className="ml-2 dark:text-white">
                             Thêm bình luận
@@ -400,20 +355,8 @@ function Post({ post }) {
                     </button>
                 </div>
             </div>
-
-            {/* Hiển thị modal nếu isReportModalOpen là true */}
-            {isReportModalOpen && (
-                <ReportModal
-                    onClose={closeReportModal}
-                    onReasonSelect={handleReasonSelect} // Truyền hàm để nhận lý do đã chọn
-                />
-            )}
-
-            {isModalOpen && (
-                <PostModal post={post} onClose={handleCloseModal} />
-            )}
         </div>
     );
 }
 
-export default Post;
+export default PostModal;

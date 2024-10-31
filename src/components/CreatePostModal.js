@@ -12,6 +12,7 @@ import {
 } from 'react-icons/fa';
 import axios from 'axios';
 import { url } from '../config/config';
+import { toast, Slide } from 'react-toastify';
 
 const CreatePostModal = ({ isOpen, onClose, topics, post }) => {
     const [editorState, setEditorState] = useState(() =>
@@ -86,8 +87,30 @@ const CreatePostModal = ({ isOpen, onClose, topics, post }) => {
             onClose();
             post();
             console.log('Bài viết đã được tạo thành công:', response.data);
+            toast.success('Lưu sách thành công', {
+                position: 'top-right',
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+                transition: Slide,
+            });
         } catch (error) {
             console.error('Có lỗi xảy ra khi tạo bài viết:', error.message);
+            toast.error('Có lỗi xảy ra khi thêm bài viết', {
+                position: 'top-right',
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+                transition: Slide,
+            });
         }
     };
 

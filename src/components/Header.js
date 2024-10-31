@@ -49,8 +49,8 @@ const Header = ({ user }) => {
 
     return (
         <div
-            className="w-full h-16 flex items-center   justify-between px-20 shadow-lg bg-gradient-to-b from-slate-50 via-slate-100 to-white 
-             dark:bg-gradient-to-r dark:from-gray-900 dark:via-gray-800 dark:to-black "
+            className="w-full h-16 flex items-center   justify-between px-20 shadow-lg dark:shadow-gray-800 bg-gradient-to-b from-slate-50 via-slate-100 to-white 
+             dark:bg-gradient-to-r dark:from-gray-900 dark:via-slate-900 dark:to-black "
         >
             <Link to={'/#'}>
                 <img

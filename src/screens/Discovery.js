@@ -161,7 +161,7 @@ function Discovery() {
     return (
         <div
             className="bg-gradient-to-b from-slate-50 via-slate-100 to-white 
-             dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black "
+             dark:bg-gradient-to-b dark:from-gray-900 dark:via-slate-900 dark:to-black "
         >
             <Header user={user} />
             <div className="min-h-screen p-4 max-w-screen-2xl mx-auto">

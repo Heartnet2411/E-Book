@@ -14,8 +14,8 @@ import { storage } from '../utils/firebase.js';
 import Notification from '../components/Notification';
 import { useState, useEffect } from 'react';
 import Comment from './BookComment.js';
-import { toast, Bounce } from 'react-toastify';
-
+import { toast, Slide } from 'react-toastify';
+import ReportModal from './ReportModal.js';
 import axios from 'axios';
 import { url } from '../config/config.js';
 
@@ -40,6 +40,22 @@ export default function BookDetails() {
     const [otherCommentLimit, setOtherCommentLimit] = useState(5);
     const [isSaved, setIsSaved] = useState(false);
     const token = localStorage.getItem('token');
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [selectedReason, setSelectedReason] = useState(null); // State lưu lý do đã chọn
+
+    const openReportModal = () => {
+        setIsReportModalOpen(true);
+    };
+
+    const closeReportModal = () => {
+        setIsReportModalOpen(false);
+    };
+
+    const handleReasonSelect = (reason) => {
+        setSelectedReason(reason); // Lưu lý do đã chọn vào state của Post
+        console.log('Reason selected in Post component:', reason);
+        closeReportModal();
+    };
 
     useEffect(() => {
         if (!book) {
@@ -202,7 +218,7 @@ export default function BookDetails() {
                 draggable: true,
                 progress: undefined,
                 theme: 'light',
-                transition: Bounce,
+                transition: Slide,
             });
             setIsSaved(true);
         } catch (error) {
@@ -216,7 +232,7 @@ export default function BookDetails() {
                 draggable: true,
                 progress: undefined,
                 theme: 'light',
-                transition: Bounce,
+                transition: Slide,
             });
         }
     };
@@ -242,7 +258,7 @@ export default function BookDetails() {
                 draggable: true,
                 progress: undefined,
                 theme: 'light',
-                transition: Bounce,
+                transition: Slide,
             });
             setIsSaved(false);
         } catch (error) {
@@ -256,7 +272,7 @@ export default function BookDetails() {
                 draggable: true,
                 progress: undefined,
                 theme: 'light',
-                transition: Bounce,
+                transition: Slide,
             });
         }
     };
@@ -265,7 +281,7 @@ export default function BookDetails() {
         book && (
             <div
                 className="book-details from-slate-50 via-slate-100 to-white 
-             dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black "
+             dark:bg-gradient-to-b dark:from-gray-900 dark:via-slate-900 dark:to-black "
             >
                 <Header user={user} />
                 <div className="container mx-auto p-8 max-w-screen-2xl">
@@ -391,7 +407,7 @@ export default function BookDetails() {
                             )}
                             {/* Reviews Section */}
                             {user ? (
-                                <div className="my-4 p-4 border rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 w-3/4">
+                                <div className="my-4 p-4 border rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-600 w-3/4">
                                     <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">
                                         Bạn nghĩ sao về cuốn sách này?
                                     </h3>
@@ -435,15 +451,15 @@ export default function BookDetails() {
                                 </div>
                             ) : null}
 
-                            <div className="mt-8 w-3/4">
-                                <h2 className="text-2xl font-bold mb-4">
+                            <div className="mt-8 w-3/4 ">
+                                <h2 className="text-2xl font-bold mb-4 dark:text-white">
                                     Độc giả nói gì về sách
                                 </h2>
-                                <div className="bg-gray-200 px-8 py-2 rounded-xl w-full">
-                                    <div>
+                                <div className="bg-gray-200  px-8 py-2 rounded-xl w-full dark:bg-gray-800 border dark:border-gray-600">
+                                    <div className="pt-2">
                                         {myComments.length > 0 && (
                                             <div>
-                                                <h3 className="font-bold text-lg mt-2">
+                                                <h3 className="font-bold text-lg mt-2 dark:text-white">
                                                     Bình luận của tôi
                                                 </h3>
                                                 {myComments
@@ -473,7 +489,7 @@ export default function BookDetails() {
 
                                         {otherComments.length > 0 && (
                                             <div className="">
-                                                <h3 className="font-bold text-lg">
+                                                <h3 className="font-bold text-lg dark:text-white">
                                                     Bình luận của độc giả khác
                                                 </h3>
                                                 {otherComments
@@ -486,6 +502,9 @@ export default function BookDetails() {
                                                             comment={comment}
                                                             isCurrentUser={
                                                                 false
+                                                            }
+                                                            openReportModal={
+                                                                openReportModal
                                                             }
                                                         />
                                                     ))}
@@ -515,11 +534,19 @@ export default function BookDetails() {
 
                     {/* Recommended Books Section */}
 
-                    {/* Hiển thị modal nếu showModal là true */}
+                    {/* Hiển thị thông báo*/}
                     {showModal && (
                         <Notification
                             message={modalMessage}
                             onClose={() => setShowModal(false)}
+                        />
+                    )}
+
+                    {/* Hiển thị modal nếu isReportModalOpen là true */}
+                    {isReportModalOpen && (
+                        <ReportModal
+                            onClose={closeReportModal}
+                            onReasonSelect={handleReasonSelect} // Truyền hàm để nhận lý do đã chọn
                         />
                     )}
 
