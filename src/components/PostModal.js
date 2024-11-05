@@ -4,16 +4,48 @@ import {
     FaRegHeart,
     FaHeart,
     FaRegComment,
+    FaTimes,
+    FaBookmark,
 } from 'react-icons/fa';
 import { PiWarningOctagonBold } from 'react-icons/pi';
 import { toast, Slide } from 'react-toastify';
+import { IoSend } from 'react-icons/io5';
+import EmojiPicker from 'emoji-picker-react';
+import { BsEmojiSmile } from 'react-icons/bs';
+import Comment from './Comment';
+import ReportModal from './ReportModal';
 
 function PostModal({ post, onClose }) {
+    const user = JSON.parse(localStorage.getItem('user'));
     const [savedPost, setSavedPost] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [showReadMore, setShowReadMore] = useState(false);
     const contentRef = useRef(null);
+    const [comment, setCommnet] = useState('');
+    const [comments, setCommnets] = useState([]);
+    const [showPicker, setShowPicker] = useState(false);
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [selectedReason, setSelectedReason] = useState(null); // State lưu lý do đã chọn
+
+    const handleReasonSelect = (reason) => {
+        setSelectedReason(reason); // Lưu lý do đã chọn vào state của Post
+        console.log('Reason selected in Post component:', reason);
+        closeReportModal();
+    };
+
+    const openReportModal = () => {
+        setIsReportModalOpen(true);
+    };
+
+    const closeReportModal = () => {
+        setIsReportModalOpen(false);
+    };
+
+    const onEmojiClick = (emoji) => {
+        setCommnet((prevText) => prevText + emoji.emoji);
+        setShowPicker(false); // Đóng picker sau khi chọn emoji
+    };
 
     const maxHeight = 144;
 
@@ -209,10 +241,30 @@ function PostModal({ post, onClose }) {
         }
     };
 
+    const fetchPostComment = async () => {
+        try {
+            const response = await fetch(
+                `http://localhost:8080/api/post/comment/${post.postId}`,
+                {
+                    method: 'GET',
+                }
+            );
+
+            if (response.ok) {
+                const comments = await response.json();
+                console.log('comments', comments);
+                setCommnets(comments);
+            }
+        } catch (error) {
+            console.error('Failed to fetch comments post:', error);
+        }
+    };
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         fetchSavedPost(post.postId, token);
         fetchFavoritePost(post.postId, token);
+        fetchPostComment();
     }, [post.postId]);
 
     const handleSavePost = () => {
@@ -241,21 +293,50 @@ function PostModal({ post, onClose }) {
         }
     };
 
+    const handleSendComment = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(
+                'http://localhost:8080/api/post/comment',
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        postId: post.postId,
+                        replyId: null,
+                        content: comment,
+                    }),
+                }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                showToast('success', 'Thêm bình luận thành công');
+                setCommnet('');
+                fetchPostComment();
+            } else {
+                showToast('error', 'Có lỗi xảy ra khi thêm bình luận');
+                setCommnet('');
+            }
+        } catch (error) {
+            console.error('Lỗi:', error);
+            showToast('error', 'Lỗi kết nối, vui lòng thử lại sau');
+            setCommnet('');
+        }
+    };
+
     return (
         <div
             id="modal-overlay"
             onMouseDown={handleOutsideClick}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
         >
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 w-11/12 md:w-3/4 lg:w-3/5 px-8 min-h-[90vh] overflow-scroll">
-                <button
-                    onClick={onClose}
-                    className="absolute top-2 right-2 text-gray-500"
-                >
-                    &times; {/* Icon đóng */}
-                </button>
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 w-3/5 px-8 min-h-[90vh] max-h-[90vh] overflow-scroll relative">
                 <div className="flex items-center justify-between my-2">
-                    <div className="flex items-center">
+                    <div className="flex items-center ">
                         <img
                             src={post.user.avatar}
                             alt="Avatar"
@@ -269,7 +350,7 @@ function PostModal({ post, onClose }) {
                         {/* Đã lưu / Chưa lưu */}
                         {savedPost ? (
                             <button onClick={handleRemoveSavePost}>
-                                <FaRegBookmark
+                                <FaBookmark
                                     size={22}
                                     className="text-yellow-400"
                                 />
@@ -283,11 +364,17 @@ function PostModal({ post, onClose }) {
                             </button>
                         )}
                         {/* Icon báo cáo */}
-                        <button className="ml-4">
+                        <button onClick={openReportModal} className="ml-4">
                             <PiWarningOctagonBold
                                 size={26}
                                 className="text-red-500"
                             />
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="ml-4 text-gray-500"
+                        >
+                            <FaTimes size={24} />
                         </button>
                     </div>
                 </div>
@@ -321,11 +408,11 @@ function PostModal({ post, onClose }) {
                         />
                     )}
                 </div>
-                <div className="flex pb-2">
+                <div className="flex pb-2 border-b">
                     {isFavorite ? (
                         <button
                             onClick={handleRemoveFavoritePost}
-                            className="flex font-semibold bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl cursor-pointer"
+                            className="flex font-medium bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl cursor-pointer"
                         >
                             <FaHeart size={24} className="text-red-500" />
                             <span className="ml-2 dark:text-white">
@@ -335,7 +422,7 @@ function PostModal({ post, onClose }) {
                     ) : (
                         <button
                             onClick={handleSaveFavoritePost}
-                            className="flex font-semibold bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl cursor-pointer"
+                            className="flex font-medium bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl cursor-pointer"
                         >
                             <FaRegHeart
                                 size={24}
@@ -344,7 +431,7 @@ function PostModal({ post, onClose }) {
                             <span className="ml-2 dark:text-white">Thích</span>
                         </button>
                     )}
-                    <button className="flex font-semibold bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl ml-4 cursor-pointer">
+                    <button className="flex font-medium bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl ml-4 cursor-pointer">
                         <FaRegComment
                             size={24}
                             className="text-black dark:text-white"
@@ -354,7 +441,75 @@ function PostModal({ post, onClose }) {
                         </span>
                     </button>
                 </div>
+
+                <div className="mt-2">
+                    {comments.length > 0 ? (
+                        comments.map((cmt) => (
+                            <Comment
+                                cmt={cmt}
+                                postId={post.postId}
+                                fetchPostComment={fetchPostComment}
+                            />
+                        ))
+                    ) : (
+                        <div>
+                            <span>Chưa có bình luận nào</span>
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex w-full rounded-xl border border-gray-300 p-2 bg-gray-100 items-center sticky -bottom-4">
+                    <img
+                        src={user.avatar}
+                        className="w-12 h-12 rounded-full object-cover ml-4"
+                    />
+                    <div className="w-full">
+                        <span className="text-lg font-semibold px-4">
+                            {user.firstName + ' ' + user.lastName}
+                        </span>
+                        <div className=" ">
+                            <input
+                                className="w-11/12 px-4 pb-2 pt-1 rounded-xl bg-gray-100 focus:outline-none text-base "
+                                placeholder="Thêm bình luận của bạn"
+                                value={comment}
+                                onChange={(e) => setCommnet(e.target.value)}
+                            />
+                            <button
+                                onClick={handleSendComment}
+                                className="absolute right-4 top-1/2 -translate-y-1/2"
+                            >
+                                <IoSend size={20} />
+                            </button>
+                            <button
+                                className="absolute right-12 top-1/2 -translate-y-1/2"
+                                onClick={() => setShowPicker((val) => !val)}
+                            >
+                                <BsEmojiSmile size={20} />
+                            </button>
+                            {showPicker && (
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        bottom: '100%',
+                                        zIndex: '1000',
+                                        right: '0',
+                                    }}
+                                >
+                                    <EmojiPicker onEmojiClick={onEmojiClick} />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            {/* Hiển thị modal nếu isReportModalOpen là true */}
+            {isReportModalOpen && (
+                <ReportModal
+                    onClose={closeReportModal}
+                    onReasonSelect={handleReasonSelect} // Truyền hàm để nhận lý do đã chọn
+                />
+            )}
         </div>
     );
 }

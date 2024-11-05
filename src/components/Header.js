@@ -44,7 +44,6 @@ const Header = ({ user }) => {
 
     useEffect(() => {
         setCurrentUser(user);
-        console.log(user);
     }, [user]);
 
     return (
