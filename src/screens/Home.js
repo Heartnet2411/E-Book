@@ -59,7 +59,8 @@ export default function Home() {
     const [scienceBooks, setScienceBooks] = useState([]);
     const [historyBooks, setHistoryBooks] = useState([]);
     const [loading, setLoading] = useState(true);
-    useEffect(() => {
+
+    const fetchBook = () => {
         axios
             .get(url + `/book/search?page=2`)
             .then((res) => {
@@ -95,7 +96,20 @@ export default function Home() {
                 setLoading(false);
             })
             .catch((err) => console.log(err));
-        setLoading(false);
+    };
+
+    useEffect(() => {
+        const loadData = new Promise(() => {
+            fetchBook();
+        });
+
+        loadData
+            .then(() => {
+                setLoading(false); // Cập nhật trạng thái khi Promise hoàn thành
+            })
+            .catch((error) => {
+                console.error('Error loading data:', error);
+            });
     }, []);
 
     return (

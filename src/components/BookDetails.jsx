@@ -14,8 +14,8 @@ import { storage } from '../utils/firebase.js';
 import Notification from '../components/Notification';
 import { useState, useEffect } from 'react';
 import Comment from './BookComment.js';
-import { toast, Bounce } from 'react-toastify';
-
+import { toast, Slide } from 'react-toastify';
+import ReportModal from './ReportModal.js';
 import axios from 'axios';
 import { url } from '../config/config.js';
 
@@ -40,14 +40,24 @@ export default function BookDetails() {
     const [otherCommentLimit, setOtherCommentLimit] = useState(5);
     const [isSaved, setIsSaved] = useState(false);
     const token = localStorage.getItem('token');
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [selectedCommentId,setSelectedCommentId] = useState(null)
+    
+
+    const openReportModal = (commentId) => {
+        setIsReportModalOpen(true);
+        setSelectedCommentId(commentId);
+
+    };
+    const closeReportModal = () => {
+        setIsReportModalOpen(false);
+        setSelectedCommentId(null)
+    };
 
     useEffect(() => {
         if (!book) {
             fetchBook(id);
         }
-    }, [id]);
-
-    useEffect(() => {
         fetchComments();
         fetchIsBookSaved();
     }, [id]);
@@ -55,7 +65,7 @@ export default function BookDetails() {
     const fetchComments = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/book/comments/${id}`
+                url+`/book/comments/${id}`
             );
 
             setComments(response.data);
@@ -111,7 +121,44 @@ export default function BookDetails() {
             console.error('Lỗi khi tải sách:', error);
         }
     };
+    const handleCreateReport = async (reason) => {
+        if (!selectedCommentId) return;
 
+        try {
+            const response = await axios.post(url + `/report/create`, {
+                targetType: 'book_comment',
+                targetId: selectedCommentId,
+                reason: reason,
+                userId : user?.userId
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            toast.success('Báo cáo thành công!', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            closeReportModal(); // Close the modal after reporting
+        } catch (error) {
+            console.error('Error creating report:', error);
+            toast.error('Có lỗi xảy ra khi báo cáo!', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
     const handleClickCategories = () => {};
 
     const toggleDescription = () => {
@@ -145,7 +192,7 @@ export default function BookDetails() {
 
         try {
             await axios.post(
-                'http://localhost:8080/api/book/comments',
+                url+'/book/comments',
                 {
                     bookId: id,
                     rating: rating,
@@ -180,7 +227,6 @@ export default function BookDetails() {
     const handleLoadMoreOtherComments = () => {
         setOtherCommentLimit((prev) => prev + 5); // Tăng số lượng bình luận hiển thị
     };
-
     // Hàm fetch để lưu sách
     const saveBook = async () => {
         try {
@@ -202,7 +248,7 @@ export default function BookDetails() {
                 draggable: true,
                 progress: undefined,
                 theme: 'light',
-                transition: Bounce,
+                transition: Slide,
             });
             setIsSaved(true);
         } catch (error) {
@@ -216,7 +262,7 @@ export default function BookDetails() {
                 draggable: true,
                 progress: undefined,
                 theme: 'light',
-                transition: Bounce,
+                transition: Slide,
             });
         }
     };
@@ -242,7 +288,7 @@ export default function BookDetails() {
                 draggable: true,
                 progress: undefined,
                 theme: 'light',
-                transition: Bounce,
+                transition: Slide,
             });
             setIsSaved(false);
         } catch (error) {
@@ -256,7 +302,7 @@ export default function BookDetails() {
                 draggable: true,
                 progress: undefined,
                 theme: 'light',
-                transition: Bounce,
+                transition: Slide,
             });
         }
     };
@@ -265,7 +311,7 @@ export default function BookDetails() {
         book && (
             <div
                 className="book-details from-slate-50 via-slate-100 to-white 
-             dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black "
+             dark:bg-gradient-to-b dark:from-gray-900 dark:via-slate-900 dark:to-black "
             >
                 <Header user={user} />
                 <div className="container mx-auto p-8 max-w-screen-2xl">
@@ -391,7 +437,7 @@ export default function BookDetails() {
                             )}
                             {/* Reviews Section */}
                             {user ? (
-                                <div className="my-4 p-4 border rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 w-3/4">
+                                <div className="my-4 p-4 border rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-600 w-3/4">
                                     <h3 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">
                                         Bạn nghĩ sao về cuốn sách này?
                                     </h3>
@@ -435,15 +481,15 @@ export default function BookDetails() {
                                 </div>
                             ) : null}
 
-                            <div className="mt-8 w-3/4">
-                                <h2 className="text-2xl font-bold mb-4">
+                            <div className="mt-8 w-3/4 ">
+                                <h2 className="text-2xl font-bold mb-4 dark:text-white">
                                     Độc giả nói gì về sách
                                 </h2>
-                                <div className="bg-gray-200 px-8 py-2 rounded-xl w-full">
-                                    <div>
+                                <div className="bg-gray-200  px-8 py-2 rounded-xl w-full dark:bg-gray-800 border dark:border-gray-600">
+                                    <div className="pt-2">
                                         {myComments.length > 0 && (
                                             <div>
-                                                <h3 className="font-bold text-lg mt-2">
+                                                <h3 className="font-bold text-lg mt-2 dark:text-white">
                                                     Bình luận của tôi
                                                 </h3>
                                                 {myComments
@@ -473,7 +519,7 @@ export default function BookDetails() {
 
                                         {otherComments.length > 0 && (
                                             <div className="">
-                                                <h3 className="font-bold text-lg">
+                                                <h3 className="font-bold text-lg dark:text-white">
                                                     Bình luận của độc giả khác
                                                 </h3>
                                                 {otherComments
@@ -486,6 +532,9 @@ export default function BookDetails() {
                                                             comment={comment}
                                                             isCurrentUser={
                                                                 false
+                                                            }
+                                                            openReportModal={()=>
+                                                                openReportModal(comment.commentId)
                                                             }
                                                         />
                                                     ))}
@@ -515,11 +564,19 @@ export default function BookDetails() {
 
                     {/* Recommended Books Section */}
 
-                    {/* Hiển thị modal nếu showModal là true */}
+                    {/* Hiển thị thông báo*/}
                     {showModal && (
                         <Notification
                             message={modalMessage}
                             onClose={() => setShowModal(false)}
+                        />
+                    )}
+
+                    {/* Hiển thị modal nếu isReportModalOpen là true */}
+                    {isReportModalOpen && (
+                        <ReportModal
+                            onClose={closeReportModal}
+                            onSubmit={handleCreateReport}
                         />
                     )}
 

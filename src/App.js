@@ -11,6 +11,7 @@ import Forum from './screens/Forum';
 import BookReader from './screens/BookReader/BookReader';
 import UploadEpub from './utils/UploadEbook';
 import Discovery from './screens/Discovery';
+import Dashboard from './dashboard/Dashboard';
 function App() {
     return (
         <Router>
@@ -24,6 +25,8 @@ function App() {
                 <Route path="/myaccount" Component={MyAccount} />
                 <Route path="/forum" Component={Forum} />
                 <Route path="/discovery" Component={Discovery} />
+                <Route path='/admin/*' Component={Dashboard} />
+
             </Routes>
         </Router>
     );

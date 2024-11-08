@@ -44,7 +44,7 @@ ol {
 
 /* Style cho ul (unordered list) */
 ul {
-    padding-left: 20px;
+    /* padding-left: 20px; */
     /* Thêm khoảng cách lề trái */
     list-style-type: disc;
     /* Sử dụng bullet kiểu "disc" */
@@ -56,7 +56,9 @@ ul li {
     line-height: 1.5;
     /* Đặt chiều cao dòng */
 }
-
+.custom {
+    padding:0px ;
+}
 /* Style cho ol (ordered list) */
 ol {
     padding-left: 20px;
