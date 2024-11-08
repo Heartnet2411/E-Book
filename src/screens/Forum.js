@@ -10,7 +10,7 @@ import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import Lottie from 'react-lottie';
 import loadingAnimation from '../lotties/loading.json';
 import nothing from '../lotties/nothing.json';
-
+import { url } from '../config/config';
 function Forum() {
     const user = JSON.parse(localStorage.getItem('user'));
     const [selected, setSelected] = useState('home');
@@ -28,7 +28,7 @@ function Forum() {
 
     const fetchTopics = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/topics/');
+            const response = await fetch(url + '/topics/');
             if (response.ok) {
                 const data = await response.json();
                 setTopics(data);
@@ -45,7 +45,7 @@ function Forum() {
 
     const fetchPosts = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/post/');
+            const response = await fetch(url + '/post/');
             if (response.ok) {
                 const data = await response.json();
                 // Gắn dữ liệu lấy được vào state
@@ -61,9 +61,7 @@ function Forum() {
 
     const fetchPostById = async (id) => {
         try {
-            const response = await fetch(
-                `http://localhost:8080/api/post/${id}`
-            );
+            const response = await fetch(url + `/post/${id}`);
             if (response.ok) {
                 const data = await response.json();
                 setPosts(data);
@@ -78,9 +76,7 @@ function Forum() {
 
     const fetchPostsByTopicId = async (topicId) => {
         try {
-            const response = await fetch(
-                `http://localhost:8080/api/post/topic/${topicId}`
-            );
+            const response = await fetch(url + `/post/topic/${topicId}`);
             if (response.ok) {
                 const data = await response.json();
                 setPosts(data);
@@ -95,16 +91,13 @@ function Forum() {
 
     const fetchSavedPostsByUserId = async (userId, token) => {
         try {
-            const response = await fetch(
-                `http://localhost:8080/api/post/saved/${userId}`,
-                {
-                    method: 'GET', // Phương thức GET
-                    headers: {
-                        Authorization: `Bearer ${token}`, // Thêm token vào headers
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+            const response = await fetch(url`/post/saved/${userId}`, {
+                method: 'GET', // Phương thức GET
+                headers: {
+                    Authorization: `Bearer ${token}`, // Thêm token vào headers
+                    'Content-Type': 'application/json',
+                },
+            });
 
             if (response.ok) {
                 const data = await response.json();

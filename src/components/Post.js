@@ -5,6 +5,8 @@ import { PiWarningOctagonBold } from 'react-icons/pi';
 import { toast, Slide } from 'react-toastify';
 import ReportModal from './ReportModal';
 import PostModal from './PostModal';
+import { url } from '../config/config';
+import axios from 'axios';
 
 function Post({ post }) {
     console.log('posst', post);
@@ -14,8 +16,9 @@ function Post({ post }) {
     const [showReadMore, setShowReadMore] = useState(false);
     const contentRef = useRef(null);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-    const [selectedReason, setSelectedReason] = useState(null); // State lưu lý do đã chọn
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedPostId, setSelectedPostId] = useState(null);
+    const token = localStorage.getItem('token');
 
     const handleOpenModal = () => {
         setIsModalOpen(true);
@@ -25,18 +28,13 @@ function Post({ post }) {
         setIsModalOpen(false);
     };
 
-    const openReportModal = () => {
+    const openReportModal = (postId) => {
+        setSelectedPostId(postId);
         setIsReportModalOpen(true);
     };
-
     const closeReportModal = () => {
         setIsReportModalOpen(false);
-    };
-
-    const handleReasonSelect = (reason) => {
-        setSelectedReason(reason); // Lưu lý do đã chọn vào state của Post
-        console.log('Reason selected in Post component:', reason);
-        closeReportModal();
+        setSelectedPostId(null);
     };
 
     const maxHeight = 144; // Set desired max height in pixels (e.g., 160px for around max-h-40)
@@ -76,7 +74,62 @@ function Post({ post }) {
             toast.warning(message, options);
         }
     }
+    const handleCreateReport = async (reason) => {
+        if (!selectedPostId) return;
 
+        try {
+            const response = await axios.post(
+                url + `/report/create`,
+                {
+                    targetType: 'post',
+                    targetId: selectedPostId,
+                    reason: reason,
+                    userId: user?.userId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            console.log(response.status);
+            if (response.status == 201) {
+                // Kiểm tra xem phản hồi có thành công không
+                toast.success('Báo cáo thành công!', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                closeReportModal(); // Đóng modal sau khi báo cáo
+            } else {
+                toast.error('Bạn đã báo cáo bài viết này rồi', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                closeReportModal();
+            }
+        } catch (error) {
+            console.error('Error creating report:', error);
+            toast.error('Có lỗi xảy ra khi báo cáo!', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
     const savePostForUser = async (postId, token) => {
         try {
             const response = await fetch(
@@ -188,17 +241,14 @@ function Post({ post }) {
 
     const removeFavoritePost = async (postId, token) => {
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/favorite/remove',
-                {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ postId }),
-                }
-            );
+            const response = await fetch(url + '/post/favorite/remove', {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ postId }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -315,7 +365,9 @@ function Post({ post }) {
                         <div className="relative group">
                             {' '}
                             <button
-                                onClick={openReportModal}
+                                onClick={() => {
+                                    openReportModal(post.postId);
+                                }}
                                 className="cursor-pointer"
                             >
                                 <PiWarningOctagonBold
@@ -405,7 +457,7 @@ function Post({ post }) {
             {isReportModalOpen && (
                 <ReportModal
                     onClose={closeReportModal}
-                    onReasonSelect={handleReasonSelect} // Truyền hàm để nhận lý do đã chọn
+                    onSubmit={handleCreateReport}
                 />
             )}
 

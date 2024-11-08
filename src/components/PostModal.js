@@ -364,7 +364,7 @@ function PostModal({ post, onClose }) {
                             </button>
                         )}
                         {/* Icon báo cáo */}
-                        <button onClick={openReportModal} className="ml-4">
+                        <button className="ml-4">
                             <PiWarningOctagonBold
                                 size={26}
                                 className="text-red-500"

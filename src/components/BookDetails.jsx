@@ -41,38 +41,28 @@ export default function BookDetails() {
     const [isSaved, setIsSaved] = useState(false);
     const token = localStorage.getItem('token');
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-    const [selectedReason, setSelectedReason] = useState(null); // State lưu lý do đã chọn
+    const [selectedCommentId, setSelectedCommentId] = useState(null);
 
-    const openReportModal = () => {
+    const openReportModal = (commentId) => {
         setIsReportModalOpen(true);
+        setSelectedCommentId(commentId);
     };
-
     const closeReportModal = () => {
         setIsReportModalOpen(false);
-    };
-
-    const handleReasonSelect = (reason) => {
-        setSelectedReason(reason); // Lưu lý do đã chọn vào state của Post
-        console.log('Reason selected in Post component:', reason);
-        closeReportModal();
+        setSelectedCommentId(null);
     };
 
     useEffect(() => {
         if (!book) {
             fetchBook(id);
         }
-    }, [id]);
-
-    useEffect(() => {
         fetchComments();
         fetchIsBookSaved();
     }, [id]);
 
     const fetchComments = async () => {
         try {
-            const response = await axios.get(
-                `http://localhost:8080/api/book/comments/${id}`
-            );
+            const response = await axios.get(url + `/book/comments/${id}`);
 
             setComments(response.data);
             setMyComments(
@@ -127,7 +117,47 @@ export default function BookDetails() {
             console.error('Lỗi khi tải sách:', error);
         }
     };
+    const handleCreateReport = async (reason) => {
+        if (!selectedCommentId) return;
 
+        try {
+            const response = await axios.post(
+                url + `/report/create`,
+                {
+                    targetType: 'book_comment',
+                    targetId: selectedCommentId,
+                    reason: reason,
+                    userId: user?.userId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            toast.success('Báo cáo thành công!', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            closeReportModal(); // Close the modal after reporting
+        } catch (error) {
+            console.error('Error creating report:', error);
+            toast.error('Có lỗi xảy ra khi báo cáo!', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
     const handleClickCategories = () => {};
 
     const toggleDescription = () => {
@@ -161,7 +191,7 @@ export default function BookDetails() {
 
         try {
             await axios.post(
-                'http://localhost:8080/api/book/comments',
+                url + '/book/comments',
                 {
                     bookId: id,
                     rating: rating,
@@ -196,7 +226,6 @@ export default function BookDetails() {
     const handleLoadMoreOtherComments = () => {
         setOtherCommentLimit((prev) => prev + 5); // Tăng số lượng bình luận hiển thị
     };
-
     // Hàm fetch để lưu sách
     const saveBook = async () => {
         try {
@@ -503,8 +532,10 @@ export default function BookDetails() {
                                                             isCurrentUser={
                                                                 false
                                                             }
-                                                            openReportModal={
-                                                                openReportModal
+                                                            openReportModal={() =>
+                                                                openReportModal(
+                                                                    comment.commentId
+                                                                )
                                                             }
                                                         />
                                                     ))}
@@ -546,7 +577,7 @@ export default function BookDetails() {
                     {isReportModalOpen && (
                         <ReportModal
                             onClose={closeReportModal}
-                            onReasonSelect={handleReasonSelect} // Truyền hàm để nhận lý do đã chọn
+                            onSubmit={handleCreateReport}
                         />
                     )}
 

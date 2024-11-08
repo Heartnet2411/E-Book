@@ -28,6 +28,25 @@ function Discovery() {
     const [toYear, setToYear] = useState('');
     const [selectedCountries, setSelectedCountries] = useState([]);
     const bookRef = useRef(null);
+    const years = [1900, 1950, 1975, 2000, 2010, 2020, 2024];
+    const handleFromYearChange = (e) => {
+        setFromYear(e.target.value);
+        if (toYear && e.target.value > toYear) {
+            setToYear('');
+        }
+    };
+
+    const handleToYearChange = (e) => {
+        setToYear(e.target.value);
+        if (fromYear && e.target.value < fromYear) {
+            setFromYear('');
+        }
+    };
+
+    const filteredToYears = years.filter(
+        (year) => !fromYear || year >= fromYear
+    );
+    const filteredFromYears = years.filter((year) => !toYear || year <= toYear);
 
     const countries = [
         'Việt Nam',
@@ -214,30 +233,28 @@ function Discovery() {
                             </label>
                             <select
                                 value={fromYear}
-                                onChange={(e) => setFromYear(e.target.value)}
+                                onChange={handleFromYearChange}
                                 className="px-4 py-2 mt-1 block w-full border border-gray-300 rounded-xl shadow-sm dark:text-white dark:bg-gray-700 dark:border-gray-900"
                             >
                                 <option value="">-- Từ năm --</option>
-                                <option>1900</option>
-                                <option>1950</option>
-                                <option>1975</option>
-                                <option>2000</option>
-                                <option>2010</option>
-                                <option>2020</option>
+                                {filteredFromYears.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
                             </select>
                             <select
                                 value={toYear}
-                                onChange={(e) => setToYear(e.target.value)}
+                                onChange={handleToYearChange}
                                 className="px-4 py-2 mt-1 block w-full border border-gray-300 rounded-xl shadow-sm dark:text-white dark:bg-gray-700 dark:border-gray-900"
                             >
                                 <option value="">-- Đến năm --</option>
 
-                                <option>1950</option>
-                                <option>1975</option>
-                                <option>2000</option>
-                                <option>2010</option>
-                                <option>2020</option>
-                                <option>2024</option>
+                                {filteredToYears.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 

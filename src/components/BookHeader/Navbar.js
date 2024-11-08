@@ -5,7 +5,7 @@ import { MdFullscreen } from 'react-icons/md';
 import { RiHeadphoneFill } from 'react-icons/ri';
 import { useState } from 'react';
 import { BsThreeDotsVertical, BsBookmarkPlusFill } from 'react-icons/bs';
-const Navbar = ({ onBookmark, onSettings, onFullScreen, onControl,title,onSearch}) => {
+const Navbar = ({onShowBookmark,isBookmarked,onBookmark, onSettings, onFullScreen, onControl,title,onSearch}) => {
      const [searchQuery, setSearchQuery] = useState('');
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
@@ -29,17 +29,27 @@ const Navbar = ({ onBookmark, onSettings, onFullScreen, onControl,title,onSearch
             <div className="flex items-center justify-center">
                 <h1>{title}</h1>
             </div>
-            <ul className="flex items-center space-x-6">
+            <ul className="custom flex items-center space-x-6">
                 <li>
                     {/* <RiHeadphoneFill size={24} className="hover:cursor-pointer"/> */}
-                    <IoIosListBox size={24} className="hover:cursor-pointer" />
+                    <IoIosListBox size={24} className="hover:cursor-pointer"  onClick={onShowBookmark}/>
                 </li>
                 <li>
-                    <BsBookmarkPlusFill
-                        size={22}
-                        onClick={onBookmark}
-                        className="hover:cursor-pointer"
-                    />
+                    {isBookmarked ? (
+                        <BsBookmarkPlusFill
+                            size={22}
+                            onClick={onBookmark}
+                            // color="yellow"
+                            className="hover:cursor-pointer"
+                        />
+                    ) : (
+                        <BsBookmarkPlusFill
+                            size={22}
+                            onClick={onBookmark}
+                            // color="yellow"
+                            className="hover:cursor-pointer"
+                        />
+                    )}
                 </li>
                 <li>
                     <IoMdSettings

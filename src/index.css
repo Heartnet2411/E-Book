@@ -67,3 +67,17 @@ html {
   outline: none;
   overflow: scroll;
 }
+.react-confirm-alert-button.confirm {
+  background-color: #4caf50; /* Màu nền cho nút xác nhận */
+}
+
+.react-confirm-alert-button.confirm:hover {
+  background-color: #5eb675; /* Màu nền khi di chuột qua cho nút huỷ */
+}
+.react-confirm-alert-button.cancel {
+  background-color: #f44336; /* Màu nền cho nút huỷ */
+}
+
+.react-confirm-alert-button.cancel:hover {
+  background-color: #e53935; /* Màu nền khi di chuột qua cho nút huỷ */
+}

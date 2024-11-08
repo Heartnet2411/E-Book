@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 
-function ReportModal({ onClose }) {
-    const [selectedReason, setSelectedReason] = useState(null); // State để lưu lý do đã chọn
-
+function ReportModal({ onClose, onSubmit }) {
     const reasons = [
         'Vấn đề liên quan đến người dưới 18 tuổi',
         'Bắt nạt, quấy rối hoặc lạm dụng/ngược đãi',
@@ -14,10 +12,8 @@ function ReportModal({ onClose }) {
     ];
 
     const handleSelectReason = (reason) => {
-        setSelectedReason(reason); // Cập nhật lý do đã chọn
-        // Bạn có thể thực hiện các xử lý khác ở đây, ví dụ: gửi dữ liệu lên server
         console.log('Selected reason:', reason);
-        onClose(); // Đóng modal sau khi chọn lý do
+        onSubmit(reason);
     };
 
     const handleOutsideClick = (event) => {
