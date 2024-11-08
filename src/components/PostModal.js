@@ -372,7 +372,7 @@ function PostModal({ post, onClose }) {
                         </button>
                         <button
                             onClick={onClose}
-                            className="ml-4 text-gray-500"
+                            className="ml-4 text-gray-700 dark:text-white"
                         >
                             <FaTimes size={24} />
                         </button>
@@ -458,30 +458,30 @@ function PostModal({ post, onClose }) {
                     )}
                 </div>
 
-                <div className="flex w-full rounded-xl border border-gray-300 p-2 bg-gray-100 items-center sticky -bottom-4">
+                <div className="flex w-full rounded-xl border border-gray-300 dark:border-gray-500 p-2 bg-gray-100 dark:bg-gray-800 items-center sticky -bottom-4">
                     <img
                         src={user.avatar}
                         className="w-12 h-12 rounded-full object-cover ml-4"
                     />
                     <div className="w-full">
-                        <span className="text-lg font-semibold px-4">
+                        <span className="text-lg font-semibold px-4 dark:text-white">
                             {user.firstName + ' ' + user.lastName}
                         </span>
                         <div className=" ">
                             <input
-                                className="w-11/12 px-4 pb-2 pt-1 rounded-xl bg-gray-100 focus:outline-none text-base "
+                                className="w-11/12 px-4 pb-2 pt-1 rounded-xl bg-gray-100 dark:bg-gray-800 dark:text-white focus:outline-none text-base "
                                 placeholder="Thêm bình luận của bạn"
                                 value={comment}
                                 onChange={(e) => setCommnet(e.target.value)}
                             />
                             <button
                                 onClick={handleSendComment}
-                                className="absolute right-4 top-1/2 -translate-y-1/2"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 dark:text-white"
                             >
                                 <IoSend size={20} />
                             </button>
                             <button
-                                className="absolute right-12 top-1/2 -translate-y-1/2"
+                                className="absolute right-12 top-1/2 -translate-y-1/2 dark:text-white"
                                 onClick={() => setShowPicker((val) => !val)}
                             >
                                 <BsEmojiSmile size={20} />

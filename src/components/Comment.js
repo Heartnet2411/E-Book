@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { PiWarningOctagonBold } from 'react-icons/pi';
 import { IoSend } from 'react-icons/io5';
 import EmojiPicker from 'emoji-picker-react';
@@ -14,6 +14,18 @@ function Comment({ cmt, postId, fetchPostComment }) {
     const [showPicker, setShowPicker] = useState(false);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
+    const replyInputRef = useRef(null);
+
+    useEffect(() => {
+        if (showReply && replyInputRef.current) {
+            replyInputRef.current.focus();
+            replyInputRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+        }
+    }, [showReply]);
+
     const handleSendComment = async () => {
         // Xử lý gửi bình luận
     };
@@ -25,12 +37,12 @@ function Comment({ cmt, postId, fetchPostComment }) {
 
     return (
         <div key={cmt.commentId} className="flex-col pb-2">
-            <div className="w-full flex items-center">
+            <div className="w-full flex items-center dark:text-white ">
                 <img
                     src={cmt.user.avatar}
                     className="w-10 h-10 rounded-full object-cover ml-4 mr-2"
                 />
-                <div className="w-full bg-gray-200 rounded-xl relative">
+                <div className="w-full bg-gray-200 rounded-xl relative dark:bg-gray-800">
                     <p className="text-base font-medium px-4 w-11/12">
                         {cmt.user.firstname + ' ' + cmt.user.lastname}
                     </p>
@@ -50,7 +62,7 @@ function Comment({ cmt, postId, fetchPostComment }) {
             </div>
             <button
                 onClick={() => setShowReply(true)}
-                className="text-sm ml-16 font-semibold text-gray-700 hover:text-gray-500 hover:underline"
+                className="text-sm ml-16 font-semibold text-gray-700 dark:text-gray-400 dark:hover:text-gray-600 hover:text-gray-500 hover:underline"
             >
                 Phản hồi
             </button>
@@ -68,7 +80,7 @@ function Comment({ cmt, postId, fetchPostComment }) {
                                     />
                                 ))}
                                 <button
-                                    className="text-sm text-blue-500 hover:underline"
+                                    className="text-sm text-blue-500 hover:underline dark:font-medium"
                                     onClick={() => setShowReplies(false)}
                                 >
                                     Thu gọn
@@ -86,18 +98,19 @@ function Comment({ cmt, postId, fetchPostComment }) {
                 )}
             </div>
             {showReply && (
-                <div className="w-full flex items-center ml-16">
+                <div className=" flex items-center ml-16 dark:text-white">
                     <img
                         src={user.avatar}
                         className="w-8 h-8 rounded-full object-cover"
                     />
-                    <div className="w-full bg-gray-100 rounded-xl ml-2">
+                    <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-xl ml-2">
                         <span className="text-base font-semibold px-4 pt-1">
                             {user.firstName + ' ' + user.lastName}
                         </span>
                         <div className="relative w-full">
                             <input
-                                className="w-11/12 px-4 pb-2 rounded-xl bg-gray-100 focus:outline-none text-base"
+                                ref={replyInputRef}
+                                className="w-11/12 px-4 pb-2 rounded-xl dark:bg-gray-800 bg-gray-100 focus:outline-none text-base"
                                 placeholder="Thêm bình luận của bạn"
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}

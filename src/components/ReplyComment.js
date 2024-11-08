@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { PiWarningOctagonBold } from 'react-icons/pi';
 import { IoSend } from 'react-icons/io5';
 import EmojiPicker from 'emoji-picker-react';
@@ -13,6 +13,18 @@ function ReplyComment({ cmt, postId, fetchPostComment, replyId }) {
     const [showPicker, setShowPicker] = useState(false);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [selectedReason, setSelectedReason] = useState(null); // State lưu lý do đã chọn
+
+    const replyInputRef = useRef(null);
+
+    useEffect(() => {
+        if (showReply && replyInputRef.current) {
+            replyInputRef.current.focus();
+            replyInputRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+        }
+    }, [showReply]);
 
     const handleReasonSelect = (reason) => {
         setSelectedReason(reason); // Lưu lý do đã chọn vào state của Post
@@ -95,12 +107,12 @@ function ReplyComment({ cmt, postId, fetchPostComment, replyId }) {
 
     return (
         <div key={cmt.commentId} className="flex-col  ">
-            <div className="w-full flex items-center">
+            <div className="w-full flex items-center dark:text-white">
                 <img
                     src={cmt.user.avatar}
                     className="w-10 h-10 rounded-full object-cover mr-2"
                 />
-                <div className="w-full bg-gray-200 rounded-xl relative">
+                <div className="w-full bg-gray-200 rounded-xl relative dark:bg-gray-800">
                     <p className="text-base font-medium px-4 w-11/12">
                         {cmt.user.firstname + ' ' + cmt.user.lastname}
                     </p>
@@ -120,24 +132,25 @@ function ReplyComment({ cmt, postId, fetchPostComment, replyId }) {
             </div>
             <button
                 onClick={() => setShowReply(true)}
-                className="text-sm ml-16 font-semibold text-gray-700 hover:text-gray-500 hover:underline"
+                className="text-sm ml-16 font-semibold text-gray-700 dark:text-gray-400 dark:hover:text-gray-600 hover:text-gray-500 hover:underline"
             >
                 Phản hồi
             </button>
 
             {showReply ? (
-                <div className="w-full flex items-center">
+                <div className="w-full flex items-center dark:text-white mb-2">
                     <img
                         src={user.avatar}
-                        className="w-8 h-8 rounded-full object-cover ml-28"
+                        className="w-8 h-8 rounded-full object-cover ml-14"
                     />
-                    <div className="w-full bg-gray-100 rounded-xl ml-2">
+                    <div className="w-full bg-gray-100 rounded-xl ml-2 dark:bg-gray-800">
                         <span className="text-base font-semibold px-4 pt-1">
                             {user.firstName + ' ' + user.lastName}
                         </span>
                         <div className="relative w-full">
                             <input
-                                className="w-11/12 px-4 pb-2  rounded-xl bg-gray-100 focus:outline-none text-base "
+                                ref={replyInputRef}
+                                className="w-11/12 px-4 pb-2  rounded-xl bg-gray-100 dark:bg-gray-800 focus:outline-none text-base "
                                 placeholder="Thêm bình luận của bạn"
                                 value={comment}
                                 onChange={(e) => setCommnet(e.target.value)}
