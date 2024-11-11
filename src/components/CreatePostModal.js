@@ -87,7 +87,7 @@ const CreatePostModal = ({ isOpen, onClose, topics, post }) => {
             onClose();
             post();
             console.log('Bài viết đã được tạo thành công:', response.data);
-            toast.success('Lưu sách thành công', {
+            toast.success('Thêm bài viết thành công', {
                 position: 'top-right',
                 autoClose: 4000,
                 hideProgressBar: false,

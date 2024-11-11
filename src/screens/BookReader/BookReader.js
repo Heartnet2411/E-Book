@@ -32,7 +32,7 @@ const BookReader = () => {
         manager: 'continuous',
     });
     const toc = useRef([]);
-    const locationChanged = (epubcfi) => {
+    const locationChanged = async (epubcfi) => {
         setLocation(epubcfi);
         if (reactReaderRef?.current && toc.current) {
             const { displayed, href } =
@@ -66,9 +66,6 @@ const BookReader = () => {
             fetchBook(id);
         }
     }, [id]);
-    useEffect(() => {
-        getFirstParagraphText();
-    }, []);
     const fetchBook = async (id) => {
         try {
             const response = await axios.get(url + `/book/${id}`);
@@ -103,61 +100,6 @@ const BookReader = () => {
         console.log(bookmarks);
         console.log(location);
     };
-    const handleSearch = async (searchTerm) => {
-        const rendition = reactReaderRef.current;
-
-        if (!rendition) return;
-
-        // Clear previous highlights and results
-        rendition.annotations.remove('highlight');
-        setSearchResults([]); // Reset search results
-
-        // Get all sections in the spine
-        const spineItems = rendition.book.spine.items;
-        const results = []; // To store search results
-
-        // Iterate over spine items
-        for (let section of spineItems) {
-            try {
-                // Load the content of the section
-                const contents = await rendition.getContents(section.href);
-
-                // Get the HTML content of the current section
-                const sectionHtml = await contents.getHtml(); // Gọi getHtml trên contents
-
-                // Find all occurrences of the search term in the section
-                const regex = new RegExp(searchTerm, 'gi');
-                let match;
-
-                while ((match = regex.exec(sectionHtml)) !== null) {
-                    // Create a range and highlight the matched text
-                    const range = document.createRange();
-                    const start = match.index;
-                    const end = start + searchTerm.length;
-
-                    // Highlight the matched range
-                    const element = document.createElement('span');
-                    element.style.backgroundColor = 'yellow'; // Highlight color
-                    element.style.opacity = '0.5'; // Highlight transparency
-                    range.surroundContents(element);
-
-                    // Store the result with href and snippet
-                    results.push({
-                        href: section.href,
-                        snippet: match[0], // The found text
-                        toc: section.label, // Title of the section
-                    });
-                }
-            } catch (error) {
-                console.error('Error searching section:', section, error);
-            }
-        }
-
-        // Update the search results state
-        setSearchResults(results);
-        console.log(results);
-    };
-
     const handleCopyLink = () => {
         navigator.clipboard
             .writeText(url)
@@ -168,47 +110,10 @@ const BookReader = () => {
                 console.error('Lỗi khi sao chép URL:', error);
             });
     };
-    // Hàm lấy đoạn văn đầu tiên của trang hiện tại
-    const getFirstParagraphText = () => {
-        const rendition = reactReaderRef.current;
-
-        if (rendition) {
-            // Lấy vị trí hiện tại từ rendition
-            const location = rendition.location;
-
-            // Kiểm tra nếu có location
-            if (location && location.start) {
-                const { start } = location;
-
-                // Lấy nội dung từ vị trí start
-                rendition.display(start.cfi).then(() => {
-                    // Sau khi đã chuyển đến vị trí, lấy nội dung hiển thị
-                    const contents = rendition.getContents();
-
-                    let firstParagraphText = '';
-
-                    contents.forEach((content) => {
-                        const firstParagraph =
-                            content.document.querySelector('p'); // Lấy đoạn văn đầu tiên
-                        if (firstParagraph) {
-                            firstParagraphText = firstParagraph.innerText; // Lưu đoạn văn đầu tiên
-                        }
-                    });
-
-                    setCurrentBookmarkText(firstParagraphText); // Cập nhật đoạn văn đầu tiên
-                });
-            }
-        }
-    };
     const handleBookmark = async () => {
         if (reactReaderRef?.current) {
             const currentLocation =
                 reactReaderRef?.current?.location?.start?.cfi;
-            //     const rendition = reactReaderRef.current;
-            //    const contents = rendition?.getContents();
-            //     if (contents.length > 0) {
-            // Ví dụ lấy text từ trang hiện tại
-            //     const textContent = contents[1]?.document?.body.childNodes[3].innerText.toString().substring(0, 100);
             console.log(currentBookmarkText);
 
             const bookmark = {
@@ -237,7 +142,7 @@ const BookReader = () => {
         setIsControlModalOpen(false);
     };
     console.log(selectedFont);
-    const updateFontSize = (size) => {
+    const updateFontSize = async (size) => {
         reactReaderRef?.current?.themes?.fontSize(`${size}%`);
     };
     useEffect(() => {
@@ -388,8 +293,7 @@ const BookReader = () => {
                 onFullScreen={toggleFullScreen}
                 onControl={handleControlClick}
                 title={book?.bookName}
-                onSearch={handleSearch}
-                
+                // onSearch={handleSearch}
             />
             <div className="flex-grow">
                 <ReactReader
@@ -409,10 +313,9 @@ const BookReader = () => {
                     epubOptions={epubOptions}
                     locationChanged={locationChanged}
                     getRendition={(rendition) => {
-                        updateTheme(reactReaderRef, selectedColor);
-                        // updateScrollMode(reactReaderRef,isScrollMode)
-                        updateFontSize(size);
                         reactReaderRef.current = rendition;
+                        updateTheme(reactReaderRef, selectedColor);
+                        updateFontSize(size);
                     }}
                 />
                 {/* <div
