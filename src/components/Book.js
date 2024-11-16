@@ -29,7 +29,7 @@ export default function Book({ book }) {
 
     return (
         <div
-            className="book flex flex-col items-center p-4 cursor-pointer"
+            className="book flex flex-col items-center p-4 cursor-pointer hover:scale-105 transition-all duration-300"
             onClick={handleClick}
         >
             <ImageWithFallback

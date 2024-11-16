@@ -10,6 +10,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io';
 import '../Home.css';
 import SkeletonBook from '../components/SkeletonBook';
+import WeeklyTopBooks from '../components/WeeklyTopBooks';
 
 import { url } from '../config/config';
 
@@ -55,13 +56,23 @@ export default function Home() {
     };
 
     const [books, setBooks] = useState([]);
+    const [mostReadOfWeek, setMostReadOfWeek] = useState([]);
     const [literatureBooks, setLiteratureBooks] = useState([]);
     const [scienceBooks, setScienceBooks] = useState([]);
     const [historyBooks, setHistoryBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const token = localStorage.getItem('token');
 
+    console.log('week', mostReadOfWeek);
+    console.log('books', books);
+
     const fetchBook = () => {
+        axios
+            .get(url + `/recommend/recommend-book/most-read-of-week`)
+            .then((res) => {
+                setMostReadOfWeek(res.data.books);
+            })
+            .catch((err) => console.log(err));
         axios
             .get(url + `/recommend/recommend-book`, {
                 headers: {
@@ -126,25 +137,39 @@ export default function Home() {
             <div className="popular px-8 mt-16 max-w-screen-2xl mx-auto">
                 <div>
                     <>
-                        <div className="title text-black dark:text-white font-semibold text-6xl px-8 text-center ">
-                            Sách đề xuất cho bạn
+                        {books.length > 0 ? (
+                            <div>
+                                <div className="title text-black dark:text-white font-semibold text-6xl px-8 text-center ">
+                                    Sách đề xuất cho bạn
+                                </div>
+                                <Slider {...setting} className="px-20 mt-8">
+                                    {loading
+                                        ? Array.from({ length: 5 }).map(
+                                              (_, index) => (
+                                                  <SkeletonBook
+                                                      key={index}
+                                                      className="flex-shrink-0 w-1/5"
+                                                  />
+                                              )
+                                          )
+                                        : books.map((book) => (
+                                              <Book
+                                                  className="flex-shrink-0 w-1/5"
+                                                  book={book}
+                                                  key={book.id}
+                                              />
+                                          ))}
+                                </Slider>
+                            </div>
+                        ) : null}
+
+                        <div className="title text-black dark:text-white font-semibold text-5xl px-8 text-center mt-5">
+                            Đọc nhiều trong tuần
                         </div>
-                        <Slider {...setting} className="px-20 mt-8">
-                            {loading
-                                ? Array.from({ length: 5 }).map((_, index) => (
-                                      <SkeletonBook
-                                          key={index}
-                                          className="flex-shrink-0 w-1/5"
-                                      />
-                                  ))
-                                : books.map((book) => (
-                                      <Book
-                                          className="flex-shrink-0 w-1/5"
-                                          book={book}
-                                          key={book.id}
-                                      />
-                                  ))}
-                        </Slider>
+                        <div className="my-8  dark:bg-gray-900 flex items-center justify-center">
+                            <WeeklyTopBooks data={mostReadOfWeek} />
+                        </div>
+
                         <div className="recommend px-8 mt-10">
                             <div className="title text-black dark:text-white font-semibold text-4xl px-8 mb-4">
                                 Sách Văn Học Việt Nam
