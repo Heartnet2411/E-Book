@@ -14,13 +14,10 @@ import axios from 'axios';
 import { url } from '../config/config';
 import { toast, Slide } from 'react-toastify';
 
-const CreatePostModal = ({ isOpen, onClose, topics, post }) => {
+const CreatePostModal = ({ isOpen, onClose, topicId, topicName }) => {
     const [editorState, setEditorState] = useState(() =>
         EditorState.createEmpty()
     );
-    const [title, setTitle] = useState('');
-    const [selectedTopicId, setSelectedTopicId] = useState('');
-    console.log(selectedTopicId);
     const [imageUrl, setImageUrl] = useState('');
     const [imageFile, setImageFile] = useState('');
     const token = localStorage.getItem('token');
@@ -64,15 +61,34 @@ const CreatePostModal = ({ isOpen, onClose, topics, post }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (!editorState.getCurrentContent().hasText()) {
+            toast.error(
+                'Vui lòng điền đầy đủ thông tin trước khi tạo bài viết',
+                {
+                    position: 'top-right',
+                    autoClose: 4000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Slide,
+                }
+            );
+            return; // Ngừng việc tạo post
+        }
+
         const contentState = editorState.getCurrentContent();
         const htmlContent = stateToHTML(contentState);
 
         // Log tất cả dữ liệu đã nhập
 
         const formData = new FormData();
-        formData.append('title', title);
+
         formData.append('content', htmlContent);
-        formData.append('topicId', selectedTopicId);
+        formData.append('topicId', topicId);
         if (imageFile) {
             formData.append('image', imageFile); // Thêm file ảnh vào FormData
         }
@@ -85,9 +101,8 @@ const CreatePostModal = ({ isOpen, onClose, topics, post }) => {
                 },
             });
             onClose();
-            post();
             console.log('Bài viết đã được tạo thành công:', response.data);
-            toast.success('Lưu sách thành công', {
+            toast.success('Đã thêm bài viết thành công. Vui lòng chờ duyệt', {
                 position: 'top-right',
                 autoClose: 4000,
                 hideProgressBar: false,
@@ -98,6 +113,10 @@ const CreatePostModal = ({ isOpen, onClose, topics, post }) => {
                 theme: 'light',
                 transition: Slide,
             });
+
+            setImageFile('');
+            setImageUrl('');
+            setEditorState(() => EditorState.createEmpty());
         } catch (error) {
             console.error('Có lỗi xảy ra khi tạo bài viết:', error.message);
             toast.error('Có lỗi xảy ra khi thêm bài viết', {
@@ -144,36 +163,12 @@ const CreatePostModal = ({ isOpen, onClose, topics, post }) => {
                 </p>
 
                 <div className="mb-2">
-                    <label className="block text-gray-700 text-base font-bold mb-1 dark:text-gray-200">
-                        Tiêu đề
-                    </label>
-                    <input
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-0"
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)} // Lưu trữ giá trị tiêu đề
-                        placeholder="Nhập tiêu đề"
-                    />
-                </div>
-
-                <div className="mb-2">
                     <label className="block text-gray-700 dark:text-gray-200 text-base font-bold mb-1">
                         Chủ đề bài viết
                     </label>
-                    <select
-                        className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-0"
-                        value={selectedTopicId}
-                        onChange={(e) => setSelectedTopicId(e.target.value)} // Lưu trữ ID của chủ đề đã chọn
-                    >
-                        <option value="default">
-                            --Chọn chủ đề bài viết--
-                        </option>
-                        {topics.map((topic) => (
-                            <option key={topic.topicId} value={topic.topicId}>
-                                {topic.name}
-                            </option>
-                        ))}
-                    </select>
+                    <p className="w-full px-3 py-2 border border-gray-300 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-0">
+                        {topicName}
+                    </p>
                 </div>
 
                 <label className="block text-gray-700 text-base font-bold mb-1 dark:text-gray-200">
@@ -264,6 +259,7 @@ const CreatePostModal = ({ isOpen, onClose, topics, post }) => {
                             handleKeyCommand={RichUtils.handleKeyCommand}
                             onChange={handleEditorChange}
                             blockStyleFn={myBlockStyleFn}
+                            placeholder="Thêm nội dung"
                         />
                     </div>
                 </div>

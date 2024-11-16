@@ -26,7 +26,6 @@ function CountrySelector({
     useEffect(() => {
         if (clearSelected) {
             setIsDropdownOpen(false);
-            setSelectedCountries([]); // Xóa lựa chọn
         }
     }, [clearSelected, setSelectedCountries]);
 

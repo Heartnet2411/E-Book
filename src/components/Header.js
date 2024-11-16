@@ -87,7 +87,7 @@ const Header = ({ user }) => {
                     <Link
                         to={'/forum'}
                         className={`text-black h-16  text-xl font-medium ${
-                            location.pathname === '/forum'
+                            location.pathname.includes('/forum')
                                 ? ' text-blue-600 hover:text-blue-800 dark:text-blue-600 dark:hover:text-blue-800'
                                 : 'hover:text-gray-500 dark:text-white dark:hover:text-gray-400'
                         }`}

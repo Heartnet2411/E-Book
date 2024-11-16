@@ -314,9 +314,9 @@ function Post({ post }) {
     return (
         <div
             key={post.postId}
-            className=" bg-white dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-xl flex justify-between p-2 px-8 items-center rounded-lg mt-4 "
+            className="border-gray-200 border dark:border-gray-700 bg-white dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-md flex justify-between p-2 px-8 items-center rounded-lg mt-4 "
         >
-            <div className="w-full">
+            <div className="w-full ">
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center">
                         <img

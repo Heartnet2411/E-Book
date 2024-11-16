@@ -59,18 +59,23 @@ export default function Home() {
     const [scienceBooks, setScienceBooks] = useState([]);
     const [historyBooks, setHistoryBooks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const token = localStorage.getItem('token');
 
     const fetchBook = () => {
         axios
-            .get(url + `/book/search?page=2`)
+            .get(url + `/recommend/recommend-book`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
             .then((res) => {
-                setBooks(res.data.books);
+                setBooks(res.data);
             })
             .catch((err) => console.log(err));
         axios
             .get(
                 url +
-                    `/book/search?page=1&categoryId=1bccf7dd-a793-4614-bd2e-661275fbb338`
+                    `/book/search?page=1&categoryIds=1bccf7dd-a793-4614-bd2e-661275fbb338`
             )
             .then((res) => {
                 setLiteratureBooks(res.data.books);
@@ -79,7 +84,7 @@ export default function Home() {
         axios
             .get(
                 url +
-                    `/book/search?page=1&categoryId=2ff820ac-b572-4a93-b2c2-811301b08d44`
+                    `/book/search?page=1&categoryIds=2ff820ac-b572-4a93-b2c2-811301b08d44`
             )
             .then((res) => {
                 setScienceBooks(res.data.books);
@@ -89,7 +94,7 @@ export default function Home() {
         axios
             .get(
                 url +
-                    `/book/search?page=1&categoryId=730f08f7-4a14-4f74-b0b6-5cca802190a0`
+                    `/book/search?page=1&categoryIds=730f08f7-4a14-4f74-b0b6-5cca802190a0`
             )
             .then((res) => {
                 setHistoryBooks(res.data.books);
@@ -122,7 +127,7 @@ export default function Home() {
                 <div>
                     <>
                         <div className="title text-black dark:text-white font-semibold text-6xl px-8 text-center ">
-                            Đọc nhiều trong tuần
+                            Sách đề xuất cho bạn
                         </div>
                         <Slider {...setting} className="px-20 mt-8">
                             {loading

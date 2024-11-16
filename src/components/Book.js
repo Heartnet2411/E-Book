@@ -37,7 +37,7 @@ export default function Book({ book }) {
                 alt="Example"
                 fallbackSrc={BookImage} // Hình ảnh mặc định
             />
-            <h3 className="text-black dark:text-white text-lg max-w-52 line-clamp-3">
+            <h3 className="text-black dark:text-white text-lg max-w-52 line-clamp-3 text-center">
                 {book.bookName}
             </h3>
         </div>

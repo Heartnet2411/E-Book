@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { TbMessageReport } from 'react-icons/tb';
+import { FaRegEdit } from 'react-icons/fa';
+import EditCommentModal from './EditCommentModal';
 
-const Comment = ({ comment, isCurrentUser, openReportModal }) => {
+const Comment = ({
+    comment,
+    isCurrentUser,
+    openReportModal,
+    updateComment,
+}) => {
+    const [isEditing, setIsEditing] = useState(false);
+
     const renderStars = (rating) => {
         return [1, 2, 3, 4, 5].map((star) =>
             star <= rating ? (
@@ -11,6 +20,11 @@ const Comment = ({ comment, isCurrentUser, openReportModal }) => {
                 <AiOutlineStar size={20} key={star} className="text-gray-400" />
             )
         );
+    };
+
+    const handleEditSave = async (updatedComment) => {
+        await updateComment(comment.bookId, updatedComment);
+        setIsEditing(false);
     };
 
     return (
@@ -32,12 +46,23 @@ const Comment = ({ comment, isCurrentUser, openReportModal }) => {
                     <span className="mr-2">
                         {new Date(comment.createdAt).toLocaleDateString(
                             'en-GB'
-                        )}{' '}
-                        {/* Định dạng dd/mm/yyyy */}
+                        )}
                     </span>
-                    {isCurrentUser ? null : (
+                    {isCurrentUser ? (
                         <div className="relative group">
-                            <button onClick={openReportModal} className="px-2 ">
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="px-2 text-black dark:text-white"
+                            >
+                                <FaRegEdit size={24} />
+                            </button>
+                            <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 text-white dark:bg-gray-200 dark:text-black text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                Chỉnh sửa bình luận
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="relative group">
+                            <button onClick={openReportModal} className="px-2">
                                 <TbMessageReport size={26} color="red" />
                             </button>
                             <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 text-white dark:bg-gray-200 dark:text-black text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -49,12 +74,18 @@ const Comment = ({ comment, isCurrentUser, openReportModal }) => {
                 <div className="flex items-center">
                     <span className="mr-2">Đánh giá:</span>
                     <div className="flex space-x-1">
-                        {renderStars(comment.rating)}{' '}
-                        {/* Hiển thị sao dựa trên rating */}
+                        {renderStars(comment.rating)}
                     </div>
                 </div>
                 <p>Nội dung: {comment.comment}</p>
             </div>
+            {isEditing && (
+                <EditCommentModal
+                    comment={comment}
+                    onClose={() => setIsEditing(false)}
+                    onSave={handleEditSave}
+                />
+            )}
         </div>
     );
 };

@@ -452,8 +452,8 @@ function PostModal({ post, onClose }) {
                             />
                         ))
                     ) : (
-                        <div>
-                            <span>Chưa có bình luận nào</span>
+                        <div className="pb-4 pt-2 text-inherit">
+                            <em>Chưa có bình luận nào</em>
                         </div>
                     )}
                 </div>

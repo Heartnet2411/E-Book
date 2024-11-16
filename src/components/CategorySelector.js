@@ -27,7 +27,6 @@ function CategorySelector({
     useEffect(() => {
         if (clearSelected) {
             setIsDropdownOpen(false); // Đóng dropdown
-            setSelectedCategories([]); // Xóa tất cả lựa chọn
         }
     }, [clearSelected, setSelectedCategories]);
 
