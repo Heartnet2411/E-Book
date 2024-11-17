@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function ReportModal({ onClose,onSubmit }) {
+function ReportModal({ onClose, onSubmit }) {
     const reasons = [
         'Vấn đề liên quan đến người dưới 18 tuổi',
         'Bắt nạt, quấy rối hoặc lạm dụng/ngược đãi',
@@ -12,8 +12,8 @@ function ReportModal({ onClose,onSubmit }) {
     ];
 
     const handleSelectReason = (reason) => {
-         console.log('Selected reason:', reason);
-         onSubmit(reason)
+        console.log('Selected reason:', reason);
+        onSubmit(reason);
     };
 
     const handleOutsideClick = (event) => {

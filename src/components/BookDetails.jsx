@@ -12,6 +12,7 @@ import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import BookImage from '../assets/book.jpg';
 import { storage } from '../utils/firebase.js';
 import Notification from '../components/Notification';
+import RatingSummary from './RatingSumary.js';
 import { useState, useEffect } from 'react';
 import Comment from './BookComment.js';
 import { toast, Slide } from 'react-toastify';
@@ -41,17 +42,15 @@ export default function BookDetails() {
     const [isSaved, setIsSaved] = useState(false);
     const token = localStorage.getItem('token');
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-    const [selectedCommentId,setSelectedCommentId] = useState(null)
-    
+    const [selectedCommentId, setSelectedCommentId] = useState(null);
 
     const openReportModal = (commentId) => {
         setIsReportModalOpen(true);
         setSelectedCommentId(commentId);
-
     };
     const closeReportModal = () => {
         setIsReportModalOpen(false);
-        setSelectedCommentId(null)
+        setSelectedCommentId(null);
     };
 
     useEffect(() => {
@@ -64,9 +63,7 @@ export default function BookDetails() {
 
     const fetchComments = async () => {
         try {
-            const response = await axios.get(
-                url+`/book/comments/${id}`
-            );
+            const response = await axios.get(url + `/book/comments/${id}`);
 
             setComments(response.data);
             setMyComments(
@@ -116,28 +113,55 @@ export default function BookDetails() {
 
     const handleClickRead = async (id) => {
         try {
+            await updateBookReadCount();
             navigate(`/reader/${id}`);
         } catch (error) {
             console.error('Lỗi khi tải sách:', error);
         }
     };
+
+    const updateBookReadCount = async () => {
+        try {
+            const response = await fetch(url + `/book/book-reader/${id}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update read count');
+            }
+
+            const data = await response.json();
+            console.log('Updated read count:', data);
+            return data; // Trả về dữ liệu nếu cần sử dụng ở nơi khác
+        } catch (error) {
+            console.error('Error updating read count:', error);
+        }
+    };
+
     const handleCreateReport = async (reason) => {
         if (!selectedCommentId) return;
 
         try {
-            const response = await axios.post(url + `/report/create`, {
-                targetType: 'book_comment',
-                targetId: selectedCommentId,
-                reason: reason,
-                userId : user?.userId
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            const response = await axios.post(
+                url + `/report/create`,
+                {
+                    targetType: 'book_comment',
+                    targetId: selectedCommentId,
+                    reason: reason,
+                    userId: user?.userId,
                 },
-            });
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             toast.success('Báo cáo thành công!', {
-                position: "top-right",
+                position: 'top-right',
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -149,7 +173,7 @@ export default function BookDetails() {
         } catch (error) {
             console.error('Error creating report:', error);
             toast.error('Có lỗi xảy ra khi báo cáo!', {
-                position: "top-right",
+                position: 'top-right',
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -192,7 +216,7 @@ export default function BookDetails() {
 
         try {
             await axios.post(
-                url+'/book/comments',
+                url + '/book/comments',
                 {
                     bookId: id,
                     rating: rating,
@@ -211,7 +235,7 @@ export default function BookDetails() {
             setShowModal(true);
         } catch (error) {
             console.error('Error submitting comment:', error);
-            setModalMessage('Có lỗi xảy ra xin vui lòng thử lại sau');
+            setModalMessage(error.response.data.message);
             setShowModal(true);
         } finally {
             setComment('');
@@ -304,6 +328,28 @@ export default function BookDetails() {
                 theme: 'light',
                 transition: Slide,
             });
+        }
+    };
+
+    const updateComment = async (bookId, updatedComment) => {
+        try {
+            const response = await fetch(url + `/book/comments/${bookId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`, // Thay userToken bằng token của user
+                },
+                body: JSON.stringify(updatedComment),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update comment');
+            }
+
+            const data = await response.json();
+            fetchComments();
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -435,6 +481,9 @@ export default function BookDetails() {
                                         : 'Xem thêm'}
                                 </button>
                             )}
+
+                            <RatingSummary bookId={book.bookId} />
+
                             {/* Reviews Section */}
                             {user ? (
                                 <div className="my-4 p-4 border rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-600 w-3/4">
@@ -501,6 +550,9 @@ export default function BookDetails() {
                                                             }
                                                             comment={comment}
                                                             isCurrentUser={true}
+                                                            updateComment={
+                                                                updateComment
+                                                            }
                                                         />
                                                     ))}
                                                 {myCommentLimit <
@@ -533,8 +585,10 @@ export default function BookDetails() {
                                                             isCurrentUser={
                                                                 false
                                                             }
-                                                            openReportModal={()=>
-                                                                openReportModal(comment.commentId)
+                                                            openReportModal={() =>
+                                                                openReportModal(
+                                                                    comment.commentId
+                                                                )
                                                             }
                                                         />
                                                     ))}

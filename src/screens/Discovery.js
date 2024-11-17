@@ -4,6 +4,8 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { url } from '../config/config';
 import Book from '../components/Book';
+import CategorySelector from '../components/CategorySelector';
+import CountrySelector from '../components/CountrySelector';
 import { FaAngleLeft } from 'react-icons/fa';
 import { FaAngleRight } from 'react-icons/fa';
 import { FaAngleDoubleRight } from 'react-icons/fa';
@@ -20,10 +22,11 @@ function Discovery() {
     const [currentPage, setCurrentPage] = useState(1);
     const [categories, setCategories] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [clearSelected, setClearSelected] = useState(false);
     const [fromYear, setFromYear] = useState('');
     const [toYear, setToYear] = useState('');
-    const [selectedCountry, setSelectedCountry] = useState('');
+    const [selectedCountries, setSelectedCountries] = useState([]);
     const bookRef = useRef(null);
     const years = [1900, 1950, 1975, 2000, 2010, 2020, 2024];
     const handleFromYearChange = (e) => {
@@ -44,6 +47,17 @@ function Discovery() {
         (year) => !fromYear || year >= fromYear
     );
     const filteredFromYears = years.filter((year) => !toYear || year <= toYear);
+
+    const countries = [
+        'Việt Nam',
+        'Hoa Kỳ',
+        'Trung Quốc',
+        'Đức',
+        'Anh',
+        'Nhật',
+        'Pháp',
+        'Nga',
+    ];
 
     // Tính toán các trang cần hiển thị
     const getPaginationPages = (currentPage, totalPages) => {
@@ -133,10 +147,10 @@ function Discovery() {
     const handleSearch = () => {
         console.log({
             searchText,
-            selectedCategory,
+            selectedCategories,
             fromYear,
             toYear,
-            selectedCountry,
+            selectedCountries,
         });
         setLoading(true);
         fetchBooks(1);
@@ -148,20 +162,29 @@ function Discovery() {
 
     const fetchBooks = (page) => {
         setLoading(true);
+        setClearSelected(true);
         axios
-            .get(
-                url +
-                    `/book/search?page=${page}&name=${searchText}&categoryId=${selectedCategory}&country=${selectedCountry}&startYear=${fromYear}&endYear=${toYear}`
-            )
+            .get(`${url}/book/search`, {
+                params: {
+                    page,
+                    name: searchText || '', // Sử dụng giá trị mặc định nếu không có searchText
+                    categoryIds: selectedCategories.join(','), // Chuyển mảng sang chuỗi cho nhiều thể loại
+                    countries: selectedCountries.join(','),
+                    startYear: fromYear || '',
+                    endYear: toYear || '',
+                },
+            })
             .then((res) => {
                 console.log(res.data.books);
                 setBooks(res.data.books);
                 setTotalPages(res.data.totalPages);
                 setLoading(false);
+                setClearSelected(false);
             })
             .catch((err) => {
                 console.log(err);
                 setLoading(false);
+                setClearSelected(false);
             });
     };
 
@@ -180,7 +203,7 @@ function Discovery() {
     return (
         <div
             className="bg-gradient-to-b from-slate-50 via-slate-100 to-white 
-             dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black "
+             dark:bg-gradient-to-b dark:from-gray-900 dark:via-slate-900 dark:to-black "
         >
             <Header user={user} />
             <div className="min-h-screen p-4 max-w-screen-2xl mx-auto">
@@ -197,28 +220,13 @@ function Discovery() {
                         />
                     </div>
                     <div className="flex mb-4">
-                        <div className="flex-1 mr-2">
-                            <label className="block text-lg font-medium text-gray-700 dark:text-white">
-                                Thể loại
-                            </label>
-                            <select
-                                value={selectedCategory}
-                                onChange={(e) =>
-                                    setSelectedCategory(e.target.value)
-                                }
-                                className="px-4 py-2 max-h-72 mt-1 block w-full border border-gray-300 rounded-xl shadow-sm dark:text-white dark:bg-gray-700 dark:border-gray-900"
-                            >
-                                <option value="">-- Chọn thể loại --</option>
-                                {categories.map((category) => (
-                                    <option
-                                        key={category.categoryId}
-                                        value={category.categoryId}
-                                    >
-                                        {category.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        <CategorySelector
+                            categories={categories}
+                            selectedCategories={selectedCategories}
+                            setSelectedCategories={setSelectedCategories}
+                            clearSelected={clearSelected}
+                        />
+
                         <div className="flex-1 mx-2">
                             <label className="block text-lg font-medium text-gray-700 dark:text-white">
                                 Năm xuất bản
@@ -249,28 +257,13 @@ function Discovery() {
                                 ))}
                             </select>
                         </div>
-                        <div className="flex-1 ml-2">
-                            <label className="block text-lg font-medium text-gray-700 dark:text-white">
-                                Quốc gia
-                            </label>
-                            <select
-                                value={selectedCountry}
-                                onChange={(e) =>
-                                    setSelectedCountry(e.target.value)
-                                }
-                                className="px-4 py-2 mt-1 block w-full border border-gray-300 rounded-xl shadow-sm dark:text-white dark:bg-gray-700 dark:border-gray-900"
-                            >
-                                <option value="">-- Chọn quốc gia --</option>
-                                <option>Việt Nam</option>
-                                <option>Hoa Kỳ</option>
-                                <option>Trung Quốc</option>
-                                <option>Đức</option>
-                                <option>Anh</option>
-                                <option>Nhật</option>
-                                <option>Pháp</option>
-                                <option>Nga</option>
-                            </select>
-                        </div>
+
+                        <CountrySelector
+                            countries={countries}
+                            selectedCountries={selectedCountries}
+                            setSelectedCountries={setSelectedCountries}
+                            clearSelected={clearSelected}
+                        />
                     </div>
 
                     <button

@@ -5,7 +5,7 @@ import { PiWarningOctagonBold } from 'react-icons/pi';
 import { toast, Slide } from 'react-toastify';
 import ReportModal from './ReportModal';
 import PostModal from './PostModal';
-import {url} from '../config/config'
+import { url } from '../config/config';
 import axios from 'axios';
 
 function Post({ post }) {
@@ -17,7 +17,7 @@ function Post({ post }) {
     const contentRef = useRef(null);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedPostId,setSelectedPostId]=useState(null)
+    const [selectedPostId, setSelectedPostId] = useState(null);
     const token = localStorage.getItem('token');
 
     const handleOpenModal = () => {
@@ -29,12 +29,12 @@ function Post({ post }) {
     };
 
     const openReportModal = (postId) => {
-        setSelectedPostId(postId)
+        setSelectedPostId(postId);
         setIsReportModalOpen(true);
     };
     const closeReportModal = () => {
         setIsReportModalOpen(false);
-        setSelectedPostId(null)
+        setSelectedPostId(null);
     };
 
     const maxHeight = 144; // Set desired max height in pixels (e.g., 160px for around max-h-40)
@@ -78,21 +78,25 @@ function Post({ post }) {
         if (!selectedPostId) return;
 
         try {
-            const response = await axios.post(url + `/report/create`, {
-                targetType: 'post',
-                targetId: selectedPostId,
-                reason: reason,
-                userId : user?.userId
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            const response = await axios.post(
+                url + `/report/create`,
+                {
+                    targetType: 'post',
+                    targetId: selectedPostId,
+                    reason: reason,
+                    userId: user?.userId,
                 },
-            });
-            console.log(response.status)
-            if (response.status == 201) { // Kiểm tra xem phản hồi có thành công không
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            console.log(response.status);
+            if (response.status == 201) {
+                // Kiểm tra xem phản hồi có thành công không
                 toast.success('Báo cáo thành công!', {
-                    position: "top-right",
+                    position: 'top-right',
                     autoClose: 5000,
                     hideProgressBar: false,
                     closeOnClick: true,
@@ -103,7 +107,7 @@ function Post({ post }) {
                 closeReportModal(); // Đóng modal sau khi báo cáo
             } else {
                 toast.error('Bạn đã báo cáo bài viết này rồi', {
-                    position: "top-right",
+                    position: 'top-right',
                     autoClose: 5000,
                     hideProgressBar: false,
                     closeOnClick: true,
@@ -116,7 +120,7 @@ function Post({ post }) {
         } catch (error) {
             console.error('Error creating report:', error);
             toast.error('Có lỗi xảy ra khi báo cáo!', {
-                position: "top-right",
+                position: 'top-right',
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -237,17 +241,14 @@ function Post({ post }) {
 
     const removeFavoritePost = async (postId, token) => {
         try {
-            const response = await fetch(
-                url+ '/post/favorite/remove',
-                {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ postId }),
-                }
-            );
+            const response = await fetch(url + '/post/favorite/remove', {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ postId }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -313,9 +314,9 @@ function Post({ post }) {
     return (
         <div
             key={post.postId}
-            className=" bg-white dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-xl flex justify-between p-2 px-8 items-center rounded-lg mt-4 "
+            className="border-gray-200 border dark:border-gray-700 bg-white dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-md flex justify-between p-2 px-8 items-center rounded-lg mt-4 "
         >
-            <div className="w-full">
+            <div className="w-full ">
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center">
                         <img
@@ -364,7 +365,9 @@ function Post({ post }) {
                         <div className="relative group">
                             {' '}
                             <button
-                                onClick={()=>{openReportModal(post.postId)}}
+                                onClick={() => {
+                                    openReportModal(post.postId);
+                                }}
                                 className="cursor-pointer"
                             >
                                 <PiWarningOctagonBold

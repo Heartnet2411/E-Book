@@ -50,7 +50,7 @@ function MyAccount() {
     return (
         <div
             className="bg-gradient-to-b from-slate-50 via-slate-100 to-white 
-             dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black min-h-screen"
+             dark:bg-gradient-to-b dark:from-gray-900 dark:via-slate-900 dark:to-black min-h-screen"
         >
             <Header user={user} />
             <div className="px-16">
