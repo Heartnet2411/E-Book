@@ -9,7 +9,7 @@ const ImageWithFallback = ({ src, alt, fallbackSrc }) => {
             src={src}
             alt={alt}
             onError={(e) => {
-                e.target.src = fallbackSrc; // Thay thế bằng hình ảnh mặc định
+                e.target.src = fallbackSrc;
             }}
             className="w-52 h-80 mb-2 rounded-lg"
         />

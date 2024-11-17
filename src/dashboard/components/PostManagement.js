@@ -233,8 +233,8 @@ export default function PostManagement() {
                 },
             ],
             closeOnClickOutside: false,
-        });
-    };
+        })
+    }
     const deletePost = async (id) => {
         try {
             const response = await axios.delete(url + `/post/${id}`, {

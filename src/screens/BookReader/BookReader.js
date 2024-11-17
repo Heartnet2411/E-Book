@@ -5,13 +5,17 @@ import { useState, useRef } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 import Navbar from '../../components/BookHeader/Navbar';
 import SettingsModal from '../../components/BookHeader/SettingModal';
-import { Rendition, Contents } from 'epubjs';
+import Epub, { Rendition, Contents } from 'epubjs';
 import { useCallback } from 'react';
 import { useMemo } from 'react';
 import ControlModal from '../../components/BookHeader/ControlModal';
 import { useLocation, useParams } from 'react-router-dom';
 import { url } from '../../config/config';
 import BookmarkModal from '../../components/BookHeader/BookmarkModal';
+import { FaSearchengin } from 'react-icons/fa';
+import useBookContent from '../../hooks/useBookContent';
+
+ export const readerContext = React.createContext(null);
 
 const BookReader = () => {
     const [location, setLocation] = useLocalStorageState('persist-location', {
@@ -19,6 +23,10 @@ const BookReader = () => {
     });
     const { id } = useParams();
     const [book, setBook] = useState(null);
+    const [bookEpub, setBookEpub] = useState(null);
+    const { bookContents, searchBookContents } = useBookContent(
+        bookEpub ? bookEpub : null
+    );
     const [loading, setLoading] = useState(true);
     const locationState = useLocation();
     const [page, setPage] = useState('');
@@ -50,10 +58,11 @@ const BookReader = () => {
     const [isBookmarkModalOpen, setIsBookmarkModalOpen] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [selectedColor, setSelectedColor] = useState('light');
-    const [searchQuery, setSearchQuery] = useState('start');
+    // const [searchText, setSearchText] = useState('')
     const [searchResults, setSearchResults] = useState([]);
     const [bookmarks, setBookmarks] = useState([]);
     const [currentBookmarkText, setCurrentBookmarkText] = useState('');
+    console.log(bookEpub);
     const toggleFullScreen = () => {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
@@ -64,6 +73,9 @@ const BookReader = () => {
     useEffect(() => {
         if (!book) {
             fetchBook(id);
+        } else {
+            const newBook = Epub(book?.epubUrl, {});
+            setBookEpub(newBook);
         }
     }, [id]);
     const fetchBook = async (id) => {
@@ -79,26 +91,18 @@ const BookReader = () => {
 
     const handleSettingsClick = () => {
         setIsSettingModalOpen(true);
-        setIsBookmarkModalOpen(false);
-        setIsControlModalOpen(false);
     };
     const closeSettingModal = () => {
         setIsSettingModalOpen(false);
     };
     const handleControlClick = () => {
         setIsControlModalOpen(true);
-        setIsBookmarkModalOpen(false);
-        setIsSettingModalOpen(false);
     };
     const closeControlModal = () => {
         setIsControlModalOpen(false);
     };
     const handleShowBookmark = () => {
         setIsBookmarkModalOpen(true);
-        setIsSettingModalOpen(false);
-        setIsControlModalOpen(false);
-        console.log(bookmarks);
-        console.log(location);
     };
     const handleCopyLink = () => {
         navigator.clipboard
@@ -284,6 +288,12 @@ const BookReader = () => {
         }),
         []
     );
+    const handleSearch = async (text) => {
+        console.log(text);
+        const result = searchBookContents(text);
+        setSearchResults(result);
+    }
+    // console.log(searchResults);
     return (
         <div className="h-screen flex flex-col">
             <Navbar
@@ -293,7 +303,10 @@ const BookReader = () => {
                 onFullScreen={toggleFullScreen}
                 onControl={handleControlClick}
                 title={book?.bookName}
-                // onSearch={handleSearch}
+                onSearch={handleSearch}
+                searchResults={searchResults}
+                setCurrentPage={setLocation}
+                rendition ={reactReaderRef}
             />
             <div className="flex-grow">
                 <ReactReader
@@ -314,6 +327,16 @@ const BookReader = () => {
                     locationChanged={locationChanged}
                     getRendition={(rendition) => {
                         reactReaderRef.current = rendition;
+                        console.log(rendition);
+                        // handleSearch();
+                        rendition.book.ready
+                            .then((book) => {
+                                return rendition.book.locations.generate();
+                            })
+                            .then((locations) => {
+                                console.log('Total Pages?: ', locations.length);
+                                console.log('current Page:', locations.total);
+                            });
                         updateTheme(reactReaderRef, selectedColor);
                         updateFontSize(size);
                     }}
@@ -331,42 +354,33 @@ const BookReader = () => {
                     {page}
                 </div> */}
             </div>
-            {isSettingModalOpen && (
-                <div className="fixed top-10 right-0 flex items-center justify-center rounded-lg bg-black bg-opacity-50 z-10">
-                    <SettingsModal
-                        onClose={closeSettingModal}
-                        isScrollMode={isScrollMode}
-                        setIsScrollMode={setIsScrollMode}
-                        selectedColor={selectedColor}
-                        setSelectedColor={setSelectedColor}
-                        size={size}
-                        setSize={setSize}
-                        selectedFont={selectedFont}
-                        setSelectedFont={setSelectedFont}
-                    />
-                </div>
-            )}
-            {isControlModalOpen && (
-                <div className="fixed top-11 right-0 flex items-center justify-center rounded-lg bg-black bg-opacity-50 z-10">
-                    <ControlModal
-                        onClose={closeControlModal}
-                        epubUrl={book?.epubUrl}
-                        onCopy={handleCopyLink}
-                    />
-                </div>
-            )}
-            {isBookmarkModalOpen && (
-                <div className="fixed top-11 right-0 flex items-center justify-center rounded-lg bg-black bg-opacity-50 z-10">
-                    <BookmarkModal
-                        onClose={() => setIsBookmarkModalOpen(false)}
-                        bookmarks={bookmarks}
-                        onJump={(bookmark) => {
-                            setLocation(bookmark.location);
-                            setIsBookmarkModalOpen(false);
-                        }}
-                    />
-                </div>
-            )}
+            <SettingsModal
+                isOpen={isSettingModalOpen}
+                onClose={closeSettingModal}
+                isScrollMode={isScrollMode}
+                setIsScrollMode={setIsScrollMode}
+                selectedColor={selectedColor}
+                setSelectedColor={setSelectedColor}
+                size={size}
+                setSize={setSize}
+                selectedFont={selectedFont}
+                setSelectedFont={setSelectedFont}
+            />
+            <ControlModal
+                isOpen={isControlModalOpen}
+                onClose={closeControlModal}
+                epubUrl={book?.epubUrl}
+                onCopy={handleCopyLink}
+            />
+            <BookmarkModal
+                isOpen={isBookmarkModalOpen}
+                onClose={() => setIsBookmarkModalOpen(false)}
+                bookmarks={bookmarks}
+                onJump={(bookmark) => {
+                    setLocation(bookmark.location);
+                    setIsBookmarkModalOpen(false);
+                }}
+            />
         </div>
     );
 };
