@@ -26,9 +26,11 @@ const Navbar = ({
     onControl,
     title,
     onSearch,
+    setSearchResults,
     searchResults,
     rendition,
     setCurrentPage,
+    bookmarked,
 }) => {
     const [searchText, setSearchText] = useState('');
     const [showResults, setShowResults] = useState(false);
@@ -42,6 +44,7 @@ const Navbar = ({
     };
     const handleBlur = () => {
         setTimeout(() => setShowResults(false), 100);
+        setSearchResults([])
     };
     const onListItemClick = async (href, paragraph) => {
         await rendition?.current?.display(href);
@@ -62,7 +65,7 @@ const Navbar = ({
                 );
             }
         }
-        setCurrentPage(href);
+         setCurrentPage(href);
     };
     return (
         <nav className="navbar flex justify-between bg-gray-900 text-white p-3">
@@ -101,7 +104,7 @@ const Navbar = ({
                             {searchResults.map((item, index) => {
                                 return item ? (
                                     <ListItemButton
-                                        onClick={() =>
+                                    onMouseDown={() =>
                                             onListItemClick(
                                                 item.href,
                                                 item.paragraph
@@ -147,11 +150,11 @@ const Navbar = ({
                     />
                 </li>
                 <li>
-                    {isBookmarked ? (
+                    {bookmarked ? (
                         <BsBookmarkPlusFill
                             size={22}
                             onClick={onBookmark}
-                            // color="yellow"
+                             color="yellow"
                             className="hover:cursor-pointer"
                         />
                     ) : (

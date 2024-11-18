@@ -12,10 +12,9 @@ import ControlModal from '../../components/BookHeader/ControlModal';
 import { useLocation, useParams } from 'react-router-dom';
 import { url } from '../../config/config';
 import BookmarkModal from '../../components/BookHeader/BookmarkModal';
-import { FaSearchengin } from 'react-icons/fa';
 import useBookContent from '../../hooks/useBookContent';
 
- export const readerContext = React.createContext(null);
+export const readerContext = React.createContext(null);
 
 const BookReader = () => {
     const [location, setLocation] = useLocalStorageState('persist-location', {
@@ -24,9 +23,7 @@ const BookReader = () => {
     const { id } = useParams();
     const [book, setBook] = useState(null);
     const [bookEpub, setBookEpub] = useState(null);
-    const { bookContents, searchBookContents } = useBookContent(
-        bookEpub ? bookEpub : null
-    );
+    const { bookContents, searchBookContents } = useBookContent(bookEpub);
     const [loading, setLoading] = useState(true);
     const locationState = useLocation();
     const [page, setPage] = useState('');
@@ -46,11 +43,11 @@ const BookReader = () => {
             const { displayed, href } =
                 reactReaderRef?.current?.location?.start;
             const chapter = toc.current.find((item) => item.href === href);
-            setPage(
-                `Page ${displayed?.page} of ${displayed?.total} ${
-                    chapter ? `in chapter` + chapter.label : ''
-                }`
+            setPage(chapter ? chapter.label : '');
+            const isBookmarked = bookmarks.some(
+                (bookmark) => bookmark.location === epubcfi
             );
+            setIsBookmarked(isBookmarked);
         }
     };
     const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
@@ -58,11 +55,10 @@ const BookReader = () => {
     const [isBookmarkModalOpen, setIsBookmarkModalOpen] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [selectedColor, setSelectedColor] = useState('light');
-    // const [searchText, setSearchText] = useState('')
     const [searchResults, setSearchResults] = useState([]);
     const [bookmarks, setBookmarks] = useState([]);
-    const [currentBookmarkText, setCurrentBookmarkText] = useState('');
-    console.log(bookEpub);
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = localStorage.getItem('token');
     const toggleFullScreen = () => {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
@@ -73,11 +69,14 @@ const BookReader = () => {
     useEffect(() => {
         if (!book) {
             fetchBook(id);
-        } else {
-            const newBook = Epub(book?.epubUrl, {});
-            setBookEpub(newBook);
         }
     }, [id]);
+    useEffect(() => {
+        if (book && book?.epubUrl) {
+            const epubInstance = Epub(book.epubUrl, {});
+            setBookEpub(epubInstance);
+        }
+    }, [book]);
     const fetchBook = async (id) => {
         try {
             const response = await axios.get(url + `/book/${id}`);
@@ -88,7 +87,6 @@ const BookReader = () => {
             console.error(error);
         }
     };
-
     const handleSettingsClick = () => {
         setIsSettingModalOpen(true);
     };
@@ -103,6 +101,7 @@ const BookReader = () => {
     };
     const handleShowBookmark = () => {
         setIsBookmarkModalOpen(true);
+        fetchBookmarks(user.userId, id);
     };
     const handleCopyLink = () => {
         navigator.clipboard
@@ -114,32 +113,83 @@ const BookReader = () => {
                 console.error('Lỗi khi sao chép URL:', error);
             });
     };
+    const fetchBookmarks = async (userId, bookId) => {
+        try {
+            const response = await axios.get(
+                `${url}/bookmark/${userId}/${bookId}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            setBookmarks(response.data);
+        } catch (error) {
+            console.error('Error fetching bookmarks:', error);
+        }
+    };
+
     const handleBookmark = async () => {
         if (reactReaderRef?.current) {
             const currentLocation =
                 reactReaderRef?.current?.location?.start?.cfi;
-            console.log(currentBookmarkText);
 
-            const bookmark = {
-                userId: 1,
-                bookId: book.bookId,
-                location: currentLocation,
-                date: new Date().toISOString(),
-                content: page,
-            };
+            // Kiểm tra nếu bookmark đã tồn tại
+            const existingBookmark = bookmarks.find(
+                (bookmark) => bookmark.location === currentLocation
+            );
 
-            setBookmarks([...bookmarks, bookmark]);
-            setIsBookmarked(!isBookmarked);
+            if (existingBookmark) {
+                deleteBookmark(existingBookmark.bookmarkId);
+            } else {
+                try {
+                    const response = await axios.post(
+                        `${url}/bookmark/create-bookmark`,
+                        {
+                            userId: user?.userId,
+                            bookId: book?.bookId,
+                            location: currentLocation,
+                            date: new Date().toISOString(),
+                            content: page,
+                        },
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                    setBookmarks([...bookmarks, response.data]);
+                    setIsBookmarked(true);
+                } catch (error) {
+                    console.error('Error adding bookmark:', error);
+                }
+            }
         }
-        // axios.post(url + '/bookmarks', bookmark)
-        // .then((response) => {
-        //     console.log('Bookmark saved:', response.data);
-        // })
-        // .catch((error) => {
-        //     console.error('Error saving bookmark:', error);
-        // });
+    };
+    const deleteBookmark = async (bookmarkId) => {
+        try {
+            await axios.delete(`${url}/bookmark/${bookmarkId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            // Cập nhật danh sách bookmark sau khi xoá
+            setBookmarks((prevBookmarks) =>
+                prevBookmarks.filter(
+                    (bookmark) => bookmark.bookmarkId !== bookmarkId
+                )
+            );
+            setIsBookmarked(false);
+        } catch (error) {
+            console.error('Error deleting bookmark:', error);
+        }
     };
 
+    console.log(bookmarks);
     const handleFullScreen = () => {
         setIsFullScreen(!!document.fullscreenElement);
         setIsSettingModalOpen(false);
@@ -292,8 +342,9 @@ const BookReader = () => {
         console.log(text);
         const result = searchBookContents(text);
         setSearchResults(result);
-    }
-    // console.log(searchResults);
+    };
+
+    console.log(searchResults);
     return (
         <div className="h-screen flex flex-col">
             <Navbar
@@ -305,8 +356,10 @@ const BookReader = () => {
                 title={book?.bookName}
                 onSearch={handleSearch}
                 searchResults={searchResults}
+                setSearchResults={setSearchResults}
                 setCurrentPage={setLocation}
-                rendition ={reactReaderRef}
+                rendition={reactReaderRef}
+                bookmarked={isBookmarked}
             />
             <div className="flex-grow">
                 <ReactReader
@@ -328,31 +381,11 @@ const BookReader = () => {
                     getRendition={(rendition) => {
                         reactReaderRef.current = rendition;
                         console.log(rendition);
-                        // handleSearch();
-                        rendition.book.ready
-                            .then((book) => {
-                                return rendition.book.locations.generate();
-                            })
-                            .then((locations) => {
-                                console.log('Total Pages?: ', locations.length);
-                                console.log('current Page:', locations.total);
-                            });
+
                         updateTheme(reactReaderRef, selectedColor);
                         updateFontSize(size);
                     }}
                 />
-                {/* <div
-                    style={{
-                        position: 'absolute',
-                        bottom: '1rem',
-                        right: '1rem',
-                        left: '1rem',
-                        textAlign: 'center',
-                        zIndex: 1,
-                    }}
-                >
-                    {page}
-                </div> */}
             </div>
             <SettingsModal
                 isOpen={isSettingModalOpen}
@@ -379,7 +412,9 @@ const BookReader = () => {
                 onJump={(bookmark) => {
                     setLocation(bookmark.location);
                     setIsBookmarkModalOpen(false);
+                    setIsBookmarked(true);
                 }}
+                onDeleteBookmark={deleteBookmark}
             />
         </div>
     );

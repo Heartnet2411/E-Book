@@ -1,31 +1,3 @@
-// import React from 'react';
-// import { IoCloseSharp } from 'react-icons/io5';
-
-// export default function BookmarkModal({ onClose, bookmarks, onJump }) {
-//     return (
-//         <div className="bg-gray-900 text-white rounded-lg w-72">
-//             <div className="">
-//                 <IoCloseSharp
-//                     className="cursor-pointer"
-//                     size={24}
-//                     onClick={onClose}
-//                 />
-//             </div>
-//             <div className="">
-//                 {bookmarks.map((bookmark, index) => (
-//                     <div
-//                         key={index}
-//                         className="flex flex-cols mt-2 p-2 w-full hover:bg-gray-700 cursor-pointer"
-//                         onClick={() => onJump(bookmark)}
-//                     >
-//                         <h2>{bookmark.content}</h2>
-//                     </div>
-//                 ))}
-//             </div>
-
-//         </div>
-//     );
-// }
 import React, { useState } from 'react';
 import {
     Drawer,
@@ -38,9 +10,8 @@ import {
     Box,
     Typography,
 } from '@mui/material';
-import { IoCloseSharp } from 'react-icons/io5';
+import { IoCloseSharp,IoTrashOutline } from 'react-icons/io5';
 
-// TabPanel Component
 function TabPanel({ children, value, index, ...other }) {
     return (
         <div
@@ -65,13 +36,21 @@ export default function BookmarkModal({
     highlights = [],
     onJump,
     isOpen,
+    onDeleteBookmark
 }) {
     const [tabIndex, setTabIndex] = useState(0);
 
     const handleTabChange = (event, newValue) => {
         setTabIndex(newValue);
     };
-
+    const formatDate = (date) => {
+        const newDate = new Date(date);
+        return newDate.toLocaleString(); // Định dạng ngày giờ theo múi giờ người dùng
+    };
+    const handleDelete = (id) => {
+        // Gọi hàm onDeleteBookmark với đối tượng bookmark hoặc highlight cần xoá
+        onDeleteBookmark(id);
+    };
     return (
         <Drawer
             anchor="right"
@@ -89,7 +68,6 @@ export default function BookmarkModal({
                 </IconButton>
             </div>
 
-            {/* Tabs */}
             <Tabs
                 value={tabIndex}
                 onChange={handleTabChange}
@@ -103,7 +81,6 @@ export default function BookmarkModal({
                 <Tab label="Highlights" />
             </Tabs>
 
-            {/* Tab Panels */}
             <TabPanel value={tabIndex} index={0}>
                 {bookmarks.length > 0 ? (
                     <List>
@@ -114,7 +91,26 @@ export default function BookmarkModal({
                                 onClick={() => onJump(bookmark)}
                                 sx={{ '&:hover': { bgcolor: 'grey.800' } }}
                             >
-                                <ListItemText primary={bookmark.content} />
+                                <ListItemText
+                                    primary={<Typography variant="body2">
+                                        {bookmark.content}
+                                    </Typography>}
+                                    secondary={
+                                        <Typography variant="caption">
+                                            {formatDate(bookmark.date)}
+                                        </Typography>
+                                    }
+                                />
+                                <IconButton
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Ngừng lan truyền sự kiện để không gọi onJump
+                                        handleDelete(bookmark.bookmarkId);
+                                    }}
+                                    sx={{ color: 'red' }}
+                                >
+                                    <IoTrashOutline />
+                                </IconButton>
+                                
                             </ListItem>
                         ))}
                     </List>

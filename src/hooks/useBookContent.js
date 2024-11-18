@@ -5,36 +5,23 @@ function useBookContent(book) {
     const [bookContents, setBookContents] = useState([]);
 
     const getBookContents = async () => {
-        const spine = await book?.loaded?.spine;
+        const spine = await book.loaded.spine;
         const contents = [];
-
         for (let item of spine.items) {
             if (!item.href) continue;
-
+            console.log(item);
             const doc = await book.load(item.href);
             const innerHTML = doc.documentElement.innerHTML;
             const innerText = convert(innerHTML);
-            const paragraphs = innerText.split(/\n+/);
+            // const paragraphs = innerText.split(/\n+/);
 
-            for (let [index, paragraph] of paragraphs.entries()) {
-                // Tính toán CFI cho từng đoạn
-                const range = doc.createRange();
-                const element = doc.body.children[index];
-                if (element) {
-                    range.selectNodeContents(element);
-                }
-
-                const cfi = book?.cfiFromRange(range);
-                contents.push({
-                    
-                    href: cfi,
-                    text: innerText.split(/\n+/),
-                });
-            }
+            contents.push({
+                href: item.href,
+                text: innerText.split(/\n+/),
+            });
         }
         setBookContents(contents);
     };
-
     const searchText = (searchString) => {
         const regexp = new RegExp(searchString, 'ig');
 
@@ -54,8 +41,10 @@ function useBookContent(book) {
     };
 
     useEffect(() => {
+        if(book){
         getBookContents();
-    }, []);
+        }
+        }, [book]);
 
     return {
         bookContents,
