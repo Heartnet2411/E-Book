@@ -3,29 +3,45 @@ import { FaRegBookmark } from 'react-icons/fa6';
 import { FaRegHeart, FaHeart, FaRegComment, FaBookmark } from 'react-icons/fa';
 import { PiWarningOctagonBold } from 'react-icons/pi';
 import { toast, Slide } from 'react-toastify';
+import { IoSend } from 'react-icons/io5';
+import EmojiPicker from 'emoji-picker-react';
+import { BsEmojiSmile } from 'react-icons/bs';
+import Comment from './Comment';
 import ReportModal from './ReportModal';
-import PostModal from './PostModal';
 import { url } from '../config/config';
 import axios from 'axios';
+import { formatDate } from '../utils/formatDate';
 
 function Post({ post }) {
-    console.log('posst', post);
     const [savedPost, setSavedPost] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [showReadMore, setShowReadMore] = useState(false);
     const contentRef = useRef(null);
+    const commentRef = useRef(null);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPostId, setSelectedPostId] = useState(null);
     const token = localStorage.getItem('token');
+    const [showPicker, setShowPicker] = useState(false);
+    const [comment, setCommnet] = useState('');
+    const [comments, setCommnets] = useState([]);
+    const [visibleComments, setVisibleComments] = useState(4); // Số lượng bình luận được hiển thị
 
-    const handleOpenModal = () => {
-        setIsModalOpen(true);
+    const commentClick = () => {
+        commentRef.current.focus();
+        commentRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+        });
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
+    const handleShowMore = () => {
+        setVisibleComments((prev) => prev + 4); // Tăng số lượng bình luận hiển thị thêm 5
+    };
+
+    const onEmojiClick = (emoji) => {
+        setCommnet((prevText) => prevText + emoji.emoji);
+        setShowPicker(false); // Đóng picker sau khi chọn emoji
     };
 
     const openReportModal = (postId) => {
@@ -285,10 +301,29 @@ function Post({ post }) {
         }
     };
 
+    const fetchPostComment = async () => {
+        try {
+            const response = await fetch(
+                `http://localhost:8080/api/post/comment/${post.postId}`,
+                {
+                    method: 'GET',
+                }
+            );
+
+            if (response.ok) {
+                const comments = await response.json();
+                setCommnets(comments);
+            }
+        } catch (error) {
+            console.error('Failed to fetch comments post:', error);
+        }
+    };
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         fetchSavedPost(post.postId, token);
         fetchFavoritePost(post.postId, token);
+        fetchPostComment();
     }, [post.postId]);
 
     const handleSavePost = () => {
@@ -311,12 +346,47 @@ function Post({ post }) {
         removeFavoritePost(post.postId, token);
     };
 
+    const handleSendComment = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(
+                'http://localhost:8080/api/post/comment',
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        postId: post.postId,
+                        replyId: null,
+                        content: comment,
+                    }),
+                }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                showToast('success', 'Thêm bình luận thành công');
+                setCommnet('');
+                fetchPostComment();
+            } else {
+                showToast('error', 'Có lỗi xảy ra khi thêm bình luận');
+                setCommnet('');
+            }
+        } catch (error) {
+            console.error('Lỗi:', error);
+            showToast('error', 'Lỗi kết nối, vui lòng thử lại sau');
+            setCommnet('');
+        }
+    };
+
     return (
         <div
             key={post.postId}
-            className="border-gray-200 border dark:border-gray-700 bg-white dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-md flex justify-between p-2 px-8 items-center rounded-lg mt-4 "
+            className="border-gray-200 border dark:border-gray-700 bg-white dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-md flex-col justify-between p-2 px-8 items-center rounded-lg mt-4 "
         >
-            <div className="w-full ">
+            <div className="w-full border-b border-gray-300 dark:border-gray-700">
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center">
                         <img
@@ -324,9 +394,14 @@ function Post({ post }) {
                             alt="Avatar"
                             className="w-11 h-11 rounded-full object-cover mr-4"
                         />
-                        <span className="text-lg font-semibold dark:text-white">
-                            {post.user.firstname + ' ' + post.user.lastname}
-                        </span>
+                        <div>
+                            <p className="text-lg font-semibold dark:text-white">
+                                {post.user.firstname + ' ' + post.user.lastname}
+                            </p>
+                            <p className="dark:text-gray-500 text-gray-500">
+                                {formatDate(post.createdAt)}
+                            </p>
+                        </div>
                     </div>
                     <div className="flex items-center">
                         <div className="relative group">
@@ -439,7 +514,7 @@ function Post({ post }) {
                     )}
 
                     <button
-                        onClick={handleOpenModal}
+                        onClick={commentClick}
                         className="flex font-semibold bg-gray-200 dark:bg-gray-800 py-1 px-3 rounded-xl ml-4 cursor-pointer"
                     >
                         <FaRegComment
@@ -453,16 +528,86 @@ function Post({ post }) {
                 </div>
             </div>
 
+            <div className="mt-2">
+                {comments.length > 0 ? (
+                    <>
+                        {comments.slice(0, visibleComments).map((cmt) => (
+                            <Comment
+                                key={cmt.id} // Đảm bảo thêm key nếu có ID hoặc unique field
+                                cmt={cmt}
+                                postId={post.postId}
+                                fetchPostComment={fetchPostComment}
+                            />
+                        ))}
+                        {visibleComments < comments.length && (
+                            <div className="pt-2 ">
+                                <button
+                                    onClick={handleShowMore}
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    Xem thêm bình luận
+                                </button>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <div className="pb-4 pt-2 text-inherit dark:text-white">
+                        <em>Chưa có bình luận nào</em>
+                    </div>
+                )}
+            </div>
+
+            <div className="flex w-full rounded-xl border border-gray-300 dark:border-gray-500 p-2 bg-gray-100 dark:bg-gray-800 items-center relative">
+                <img
+                    src={user.avatar}
+                    className="w-12 h-12 rounded-full object-cover ml-4"
+                />
+                <div className="w-full">
+                    <span className="text-lg font-semibold px-4 dark:text-white">
+                        {user.firstName + ' ' + user.lastName}
+                    </span>
+                    <div className=" ">
+                        <input
+                            ref={commentRef}
+                            className="w-11/12 px-4 pb-2 pt-1 rounded-xl bg-gray-100 dark:bg-gray-800 dark:text-white focus:outline-none text-base "
+                            placeholder="Thêm bình luận của bạn"
+                            value={comment}
+                            onChange={(e) => setCommnet(e.target.value)}
+                        />
+                        <button
+                            onClick={handleSendComment}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 dark:text-white"
+                        >
+                            <IoSend size={20} />
+                        </button>
+                        <button
+                            className="absolute right-12 top-1/2 -translate-y-1/2 dark:text-white"
+                            onClick={() => setShowPicker((val) => !val)}
+                        >
+                            <BsEmojiSmile size={20} />
+                        </button>
+                        {showPicker && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    bottom: '100%',
+                                    zIndex: '1000',
+                                    right: '0',
+                                }}
+                            >
+                                <EmojiPicker onEmojiClick={onEmojiClick} />
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
             {/* Hiển thị modal nếu isReportModalOpen là true */}
             {isReportModalOpen && (
                 <ReportModal
                     onClose={closeReportModal}
                     onSubmit={handleCreateReport}
                 />
-            )}
-
-            {isModalOpen && (
-                <PostModal post={post} onClose={handleCloseModal} />
             )}
         </div>
     );

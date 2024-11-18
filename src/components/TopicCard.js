@@ -1,13 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { url } from '../config/config';
 import { useNavigate } from 'react-router-dom';
+import { toast, Slide } from 'react-toastify';
 
 function TopicCard({ name, id }) {
     const [lastPost, setLastPost] = useState(null);
     const [postCount, setPostCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem('user'));
+
     const handleClick = () => {
+        if (!user) {
+            toast.error('Vui lòng đăng nhập để tham gia diễn đàn!', {
+                position: 'top-right',
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+                transition: Slide,
+            });
+            return;
+        }
         navigate(`/forum/${id}`, {
             state: { topicName: name },
         });

@@ -97,10 +97,14 @@ const Header = ({ user }) => {
                 </div>
                 <div>
                     <Link
-                        to={'/'}
-                        className="text-black hover:text-gray-500 dark:text-white dark:hover:text-gray-400 text-xl font-medium"
+                        to={'/myaccount'}
+                        className={`text-black h-16  text-xl font-medium ${
+                            location.pathname.includes('/myaccount')
+                                ? ' text-blue-600 hover:text-blue-800 dark:text-blue-600 dark:hover:text-blue-800'
+                                : 'hover:text-gray-500 dark:text-white dark:hover:text-gray-400'
+                        }`}
                     >
-                        Podcast
+                        Cá nhân
                     </Link>
                 </div>
             </div>

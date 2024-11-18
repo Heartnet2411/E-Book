@@ -5,6 +5,7 @@ import EmojiPicker from 'emoji-picker-react';
 import { BsEmojiSmile } from 'react-icons/bs';
 import { toast, Slide } from 'react-toastify';
 import ReportModal from './ReportModal';
+import { formatDate } from '../utils/formatDate';
 
 function ReplyComment({ cmt, postId, fetchPostComment, replyId }) {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -136,6 +137,9 @@ function ReplyComment({ cmt, postId, fetchPostComment, replyId }) {
             >
                 Phản hồi
             </button>
+            <span className="ml-4 text-sm dark:text-gray-400">
+                {formatDate(cmt.createdAt)}
+            </span>
 
             {showReply ? (
                 <div className="w-full flex items-center dark:text-white mb-2">
