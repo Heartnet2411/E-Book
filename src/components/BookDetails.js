@@ -11,7 +11,7 @@ import { getLanguageName } from '../locales/vi/vi.js';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import BookImage from '../assets/book.jpg';
 import { storage } from '../utils/firebase.js';
-import Notification from '../components/Notification';
+import Notification from './Notification.js';
 import RatingSummary from './RatingSumary.js';
 import { useState, useEffect } from 'react';
 import Comment from './BookComment.js';

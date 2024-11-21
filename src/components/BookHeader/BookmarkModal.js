@@ -10,7 +10,7 @@ import {
     Box,
     Typography,
 } from '@mui/material';
-import { IoCloseSharp,IoTrashOutline } from 'react-icons/io5';
+import { IoCloseSharp, IoTrashOutline } from 'react-icons/io5';
 
 function TabPanel({ children, value, index, ...other }) {
     return (
@@ -35,8 +35,10 @@ export default function BookmarkModal({
     bookmarks = [],
     highlights = [],
     onJump,
+    onJumpHighlight,
     isOpen,
-    onDeleteBookmark
+    onDeleteBookmark,
+    onDeleteHighlight,
 }) {
     const [tabIndex, setTabIndex] = useState(0);
 
@@ -45,11 +47,19 @@ export default function BookmarkModal({
     };
     const formatDate = (date) => {
         const newDate = new Date(date);
-        return newDate.toLocaleString(); // Định dạng ngày giờ theo múi giờ người dùng
+        return newDate.toLocaleString();
     };
     const handleDelete = (id) => {
-        // Gọi hàm onDeleteBookmark với đối tượng bookmark hoặc highlight cần xoá
         onDeleteBookmark(id);
+    };
+    const handleDeleteHighlight = (highlightId, cfiRange) => {
+        onDeleteHighlight(highlightId, cfiRange);
+    };
+    const truncateText = (text, maxLength = 53) => {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...';
+        }
+        return text;
     };
     return (
         <Drawer
@@ -62,7 +72,9 @@ export default function BookmarkModal({
         >
             {/* Header */}
             <div className="flex justify-between items-center p-4 border-b border-gray-700">
-                <h2 className="text-lg font-semibold">Bookmarks & Highlights</h2>
+                <h2 className="text-lg font-semibold">
+                    Bookmarks & Highlights
+                </h2>
                 <IconButton onClick={onClose} sx={{ color: 'white' }}>
                     <IoCloseSharp size={24} />
                 </IconButton>
@@ -92,9 +104,11 @@ export default function BookmarkModal({
                                 sx={{ '&:hover': { bgcolor: 'grey.800' } }}
                             >
                                 <ListItemText
-                                    primary={<Typography variant="body2">
-                                        {bookmark.content}
-                                    </Typography>}
+                                    primary={
+                                        <Typography variant="body2">
+                                            {bookmark.content}
+                                        </Typography>
+                                    }
                                     secondary={
                                         <Typography variant="caption">
                                             {formatDate(bookmark.date)}
@@ -110,7 +124,6 @@ export default function BookmarkModal({
                                 >
                                     <IoTrashOutline />
                                 </IconButton>
-                                
                             </ListItem>
                         ))}
                     </List>
@@ -125,10 +138,27 @@ export default function BookmarkModal({
                             <ListItem
                                 button
                                 key={index}
-                                onClick={() => onJump(highlight)}
+                                onClick={() => onJumpHighlight(highlight)}
                                 sx={{ '&:hover': { bgcolor: 'grey.800' } }}
                             >
-                                <ListItemText primary={highlight.content} />
+                                <ListItemText
+                                    primary={
+                                        <Typography variant="body2">
+                                            {truncateText(highlight.text)}
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="caption">
+                                            {formatDate(highlight.date)}
+                                        </Typography>
+                                    }
+                                />
+                                <IconButton onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteHighlight(highlight.highlightId,highlight.cfiRange);
+                                    }} sx={{ color: 'red' }}>
+                                    <IoTrashOutline />
+                                </IconButton>
                             </ListItem>
                         ))}
                     </List>

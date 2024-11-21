@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { IoMdSettings, IoIosListBox, IoMdSearch, ioMd } from 'react-icons/io';
 import { MdFullscreen } from 'react-icons/md';
 import { RiHeadphoneFill } from 'react-icons/ri';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { BsThreeDotsVertical, BsBookmarkPlusFill } from 'react-icons/bs';
 import {
     Drawer,
@@ -15,8 +15,7 @@ import {
     ListSubheader,
     ListItemButton,
 } from '@mui/material';
-import { SeriesContext } from '@mui/x-charts/internals';
-// import { readerContext } from '../../screens/BookReader/BookReader';
+import Highlighter from 'react-highlight-words';
 const Navbar = ({
     onShowBookmark,
     isBookmarked,
@@ -29,44 +28,48 @@ const Navbar = ({
     setSearchResults,
     searchResults,
     rendition,
-    setCurrentPage,
     bookmarked,
 }) => {
     const [searchText, setSearchText] = useState('');
     const [showResults, setShowResults] = useState(false);
-    const [matchSearches, setMatches] = useState([]);
-    // const context = useContext(readerContext)
+    const [highlighted, setHighlighted] = useState(false);
+    useEffect(() => {
+        if (searchResults.length > 0 && !highlighted) {
+            // Highlight khi có kết quả tìm kiếm
+            const cfiList = searchResults.map(result => result.cfi);
+            highlightText(cfiList);
+            setHighlighted(true); // Đánh dấu là đã highlight
+        }
+    }, [searchResults, highlighted]);
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             onSearch(searchText);
             setShowResults(true);
+            setHighlighted(false);
+            // console.log('done')
         }
     };
     const handleBlur = () => {
         setTimeout(() => setShowResults(false), 100);
-        setSearchResults([])
+        // setSearchResults([]);
     };
-    const onListItemClick = async (href, paragraph) => {
-        await rendition?.current?.display(href);
-
-        const win = document.querySelector('iframe')?.contentWindow;
-        if (win) {
-            const body = win.document.documentElement.querySelector('body');
-            if (body) {
-                const regExp = new RegExp(
-                    `(<[\\w\\d]+>)?.*(${searchText}).*<\\/?[\\w\\d]+>`,
-                    'ig'
-                );
-                body.innerHTML = body.innerHTML.replace(
-                    regExp,
-                    (match, sub1, sub2) => {
-                        return match.replace(sub2, `<mark>${sub2}</mark>`);
-                    }
-                );
+    const highlightText = (cfiList) => {
+        cfiList.forEach((cfi) => {
+            if (rendition) {
+                rendition.annotations.add('highlight', cfi, {
+                    fill: 'yellow',
+                });
             }
-        }
-         setCurrentPage(href);
+        });
+        console.log('mark done')
     };
+
+    const onListItemClick = async (cfi, searchResults, rendition) => {
+        await rendition?.display(cfi);
+// console.log(cfi)
+//         highlightText([cfi]);
+    };
+
     return (
         <nav className="navbar flex justify-between bg-gray-900 text-white p-3">
             <div className="flex items-center">
@@ -97,38 +100,31 @@ const Navbar = ({
                                     id="nested-list-subheader"
                                     style={{ width: '100%' }}
                                 >
-                                    {/* Result：Total {matchSearches.length} Record */}
+                                    {searchResults.length} kết quả
                                 </ListSubheader>
                             }
                         >
                             {searchResults.map((item, index) => {
                                 return item ? (
                                     <ListItemButton
-                                    onMouseDown={() =>
+                                        onMouseDown={() =>
                                             onListItemClick(
-                                                item.href,
-                                                item.paragraph
+                                                item.cfi,
+                                                searchText,
+                                                rendition
                                             )
                                         }
                                         key={index}
                                     >
-                                        <ListItemText
-                                            style={{ height: '50px' }}
-                                        >
-                                            <p
-                                                dangerouslySetInnerHTML={{
-                                                    __html:
-                                                        item && item.paragraph
-                                                            ? item.paragraph.replace(
-                                                                  new RegExp(
-                                                                      searchText,
-                                                                      'ig'
-                                                                  ),
-                                                                  `<span class="highlight">${searchText}</span>`
-                                                              )
-                                                            : '',
-                                                }}
-                                            ></p>
+                                        <ListItemText>
+                                            <Highlighter
+                                                searchWords={[searchText]}
+                                                autoEscape
+                                                textToHighlight={item.excerpt}
+                                                // highlightStyle={{
+                                                //     backgroundColor: 'yellow',
+                                                // }}
+                                            />
                                         </ListItemText>
                                     </ListItemButton>
                                 ) : null;
@@ -154,7 +150,7 @@ const Navbar = ({
                         <BsBookmarkPlusFill
                             size={22}
                             onClick={onBookmark}
-                             color="yellow"
+                            color="yellow"
                             className="hover:cursor-pointer"
                         />
                     ) : (
