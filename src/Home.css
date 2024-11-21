@@ -1,7 +1,6 @@
 .slick-prev::before,
 .slick-next::before {
     display: none;
-
 }
 
 .slick-arrow.slick-next,
@@ -31,10 +30,16 @@ blockquote {
     font-style: italic;
 }
 
-
 .border-l-2 {
     border-left: 2px solid #d1d5db;
     /* Màu xám nhạt */
     padding-left: 1rem;
     /* Khoảng cách từ thanh dọc đến nội dung */
+}
+
+.crop-container {
+    position: absolute;
+    width: 90%;
+    height: 400px;
+    background: #33333300;
 }

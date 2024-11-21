@@ -252,7 +252,6 @@ function PostModal({ post, onClose }) {
 
             if (response.ok) {
                 const comments = await response.json();
-                console.log('comments', comments);
                 setCommnets(comments);
             }
         } catch (error) {

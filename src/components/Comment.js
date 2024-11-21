@@ -6,6 +6,7 @@ import { BsEmojiSmile } from 'react-icons/bs';
 import { toast, Slide } from 'react-toastify';
 import ReplyComment from './ReplyComment';
 import ReportModal from './ReportModal';
+import { formatDate } from '../utils/formatDate';
 
 function Comment({ cmt, postId, fetchPostComment }) {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -136,10 +137,13 @@ function Comment({ cmt, postId, fetchPostComment }) {
             </div>
             <button
                 onClick={() => setShowReply(true)}
-                className="text-sm ml-16 dark:text-gray-400"
+                className="text-sm ml-16 font-semibold text-gray-700 dark:text-gray-400 dark:hover:text-gray-600 hover:text-gray-500 hover:underline"
             >
                 Phản hồi
             </button>
+            <span className="ml-4 text-sm dark:text-gray-400">
+                {formatDate(cmt.createdAt)}
+            </span>
             <div className="ml-16 border-l-2 border-gray-300 pl-4">
                 {cmt.Replies.length > 0 ? (
                     showReplies ? (

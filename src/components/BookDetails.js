@@ -7,11 +7,9 @@ import {
     FaBookmark,
 } from 'react-icons/fa';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { getLanguageName } from '../locales/vi/vi.js';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import BookImage from '../assets/book.jpg';
-import { storage } from '../utils/firebase.js';
-import Notification from './Notification.js';
+import Notification from '../components/Notification';
 import RatingSummary from './RatingSumary.js';
 import { useState, useEffect } from 'react';
 import Comment from './BookComment.js';
@@ -22,7 +20,7 @@ import { url } from '../config/config.js';
 
 export default function BookDetails() {
     const user = JSON.parse(localStorage.getItem('user'));
-    const currentUserId = user.userId;
+
     const location = useLocation();
     const navigate = useNavigate();
     const { id } = useParams();
@@ -64,18 +62,22 @@ export default function BookDetails() {
     const fetchComments = async () => {
         try {
             const response = await axios.get(url + `/book/comments/${id}`);
-
-            setComments(response.data);
-            setMyComments(
-                response.data.filter(
-                    (comment) => comment.userId === currentUserId
-                )
-            );
-            setOtherComments(
-                response.data.filter(
-                    (comment) => comment.userId !== currentUserId
-                )
-            );
+            if (!user) {
+                setOtherComments(response.data);
+            } else {
+                const currentUserId = user.userId;
+                setComments(response.data);
+                setMyComments(
+                    response.data.filter(
+                        (comment) => comment.userId === currentUserId
+                    )
+                );
+                setOtherComments(
+                    response.data.filter(
+                        (comment) => comment.userId !== currentUserId
+                    )
+                );
+            }
         } catch (err) {
             console.log(err);
         }
@@ -253,6 +255,20 @@ export default function BookDetails() {
     };
     // Hàm fetch để lưu sách
     const saveBook = async () => {
+        if (!user) {
+            toast.error('Vui lòng đăng nhập để thực hiện chức năng trên!', {
+                position: 'top-right',
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+                transition: Slide,
+            });
+            return;
+        }
         try {
             const response = await axios.post(
                 url + '/book/saved/save-book',
@@ -571,9 +587,12 @@ export default function BookDetails() {
 
                                         {otherComments.length > 0 && (
                                             <div className="">
-                                                <h3 className="font-bold text-lg dark:text-white">
-                                                    Bình luận của độc giả khác
-                                                </h3>
+                                                {user ? (
+                                                    <h3 className="font-bold text-lg dark:text-white">
+                                                        Bình luận của độc giả
+                                                        khác
+                                                    </h3>
+                                                ) : null}
                                                 {otherComments
                                                     .slice(0, otherCommentLimit)
                                                     .map((comment) => (
