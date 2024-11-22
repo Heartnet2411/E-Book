@@ -11,6 +11,7 @@ import {
     Typography,
 } from '@mui/material';
 import { IoCloseSharp, IoTrashOutline } from 'react-icons/io5';
+import { formatDate } from '../../utils/formatDate';
 
 function TabPanel({ children, value, index, ...other }) {
     return (
@@ -45,10 +46,10 @@ export default function BookmarkModal({
     const handleTabChange = (event, newValue) => {
         setTabIndex(newValue);
     };
-    const formatDate = (date) => {
-        const newDate = new Date(date);
-        return newDate.toLocaleString();
-    };
+    // const formatDate = (date) => {
+    //     const newDate = new Date(date);
+    //     return newDate.toLocaleString();
+    // };
     const handleDelete = (id) => {
         onDeleteBookmark(id);
     };

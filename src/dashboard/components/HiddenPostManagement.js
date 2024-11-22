@@ -12,6 +12,7 @@ import {
     TableRow,
     Button,
     IconButton,
+    Stack,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { url } from '../../config/config';
@@ -27,33 +28,22 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import PostDetailModal from './PostDetailModal';
 
-export default function PostManagement() {
+export default function HiddenPostManagement() {
     const [posts, setPosts] = useState(null);
-    const [selectedPost, setSelectedPost] = useState(null);
     const token = localStorage.getItem('token');
-    const [filter, setFilter] = useState('pending');
+    const [filter, setFilter] = useState('hidden');
     const [showPostModal, setShowPostModal] = useState(false);
-    const handleFilter = (event) => {
-        setFilter(event.target.value);
-    };
+    const [selectedPost, setSelectedPost] = useState(null);
+
     const getPosts = async () => {
         try {
             let response;
-            if (filter === 'reported') {
-                response = await fetch(url + `/report/post`, {
-                    headers: {
-                        method: 'GET',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-            } else {
-                response = await fetch(url + `/post/list/${filter}`, {
-                    headers: {
-                        method: 'GET',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-            }
+            response = await fetch(url + `/post/list/${filter}`, {
+                headers: {
+                    method: 'GET',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             const data = await response.json();
             const rowsData = data.map((item, index) => ({
                 id: item.targetId ? item.targetId : item.postId,
@@ -87,30 +77,7 @@ export default function PostManagement() {
         // Trả về định dạng "DD/MM/YYYY"
         return `${day}/${month}/${year}`;
     };
-    const handleUpdatePosts = (postId) => {
-        setPosts((prevPosts) =>
-            prevPosts.filter((post) => post.postId !== postId)
-        );
-    };
 
-    const hidePostConfirmm = (id) => {
-        confirmAlert({
-            title: 'Ẩn bài viết',
-            message: 'Bạn có chắc chắn muốn ẩn bài viết này?',
-            buttons: [
-                {
-                    label: 'Huỷ',
-                    className: 'react-confirm-alert-button cancel',
-                },
-                {
-                    label: 'Xác nhận',
-                    className: 'react-confirm-alert-button confirm',
-                    onClick: () => hidePost(id),
-                },
-            ],
-            closeOnClickOutside: false,
-        });
-    };
     const deletePostConfirm = (id) => {
         confirmAlert({
             title: 'Xoá bài viết',
@@ -156,47 +123,19 @@ export default function PostManagement() {
             console.error('Failed to delete posts:', error);
         }
     };
-
-    const hidePost = async (id) => {
-        try {
-            const response = await axios.post(
-                url + `/report/hide-post/${id}`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            // const data = await response.json();
-            if (response.status === 200) {
-                // Nếu thành công thì cập nhật lại danh sách bài viết
-                setPosts((prevPosts) =>
-                    prevPosts.filter((post) => post.id !== id)
-                );
-                toast.success('Ẩn bài viết thành công', {
-                    position: 'top-right',
-                    autoClose: 4000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-            }
-        } catch (error) {
-            console.error('Failed to hide posts:', error);
-        }
+    const handleUpdatePosts = (postId) => {
+        setPosts((prevPosts) =>
+            prevPosts.filter((post) => post.postId !== postId)
+        );
     };
-
-    useEffect(() => {
-        getPosts();
-    }, [filter]);
     const handleShowPostModal = async (post) => {
         setSelectedPost(post);
         console.log(post);
         setShowPostModal(true);
     };
+    useEffect(() => {
+        getPosts();
+    }, [filter]);
     const postColumns = [
         { field: 'id', headerName: 'ID', width: 100 },
         {
@@ -213,7 +152,7 @@ export default function PostManagement() {
             headerName: 'Ngày đăng',
             width: 150,
             renderCell: (params) => {
-                const date = params?.row?.createdAt;
+                const date = params.row.createdAt;
                 return <div>{convertDate(date)}</div>;
             },
         },
@@ -237,14 +176,19 @@ export default function PostManagement() {
             },
         },
         {
-            field: 'action',
+            field: 'actions',
             headerName: 'Hành động',
-            width: 120,
+            width: 280,
             renderCell: (params) => {
                 return (
-                    <IconButton onClick={() => handleShowPostModal(params.row)}>
-                        <VisibilityIcon />
-                    </IconButton>
+                    <Stack direction="row" spacing={2}>
+                        <IconButton  onClick={() => handleShowPostModal(params.row)}>
+                        <VisibilityIcon  />
+                        </IconButton>
+                        <IconButton  onClick={() => deletePostConfirm(params.row)}>
+                        <DeleteOutlineIcon color="error" />
+                        </IconButton>
+                    </Stack>
                 );
             },
         },
@@ -260,21 +204,6 @@ export default function PostManagement() {
                     >
                         Bộ lọc
                     </Typography>
-                    <FormControl fullWidth variant="outlined">
-                        <InputLabel>Loại</InputLabel>
-                        <Select
-                            label="Comment Type"
-                            value={filter}
-                            onChange={handleFilter}
-                        >
-                            <MenuItem value="pending">
-                                Bài viết chờ duyệt
-                            </MenuItem>
-                            <MenuItem value="approved">
-                                Bài viết đã duyệt
-                            </MenuItem>
-                        </Select>
-                    </FormControl>
                 </Grid2>
             </Grid2>
             <Grid2 marginTop={3}>

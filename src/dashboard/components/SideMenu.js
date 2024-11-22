@@ -40,7 +40,6 @@ export default function SideMenu() {
           p: 1.5,
         }}
       >
-        {/* <SelectContent /> */}
         <img
                     src="..\..\logo512.png"
                     className=" w-24 cursor-pointer"

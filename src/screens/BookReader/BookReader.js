@@ -53,6 +53,9 @@ const BookReader = () => {
     const { bookContents, searchBookContents } = useBookContent(
         rendition?.book
     );
+    const { bookContents, searchBookContents } = useBookContent(
+        rendition?.book
+    );
     const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
     const [isControlModalOpen, setIsControlModalOpen] = useState(false);
     const [isBookmarkModalOpen, setIsBookmarkModalOpen] = useState(false);
@@ -266,12 +269,20 @@ const BookReader = () => {
         highlights.forEach((highlight) => {
             console.log(highlight.color);
             const highlightColor = highlight.color;
+            const highlightColor = highlight.color;
             rendition.annotations.highlight(
                 highlight.cfiRange,
                 {}, // Không cần data bổ sung nếu không sử dụng callback
                 null, // Không cần callback
                 '', // Không cần className
+                highlight.cfiRange,
+                {}, // Không cần data bổ sung nếu không sử dụng callback
+                null, // Không cần callback
+                '', // Không cần className
                 {
+                    fill: highlightColor, // Màu nền của highlight
+                    opacity: 1, // Độ mờ
+                    'mix-blend-mode': 'multiply', // Hiệu ứng pha trộn
                     fill: highlightColor, // Màu nền của highlight
                     opacity: 1, // Độ mờ
                     'mix-blend-mode': 'multiply', // Hiệu ứng pha trộn
@@ -285,10 +296,14 @@ const BookReader = () => {
             if (rendition) {
                 console.log('deleted');
                 rendition?.annotations.remove(cfiRange, 'highlight');
+                console.log('deleted');
+                rendition?.annotations.remove(cfiRange, 'highlight');
             }
+
 
             // Xoá highlight khỏi database thông qua API
             const response = await axios.delete(
+                `${url}/highlight/${highlightId}`,
                 `${url}/highlight/${highlightId}`,
                 {
                     headers: {
@@ -298,9 +313,13 @@ const BookReader = () => {
                 }
             );
 
+
             if (response.status === 200) {
                 // Cập nhật lại state sau khi xoá highlight thành công
                 setHighlights((prevHighlights) =>
+                    prevHighlights.filter(
+                        (highlight) => highlight.highlightId !== highlightId
+                    )
                     prevHighlights.filter(
                         (highlight) => highlight.highlightId !== highlightId
                     )
@@ -313,6 +332,7 @@ const BookReader = () => {
             console.error('Error deleting highlight:', error);
         }
     };
+
 
     console.log(highlights);
     const handleFullScreen = () => {
@@ -535,6 +555,7 @@ const BookReader = () => {
         []
     );
 
+
     const handleSearch = async (text) => {
         console.log(text);
         const result = await searchBookContents(text);
@@ -578,6 +599,7 @@ const BookReader = () => {
                     getRendition={(rendition) => {
                         reactReaderRef.current = rendition;
                         setRendition(rendition);
+                        console.log(rendition);
                         console.log(rendition);
                         updateTheme(reactReaderRef, selectedColor);
                         updateFontSize(size);
