@@ -19,7 +19,27 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 const mainListItems = [
     { text: 'Trang chủ', icon: <HomeRoundedIcon />, path: '/admin' },
-    { text: 'Bài viết', icon: <ArticleIcon />, path: '/admin/posts' },
+    {
+        text: 'Bài viết',
+        icon: <ArticleIcon />,
+        subMenu: [
+            {
+                text: 'Bài viết chờ duyệt',
+                icon: <CommentIcon />,
+                path: '/admin/posts',
+            },
+            {
+                text: 'Bài viết bị báo cáo',
+                icon: <AnnouncementIcon />,
+                path: '/admin/report-posts',
+            },
+            {
+                text: 'Bài viết bị ẩn',
+                icon: <AnnouncementIcon />,
+                path: '/admin/hidden-posts',
+            },
+        ],
+    },
     {
         text: 'Bình luận',
         icon: <CommentIcon />,
@@ -34,6 +54,11 @@ const mainListItems = [
                 icon: <AnnouncementIcon />,
                 path: '/admin/report-comments',
             },
+            {
+                text: 'Bình luận bị ẩn',
+                icon: <AnnouncementIcon />,
+                path: '/admin/hidden-comments',
+            },
         ],
     },
     { text: 'Độc giả', icon: <GroupIcon />, path: '/admin/users' },
@@ -46,17 +71,19 @@ export default function MenuContent() {
     const [selectedSubIndex, setSelectedSubIndex] = useState(null);
     const handleMenuItemClick = (index, path, hasSubMenu) => {
         if (!path) {
-            // Nếu có submenu, chỉ cần mở/đóng submenu
             setOpenSubMenuIndex(openSubMenuIndex === index ? null : index);
-            setSelectedIndex(null); // Không chọn mục cha
+            setSelectedSubIndex(null);
         } else {
             // Nếu không có submenu, chọn mục và điều hướng
-            setSelectedIndex(index);
+            setOpenSubMenuIndex(null); // Đóng tất cả submenu
+            setSelectedSubIndex(null); // Bỏ chọn submenu
+            setSelectedIndex(index); // Chọn mục cha
             navigate(path);
         }
     };
     const handleSubMenuItemClick = (subIndex, path) => {
-        setSelectedSubIndex(subIndex);
+        setSelectedIndex(null); // Bỏ chọn mục cha
+        setSelectedSubIndex(subIndex); // Chọn submenu
         navigate(path);
     };
     return (
@@ -88,9 +115,7 @@ export default function MenuContent() {
                             }
                         >
                             <ListItemIcon>{item.icon}</ListItemIcon>
-                            <ListItemText
-                                primary={item.text}
-                            />
+                            <ListItemText primary={item.text} />
                             {item.subMenu ? (
                                 openSubMenuIndex === index ? (
                                     <ExpandLess />

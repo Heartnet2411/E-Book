@@ -8,14 +8,16 @@ import Header from './components/Header';
 import MainGrid from './components/MainGrid';
 import SideMenu from './components/SideMenu';
 import AppTheme from '../shared-theme/AppTheme';
-import { Typography } from '@mui/material';
+import { Hidden, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import UserManagement from './components/UserManagement';
 import CommentManagement from './components/CommentManagement';
 import ReportedComment from './components/ReportedComment';
 import PostManagement from './components/PostManagement';
-import EnhancedTable from './components/Test';
+import ReportPostManagement from './components/ReportPostManagement';
+import HiddenPostManagement from './components/HiddenPostManagement';
+import HiddenCommentManagement from './components/HiddenCommentManagement';
 
 
 export default function Dashboard(props) {
@@ -55,8 +57,6 @@ export default function Dashboard(props) {
             <CssBaseline enableColorScheme />
             <Box sx={{ display: 'flex' }}>
                 <SideMenu />
-                {/* <AppNavbar /> */}
-                {/* Main content */}
                 <Box
                     component="main"
                     sx={(theme) => ({
@@ -84,12 +84,24 @@ export default function Dashboard(props) {
                                 element={<PostManagement/>}
                             />
                             <Route
+                                path="/report-posts"
+                                element={<ReportPostManagement/>}
+                            />
+                            <Route
+                                path="/hidden-posts"
+                                element={<HiddenPostManagement/>}
+                            />
+                            <Route
                                 path="/comments"
                                 element={<CommentManagement/>}
                             />
                             <Route 
                             path="/report-comments"
                             element={<ReportedComment/>}
+                            />
+                             <Route 
+                            path="/hidden-comments"
+                            element={<HiddenCommentManagement/>}
                             />
                             <Route
                                 path="/users"

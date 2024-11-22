@@ -33,20 +33,20 @@ const Navbar = ({
     const [searchText, setSearchText] = useState('');
     const [showResults, setShowResults] = useState(false);
     const [highlighted, setHighlighted] = useState(false);
+    const [highlightedCFIs, setHighlightedCFIs] = useState([]);
     useEffect(() => {
-        if (searchResults.length > 0 && !highlighted) {
+        if (searchResults.length > 0) {
             // Highlight khi có kết quả tìm kiếm
             const cfiList = searchResults.map(result => result.cfi);
             highlightText(cfiList);
             setHighlighted(true); // Đánh dấu là đã highlight
         }
-    }, [searchResults, highlighted]);
+    }, [searchResults]);
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
+            removeHighlights();
             onSearch(searchText);
             setShowResults(true);
-            setHighlighted(false);
-            // console.log('done')
         }
     };
     const handleBlur = () => {
@@ -54,20 +54,36 @@ const Navbar = ({
         // setSearchResults([]);
     };
     const highlightText = (cfiList) => {
+
         cfiList.forEach((cfi) => {
             if (rendition) {
-                rendition.annotations.add('highlight', cfi, {
-                    fill: 'yellow',
-                });
+                rendition.annotations.add('highlight', cfi, {},
+                    null,
+                    'hls',
+                    {
+                        fill: 'yellow',
+                        'fill-opacity': '0.6',
+                        'mix-blend-mode': 'multiply',
+                    }
+                );
             }
         });
-        console.log('mark done')
+        setHighlightedCFIs(cfiList);
+
     };
 
     const onListItemClick = async (cfi, searchResults, rendition) => {
         await rendition?.display(cfi);
-// console.log(cfi)
-//         highlightText([cfi]);
+    };
+    const removeHighlights = () => {
+        if (rendition) {
+            highlightedCFIs.forEach((cfi) => {
+                rendition.annotations.remove(cfi, 'highlight');
+            });
+
+            // Xóa danh sách cfiRange đã lưu
+            setHighlightedCFIs([]);
+        }
     };
 
     return (
@@ -85,7 +101,7 @@ const Navbar = ({
                     onBlur={handleBlur}
                 />
                 {showResults && searchResults.length > 0 && (
-                    <div className="absolute top-12  text-black left-0 w-110 bg-white shadow-lg rounded-lg max-h-96 overflow-y-auto z-50">
+                    <div className="absolute top-14  text-black left-0 w-110 bg-white shadow-lg rounded-lg max-h-96 overflow-y-auto z-50">
                         <List
                             style={{
                                 width: '400px',

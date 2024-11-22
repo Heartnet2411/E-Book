@@ -27,33 +27,22 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import PostDetailModal from './PostDetailModal';
 
-export default function PostManagement() {
+export default function ReportPostManagement() {
     const [posts, setPosts] = useState(null);
-    const [selectedPost, setSelectedPost] = useState(null);
     const token = localStorage.getItem('token');
     const [filter, setFilter] = useState('pending');
     const [showPostModal, setShowPostModal] = useState(false);
-    const handleFilter = (event) => {
-        setFilter(event.target.value);
-    };
+    const [selectedPost, setSelectedPost] = useState(null);
     const getPosts = async () => {
         try {
             let response;
-            if (filter === 'reported') {
-                response = await fetch(url + `/report/post`, {
-                    headers: {
-                        method: 'GET',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-            } else {
-                response = await fetch(url + `/post/list/${filter}`, {
-                    headers: {
-                        method: 'GET',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-            }
+            response = await fetch(url + `/report/post`, {
+                headers: {
+                    method: 'GET',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
             const data = await response.json();
             const rowsData = data.map((item, index) => ({
                 id: item.targetId ? item.targetId : item.postId,
@@ -62,6 +51,18 @@ export default function PostManagement() {
             setPosts(rowsData);
         } catch (error) {
             console.error('Failed to fetch posts:', error);
+        }
+    };
+    const convertStatus = (status) => {
+        switch (status) {
+            case 'pending':
+                return 'Đang xử lý';
+            case 'reviewed':
+                return 'Đã xử lý';
+            case 'hidden':
+                return 'Đã ẩn';
+            default:
+                break;
         }
     };
     const convertState = (state) => {
@@ -87,13 +88,9 @@ export default function PostManagement() {
         // Trả về định dạng "DD/MM/YYYY"
         return `${day}/${month}/${year}`;
     };
-    const handleUpdatePosts = (postId) => {
-        setPosts((prevPosts) =>
-            prevPosts.filter((post) => post.postId !== postId)
-        );
-    };
-
-    const hidePostConfirmm = (id) => {
+    //==========================================================
+    //  report table
+    const hidePostConfirm = (id) => {
         confirmAlert({
             title: 'Ẩn bài viết',
             message: 'Bạn có chắc chắn muốn ẩn bài viết này?',
@@ -111,52 +108,6 @@ export default function PostManagement() {
             closeOnClickOutside: false,
         });
     };
-    const deletePostConfirm = (id) => {
-        confirmAlert({
-            title: 'Xoá bài viết',
-            message: 'Bạn có chắc chắn muốn xoá bài viết này?',
-            buttons: [
-                {
-                    label: 'Huỷ',
-                    className: 'react-confirm-alert-button cancel',
-                    onClick: () => {},
-                },
-                {
-                    label: 'Xác nhận',
-                    className: 'react-confirm-alert-button confirm',
-                    onClick: () => deletePost(id),
-                },
-            ],
-            closeOnClickOutside: false,
-        });
-    };
-    const deletePost = async (id) => {
-        try {
-            const response = await axios.delete(url + `/post/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (response.status === 204) {
-                // Nếu thành công thì cập nhật lại danh sách bài viết
-                setPosts((prevPosts) =>
-                    prevPosts.filter((post) => post.id !== id)
-                );
-                toast.success('Xoá thành công', {
-                    position: 'top-right',
-                    autoClose: 4000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-            }
-        } catch (error) {
-            console.error('Failed to delete posts:', error);
-        }
-    };
-
     const hidePost = async (id) => {
         try {
             const response = await axios.post(
@@ -188,16 +139,70 @@ export default function PostManagement() {
             console.error('Failed to hide posts:', error);
         }
     };
-
-    useEffect(() => {
-        getPosts();
-    }, [filter]);
+    const declinePostConfirm = (id) => {
+        confirmAlert({
+            title: 'Từ chối ẩn bài viết',
+            message: 'Bạn có chắc chắn muốn từ chối ẩn bài viết này?',
+            buttons: [
+                {
+                    label: 'Huỷ',
+                    className: 'react-confirm-alert-button cancel',
+                },
+                {
+                    label: 'Xác nhận',
+                    className: 'react-confirm-alert-button confirm',
+                    onClick: () => declinePost(id),
+                },
+            ],
+            closeOnClickOutside: false,
+        });
+    };
+    const declinePost = async (id) => {
+        try {
+            const response = await axios.put(
+                url + `/report/decline-hide-post/${id}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            // const data = await response.json();
+            if (response.status === 200) {
+                // Nếu thành công thì cập nhật lại danh sách bài viết
+                setPosts((prevPosts) =>
+                    prevPosts.filter((post) => post.id !== id)
+                );
+                toast.success('Đã từ chối', {
+                    position: 'top-right',
+                    autoClose: 4000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }
+        } catch (error) {
+            console.error('Failed to decline report:', error);
+        }
+    };
+    const handleUpdatePosts = (postId) => {
+        setPosts((prevPosts) =>
+            prevPosts.filter((post) => post.postId !== postId)
+        );
+    };
     const handleShowPostModal = async (post) => {
         setSelectedPost(post);
         console.log(post);
         setShowPostModal(true);
     };
-    const postColumns = [
+    useEffect(() => {
+        getPosts();
+    }, []);
+    console.log(posts);
+    const reportColumns = [
         { field: 'id', headerName: 'ID', width: 100 },
         {
             field: 'topic',
@@ -209,42 +214,41 @@ export default function PostManagement() {
             },
         },
         {
-            field: 'createdAt',
-            headerName: 'Ngày đăng',
+            field: 'count',
+            headerName: 'Báo cáo',
+            width: 100,
+        },
+        {
+            field: 'status',
+            headerName: 'Trạng thái',
             width: 150,
             renderCell: (params) => {
-                const date = params?.row?.createdAt;
+                const status = params?.row?.status;
+                return <div>{convertStatus(status)}</div>;
+            },
+        },
+        {
+            field: 'postCreatedAt',
+            headerName: 'Ngày đăng',
+            width: 180,
+            renderCell: (params) => {
+                const date = params.row.postCreatedAt;
                 return <div>{convertDate(date)}</div>;
             },
         },
         {
-            field: 'user',
-            headerName: 'Người đăng',
-            width: 150,
-            renderCell: (params) => {
-                const { firstname } = params.value || {};
-                const { lastname } = params.value || {};
-                return <div>{firstname + ' ' + lastname}</div>;
-            },
-        },
-        {
-            field: 'state',
-            headerName: 'Trạng thái',
-            width: 150,
-            renderCell: (params) => {
-                const state = params?.row?.state;
-                return <div>{convertState(state)}</div>;
-            },
-        },
-        {
-            field: 'action',
+            field: 'actions',
             headerName: 'Hành động',
-            width: 120,
+            width: 270,
             renderCell: (params) => {
                 return (
-                    <IconButton onClick={() => handleShowPostModal(params.row)}>
-                        <VisibilityIcon />
-                    </IconButton>
+                    <div className="flex mt-1 justify-between">
+                        <IconButton
+                            onClick={() => handleShowPostModal(params.row)}
+                        >
+                            <VisibilityIcon />
+                        </IconButton>
+                    </div>
                 );
             },
         },
@@ -260,28 +264,12 @@ export default function PostManagement() {
                     >
                         Bộ lọc
                     </Typography>
-                    <FormControl fullWidth variant="outlined">
-                        <InputLabel>Loại</InputLabel>
-                        <Select
-                            label="Comment Type"
-                            value={filter}
-                            onChange={handleFilter}
-                        >
-                            <MenuItem value="pending">
-                                Bài viết chờ duyệt
-                            </MenuItem>
-                            <MenuItem value="approved">
-                                Bài viết đã duyệt
-                            </MenuItem>
-                        </Select>
-                    </FormControl>
                 </Grid2>
             </Grid2>
             <Grid2 marginTop={3}>
                 <DataGrid
-                    columns={postColumns}
+                    columns={reportColumns}
                     rows={posts}
-                    rowHeight={50}
                     disableRowSelectionOnClick
                 />
                 {showPostModal && (

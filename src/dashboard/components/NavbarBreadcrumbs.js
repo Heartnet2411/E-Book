@@ -21,6 +21,9 @@ const breadcrumbNameMap = {
   '/admin/comments': 'Bình luận',
   '/admin/report-comments': 'Bình luận bị báo cáo',
   '/admin/users': 'Độc giả',
+  '/admin/hidden-posts': 'Bài viết bị ẩn',
+  '/admin/hidden-comments': 'Bình luận bị ẩn',
+  '/admin/report-posts': 'Bài viết bị báo cáo',
 };
 
 export default function NavbarBreadcrumbs() {
