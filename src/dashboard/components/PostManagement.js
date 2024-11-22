@@ -39,21 +39,12 @@ export default function PostManagement() {
     const getPosts = async () => {
         try {
             let response;
-            if (filter === 'reported') {
-                response = await fetch(url + `/report/post`, {
-                    headers: {
-                        method: 'GET',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-            } else {
-                response = await fetch(url + `/post/list/${filter}`, {
-                    headers: {
-                        method: 'GET',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-            }
+            response = await fetch(url + `/post/list/${filter}`, {
+                headers: {
+                    method: 'GET',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             const data = await response.json();
             const rowsData = data.map((item, index) => ({
                 id: item.targetId ? item.targetId : item.postId,

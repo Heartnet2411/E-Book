@@ -278,7 +278,7 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
             onMouseDown={handleOutsideClick}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
         >
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 w-2/4 px-8 min-h-[90vh] max-h-[90vh] flex flex-col relative">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 w-2/4 h-fit px-8 max-h-[90vh] flex flex-col relative">
                 {/* Header */}
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center">
@@ -354,7 +354,9 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
                         >
                             <ListItem alignItems="flex-start">
                                 {' '}
-                                <ListItemText>Lý do ẩn : {post.hiddenReason}</ListItemText>
+                                <ListItemText>
+                                    Lý do ẩn : {post.hiddenReason}
+                                </ListItemText>
                             </ListItem>
                         </List>
                     )}
@@ -437,6 +439,26 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
                 )}
                 {post.state == 'hidden' && (
                     <div className="flex justify-end gap-4 mt-4">
+                        <Button
+                            color="error"
+                            variant="contained"
+                            startIcon={<DeleteOutlineIcon />}
+                            onClick={() => deletePostConfirm(post.postId)}
+                        >
+                            Xoá bài viết
+                        </Button>
+                    </div>
+                )}
+                {post.state == 'approved' && (
+                    <div className="flex justify-end gap-4 mt-4">
+                        <Button
+                            color="secondary"
+                            variant="contained"
+                            startIcon={<VisibilityOffIcon />}
+                            onClick={() => hidePostConfirm(post.postId)}
+                        >
+                            Ẩn bài viết
+                        </Button>
                         <Button
                             color="error"
                             variant="contained"
