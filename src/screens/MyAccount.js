@@ -33,6 +33,91 @@ function MyAccount() {
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const [isCropping, setIsCropping] = useState(false);
+    const [formData, setFormData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+    });
+
+    const [errors, setErrors] = useState({});
+    const [submitError, setSubmitError] = useState('');
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+        setErrors({ ...errors, [name]: '' }); // Xóa lỗi khi người dùng thay đổi input
+    };
+
+    const validateForm = () => {
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/; // Regex kiểm tra mật khẩu
+        const newErrors = {};
+
+        if (!formData.currentPassword) {
+            newErrors.currentPassword = 'Vui lòng nhập mật khẩu hiện tại.';
+        }
+        if (!formData.newPassword) {
+            newErrors.newPassword = 'Vui lòng nhập mật khẩu mới.';
+        } else if (!passwordRegex.test(formData.newPassword)) {
+            newErrors.newPassword =
+                'Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm 1 chữ hoa và 1 số.';
+        } else if (formData.currentPassword === formData.newPassword)
+            newErrors.newPassword = 'Mật khẩu mới phải khác với mật khẩu cũ.';
+        if (!formData.confirmPassword) {
+            newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu mới.';
+        } else if (formData.confirmPassword !== formData.newPassword) {
+            newErrors.confirmPassword = 'Mật khẩu xác nhận không khớp.';
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validateForm()) return;
+
+        try {
+            const response = await fetch(url + '/user/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`, // Thay đổi nếu token được lưu ở nơi khác
+                },
+                body: JSON.stringify({
+                    currentPassword: formData.currentPassword,
+                    newPassword: formData.newPassword,
+                }),
+            });
+
+            if (response.ok) {
+                toast.success('Đổi mật khẩu thành công!', {
+                    position: 'top-right',
+                    autoClose: 4000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Slide,
+                });
+                setFormData({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: '',
+                });
+                setSubmitError('');
+            } else {
+                const data = await response.json();
+                console.log(data);
+                setSubmitError(
+                    data.message || 'Đã xảy ra lỗi khi thay đổi mật khẩu.'
+                );
+            }
+        } catch (error) {
+            setSubmitError('Đã xảy ra lỗi khi kết nối tới máy chủ.');
+        }
+    };
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
@@ -426,6 +511,24 @@ function MyAccount() {
                                             Sách đã lưu
                                         </a>
                                     </li>
+
+                                    <li
+                                        className={`p-3 rounded-xl border border-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer dark:border-gray-600 ${
+                                            activeTab === 'change-password'
+                                                ? 'bg-gray-200  dark:bg-gray-600'
+                                                : ''
+                                        }`}
+                                        onClick={() =>
+                                            setActiveTab('change-password')
+                                        }
+                                    >
+                                        <a
+                                            href="#change-password"
+                                            className="text-gray-700 font-medium dark:text-gray-200"
+                                        >
+                                            Đổi mật khẩu
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                             {activeTab === 'personal-info' && (
@@ -544,20 +647,7 @@ function MyAccount() {
                                     </div>
                                 </div>
                             )}
-                            {activeTab === 'your-posts' && (
-                                <div className="col-span-7 p-4 bg-gray-200 rounded-xl">
-                                    <h1 className="text-2xl font-semibold text-gray-800">
-                                        Bài viết của bạn
-                                    </h1>
-                                </div>
-                            )}
-                            {activeTab === 'saved-posts' && (
-                                <div className="col-span-7 p-4 bg-gray-200 rounded-xl">
-                                    <h1 className="text-2xl font-semibold text-gray-800">
-                                        Bài viết đã lưu
-                                    </h1>
-                                </div>
-                            )}
+
                             {activeTab === 'saved-books' && (
                                 <div className="col-span-7 py-2">
                                     <div className="grid grid-cols-3 gap-4 ">
@@ -578,6 +668,86 @@ function MyAccount() {
                                                   />
                                               ))}
                                     </div>
+                                    {SavedBook.length === 0 ? (
+                                        <div className="text-center w-full dark:text-gray-400 text-gray-700 text-xl font-medium">
+                                            <i>Bạn chưa lưu sách nào</i>
+                                        </div>
+                                    ) : null}
+                                </div>
+                            )}
+                            {activeTab === 'change-password' && (
+                                <div className="col-span-7 py-2">
+                                    <form
+                                        onSubmit={handleSubmit}
+                                        className="space-y-4"
+                                    >
+                                        <div>
+                                            <label className="block mb-2 text-gray-700 dark:text-gray-300">
+                                                Mật khẩu hiện tại
+                                            </label>
+                                            <input
+                                                type="password"
+                                                name="currentPassword"
+                                                value={formData.currentPassword}
+                                                onChange={handleChange}
+                                                className="w-full p-2 border rounded-xl dark:bg-gray-700 dark:text-white"
+                                            />
+                                            {errors.currentPassword && (
+                                                <p className="text-red-500 text-sm mt-1">
+                                                    {errors.currentPassword}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <label className="block mb-2 text-gray-700 dark:text-gray-300">
+                                                Mật khẩu mới
+                                            </label>
+                                            <input
+                                                type="password"
+                                                name="newPassword"
+                                                value={formData.newPassword}
+                                                onChange={handleChange}
+                                                className="w-full p-2 border rounded-xl dark:bg-gray-700 dark:text-white"
+                                            />
+                                            {errors.newPassword && (
+                                                <p className="text-red-500 text-sm mt-1">
+                                                    {errors.newPassword}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <label className="block mb-2 text-gray-700 dark:text-gray-300">
+                                                Xác nhận mật khẩu mới
+                                            </label>
+                                            <input
+                                                type="password"
+                                                name="confirmPassword"
+                                                value={formData.confirmPassword}
+                                                onChange={handleChange}
+                                                className="w-full p-2 border rounded-xl dark:bg-gray-700 dark:text-white"
+                                            />
+                                            {errors.confirmPassword && (
+                                                <p className="text-red-500 text-sm mt-1">
+                                                    {errors.confirmPassword}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {submitError && (
+                                            <p className="text-red-500 text-sm mt-2">
+                                                {submitError}
+                                            </p>
+                                        )}
+
+                                        <button
+                                            type="submit"
+                                            className="w-full p-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600"
+                                        >
+                                            Đổi mật khẩu
+                                        </button>
+                                    </form>
                                 </div>
                             )}
                         </div>

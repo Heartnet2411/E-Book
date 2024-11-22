@@ -182,11 +182,10 @@ export default function HiddenPostManagement() {
             renderCell: (params) => {
                 return (
                     <Stack direction="row" spacing={2}>
-                        <IconButton  onClick={() => handleShowPostModal(params.row)}>
-                        <VisibilityIcon  />
-                        </IconButton>
-                        <IconButton  onClick={() => deletePostConfirm(params.row)}>
-                        <DeleteOutlineIcon color="error" />
+                        <IconButton
+                            onClick={() => handleShowPostModal(params.row)}
+                        >
+                            <VisibilityIcon />
                         </IconButton>
                     </Stack>
                 );

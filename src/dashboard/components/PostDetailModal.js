@@ -17,6 +17,7 @@ import Comment from '../../components/Comment';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { Cancel, CheckCircle } from '@mui/icons-material';
 import { url } from '../../config/config';
 import { toast, Slide } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert';
@@ -73,21 +74,75 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
         confirmAlert({
             title: 'Duyệt bài viết',
             message: 'Bạn có chắc chắn muốn duyệt bài viết này?',
-            buttons: [
-                {
-                    label: 'Huỷ',
-                    className: 'react-confirm-alert-button cancel',
-                },
-                {
-                    label: 'Xác nhận',
-                    className: 'react-confirm-alert-button confirm',
-                    onClick: () => acceptPendingPost(id, token),
-                },
-            ],
             closeOnClickOutside: false,
+            customUI: ({ onClose }) => (
+                <div
+                    style={{
+                        textAlign: 'center',
+                        padding: '20px',
+                        borderRadius: '8px',
+                        background: 'white',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                    }}
+                >
+                    <h2 style={{ marginBottom: '10px', fontSize: '18px' }}>
+                        Duyệt bài viết
+                    </h2>
+                    <p style={{ marginBottom: '20px', color: '#555' }}>
+                        Bạn có chắc chắn muốn duyệt bài viết này?
+                    </p>
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '10px',
+                        }}
+                    >
+                        <button
+                            onClick={onClose}
+                            style={{
+                                backgroundColor: '#f44336',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                padding: '8px 15px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Cancel style={{ marginRight: '5px' }} />
+                            Huỷ
+                        </button>
+                        <button
+                            onClick={() => {
+                                acceptPendingPost(id);
+                                onClose();
+                            }}
+                            style={{
+                                backgroundColor: '#4caf50',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                padding: '8px 15px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <CheckCircle style={{ marginRight: '5px' }} />
+                            Xác nhận
+                        </button>
+                    </div>
+                </div>
+            ),
         });
     };
-    const acceptPendingPost = async (id, token) => {
+    const acceptPendingPost = async (id) => {
         // Gọi API để duyệt bài viết
         try {
             const response = await axios.post(
@@ -136,17 +191,127 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
             message: 'Bạn có chắc chắn muốn xoá bài viết này?',
             buttons: [
                 {
-                    label: 'Huỷ',
+                    label: (
+                        <span>
+                            <Cancel
+                                style={{
+                                    marginRight: '5px',
+                                    verticalAlign: 'middle',
+                                }}
+                            />
+                            Huỷ
+                        </span>
+                    ),
                     className: 'react-confirm-alert-button cancel',
                     onClick: () => {},
+                    style: {
+                        backgroundColor: '#f44336', // Màu đỏ
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        padding: '8px 15px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: '10px', // Khoảng cách giữa 2 nút
+                    },
                 },
                 {
-                    label: 'Xác nhận',
+                    label: (
+                        <span>
+                            <CheckCircle
+                                style={{
+                                    marginRight: '5px',
+                                    verticalAlign: 'middle',
+                                }}
+                            />
+                            Xác nhận
+                        </span>
+                    ),
                     className: 'react-confirm-alert-button confirm',
                     onClick: () => deletePost(id),
+                    style: {
+                        backgroundColor: '#4caf50', // Màu xanh lá
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        padding: '8px 15px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    },
                 },
             ],
             closeOnClickOutside: false,
+            customUI: ({ onClose }) => (
+                <div
+                    style={{
+                        textAlign: 'center',
+                        padding: '20px',
+                        borderRadius: '8px',
+                        background: 'white',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                    }}
+                >
+                    <h2 style={{ marginBottom: '10px', fontSize: '18px' }}>
+                        Xoá bài viết
+                    </h2>
+                    <p style={{ marginBottom: '20px', color: '#555' }}>
+                        Bạn có chắc chắn muốn xoá bài viết này?
+                    </p>
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '10px',
+                        }}
+                    >
+                        <button
+                            onClick={onClose}
+                            style={{
+                                backgroundColor: '#f44336',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                padding: '8px 15px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Cancel style={{ marginRight: '5px' }} />
+                            Huỷ
+                        </button>
+                        <button
+                            onClick={() => {
+                                deletePost(id);
+                                onClose();
+                            }}
+                            style={{
+                                backgroundColor: '#4caf50',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                padding: '8px 15px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <CheckCircle style={{ marginRight: '5px' }} />
+                            Xác nhận
+                        </button>
+                    </div>
+                </div>
+            ),
         });
     };
     const deletePost = async (id) => {
@@ -172,20 +337,89 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
         confirmAlert({
             title: 'Ẩn bài viết',
             message: 'Bạn có chắc chắn muốn ẩn bài viết này?',
-            buttons: [
-                {
-                    label: 'Huỷ',
-                    className: 'react-confirm-alert-button cancel',
-                },
-                {
-                    label: 'Xác nhận',
-                    className: 'react-confirm-alert-button confirm',
-                    onClick: () => hidePost(id),
-                },
-            ],
             closeOnClickOutside: false,
+            customUI: ({ onClose }) => (
+                <div
+                    style={{
+                        textAlign: 'center',
+                        padding: '20px',
+                        borderRadius: '8px',
+                        background: 'white',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                    }}
+                >
+                    <h2 style={{ marginBottom: '10px', fontSize: '18px' }}>
+                        Ẩn bài viết
+                    </h2>
+                    <p style={{ marginBottom: '20px', color: '#555' }}>
+                        Bạn có chắc chắn muốn ẩn bài viết này?
+                    </p>
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '10px',
+                        }}
+                    >
+                        <button
+                            onClick={onClose}
+                            style={{
+                                backgroundColor: '#f44336',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                padding: '8px 15px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'background-color 0.3s',
+                            }}
+                            onMouseEnter={(e) =>
+                                (e.target.style.backgroundColor = '#e53935')
+                            }
+                            onMouseLeave={(e) =>
+                                (e.target.style.backgroundColor = '#f44336')
+                            }
+                        >
+                            <Cancel style={{ marginRight: '5px' }} />
+                            Huỷ
+                        </button>
+                        <button
+                            onClick={() => {
+                                hidePost(id);
+                                onClose();
+                            }}
+                            style={{
+                                backgroundColor: '#4caf50',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                padding: '8px 15px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'background-color 0.3s',
+                            }}
+                            onMouseEnter={(e) =>
+                                (e.target.style.backgroundColor = '#43a047')
+                            }
+                            onMouseLeave={(e) =>
+                                (e.target.style.backgroundColor = '#4caf50')
+                            }
+                        >
+                            <CheckCircle style={{ marginRight: '5px' }} />
+                            Xác nhận
+                        </button>
+                    </div>
+                </div>
+            ),
         });
     };
+
     const hidePost = async (id) => {
         try {
             const response = await axios.post(
@@ -212,20 +446,89 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
         confirmAlert({
             title: 'Giữ nguyên bài viết',
             message: 'Bạn có chắc chắn muốn giữ nguyên bài viết này?',
-            buttons: [
-                {
-                    label: 'Huỷ',
-                    className: 'react-confirm-alert-button cancel',
-                },
-                {
-                    label: 'Xác nhận',
-                    className: 'react-confirm-alert-button confirm',
-                    onClick: () => declinePost(id),
-                },
-            ],
             closeOnClickOutside: false,
+            customUI: ({ onClose }) => (
+                <div
+                    style={{
+                        textAlign: 'center',
+                        padding: '20px',
+                        borderRadius: '8px',
+                        background: 'white',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                    }}
+                >
+                    <h2 style={{ marginBottom: '10px', fontSize: '18px' }}>
+                        Giữ nguyên bài viết
+                    </h2>
+                    <p style={{ marginBottom: '20px', color: '#555' }}>
+                        Bạn có chắc chắn muốn giữ nguyên bài viết này?
+                    </p>
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '10px',
+                        }}
+                    >
+                        <button
+                            onClick={onClose}
+                            style={{
+                                backgroundColor: '#f44336',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                padding: '8px 15px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'background-color 0.3s',
+                            }}
+                            onMouseEnter={(e) =>
+                                (e.target.style.backgroundColor = '#e53935')
+                            }
+                            onMouseLeave={(e) =>
+                                (e.target.style.backgroundColor = '#f44336')
+                            }
+                        >
+                            <Cancel style={{ marginRight: '5px' }} />
+                            Huỷ
+                        </button>
+                        <button
+                            onClick={() => {
+                                declinePost(id);
+                                onClose();
+                            }}
+                            style={{
+                                backgroundColor: '#4caf50',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                padding: '8px 15px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'background-color 0.3s',
+                            }}
+                            onMouseEnter={(e) =>
+                                (e.target.style.backgroundColor = '#43a047')
+                            }
+                            onMouseLeave={(e) =>
+                                (e.target.style.backgroundColor = '#4caf50')
+                            }
+                        >
+                            <CheckCircle style={{ marginRight: '5px' }} />
+                            Xác nhận
+                        </button>
+                    </div>
+                </div>
+            ),
         });
     };
+
     const declinePost = async (id) => {
         try {
             const response = await axios.put(
@@ -278,7 +581,7 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
             onMouseDown={handleOutsideClick}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
         >
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 w-2/4 h-fit px-8 max-h-[90vh] flex flex-col relative">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 w-2/4 px-8 h-fit max-h-[90vh] flex flex-col relative">
                 {/* Header */}
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center">
