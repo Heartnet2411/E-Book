@@ -11,7 +11,7 @@ const WeeklyTopBooks = ({ data }) => {
 
     if (data.length === 0) {
         return (
-            <div className="text-center text-gray-500 dark:text-gray-400">
+            <div className="text-center text-lg text-gray-500 dark:text-gray-400">
                 Không có dữ liệu sách đọc nhiều trong tuần.
             </div>
         );

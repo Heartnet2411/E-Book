@@ -207,14 +207,16 @@ const Login = () => {
         >
             <div className="grid grid-cols-2 grid-rows-[15vh_42.5vh_42.5vh]  px-16  max-h-screen max-w-screen-2xl">
                 <div className="col-span-2 h-auto">
-                    <div className="h-1/5">
-                        <img
-                            src="..\..\TheBookLounge.png"
-                            alt="Logo"
-                            height="10%"
-                            width="10%"
-                            className="ml-auto mr-auto"
-                        />
+                    <div className="h-1/5 cursor-pointer">
+                        <Link to="/" className="h-1/5 cursor-pointer">
+                            <img
+                                src="..\..\TheBookLounge.png"
+                                alt="Logo"
+                                height="10%"
+                                width="10%"
+                                className="ml-auto mr-auto"
+                            />
+                        </Link>
                     </div>
                 </div>
                 <div className="row-start-2 w-auto  px-12">

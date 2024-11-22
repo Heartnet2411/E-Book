@@ -44,7 +44,7 @@ const Comment = ({
                         {comment.user.firstName + ' ' + comment.user.lastName}
                     </span>
                     <span className="mr-2">
-                        {new Date(comment.createdAt).toLocaleDateString(
+                        {new Date(comment.updatedAt).toLocaleDateString(
                             'en-GB'
                         )}
                     </span>

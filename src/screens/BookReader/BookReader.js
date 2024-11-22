@@ -13,6 +13,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { url } from '../../config/config';
 import BookmarkModal from '../../components/BookHeader/BookmarkModal';
 import useBookContent from '../../hooks/useBookContent';
+import { toast, Slide } from 'react-toastify';
 
 export const readerContext = React.createContext(null);
 
@@ -49,7 +50,9 @@ const BookReader = () => {
         }
     };
     const [rendition, setRendition] = useState(undefined);
-    const { bookContents, searchBookContents } = useBookContent(rendition?.book);
+    const { bookContents, searchBookContents } = useBookContent(
+        rendition?.book
+    );
     const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
     const [isControlModalOpen, setIsControlModalOpen] = useState(false);
     const [isBookmarkModalOpen, setIsBookmarkModalOpen] = useState(false);
@@ -58,10 +61,7 @@ const BookReader = () => {
     const [highlights, setHighlights] = useState([]);
     const [selectedHighlight, setSelectedHighlight] = useState(null);
     const [isColorPickerOpen, setIsColorPickerOpen] = useState(false); // Trạng thái để điều khiển hiển thị bảng chọn màu
-    const [colorPickerPosition, setColorPickerPosition] = useState({
-        top: 0,
-        left: 0,
-    });
+
     const [searchResults, setSearchResults] = useState([]);
     const [bookmarks, setBookmarks] = useState([]);
     const user = JSON.parse(localStorage.getItem('user'));
@@ -81,7 +81,7 @@ const BookReader = () => {
         }
     }, [id]);
     useEffect(() => {
-        if (book && book?.epubUrl) {
+        if (book && book?.epubUrl && user) {
             fetchBookmarks(user.userId, id);
             fetchHighlights(user.userId, id);
         }
@@ -94,6 +94,12 @@ const BookReader = () => {
             setLoading(false);
         } catch (error) {
             console.error(error);
+        }
+    };
+
+    const handleOutsideClick = (event) => {
+        if (event.target.id === 'modal-overlay') {
+            setIsColorPickerOpen(false);
         }
     };
 
@@ -155,6 +161,24 @@ const BookReader = () => {
         }
     };
     const handleBookmark = async () => {
+        if (!user) {
+            toast.error(
+                'Vui lòng đăng nhập để có thể thực hiện các chức năng!',
+                {
+                    position: 'top-left',
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Slide,
+                }
+            );
+
+            return;
+        }
         if (reactReaderRef?.current) {
             const currentLocation =
                 reactReaderRef?.current?.location?.start?.cfi;
@@ -241,18 +265,17 @@ const BookReader = () => {
         // Hiển thị các highlight đã lưu
         highlights.forEach((highlight) => {
             console.log(highlight.color);
-            const highlightColor = highlight.color
+            const highlightColor = highlight.color;
             rendition.annotations.highlight(
-                highlight.cfiRange, 
-                {},  // Không cần data bổ sung nếu không sử dụng callback
-                null,  // Không cần callback
-                '',  // Không cần className
+                highlight.cfiRange,
+                {}, // Không cần data bổ sung nếu không sử dụng callback
+                null, // Không cần callback
+                '', // Không cần className
                 {
-                    'fill': highlightColor,  // Màu nền của highlight
-                    'opacity': 1,  // Độ mờ
-                    'mix-blend-mode': 'multiply'  // Hiệu ứng pha trộn
+                    fill: highlightColor, // Màu nền của highlight
+                    opacity: 1, // Độ mờ
+                    'mix-blend-mode': 'multiply', // Hiệu ứng pha trộn
                 }
-
             );
         });
     };
@@ -260,13 +283,13 @@ const BookReader = () => {
         try {
             // Xoá highlight khỏi annotations
             if (rendition) {
-                console.log('deleted')
-                rendition?.annotations.remove(cfiRange,'highlight');
+                console.log('deleted');
+                rendition?.annotations.remove(cfiRange, 'highlight');
             }
-    
+
             // Xoá highlight khỏi database thông qua API
             const response = await axios.delete(
-                `${url}/highlight/${highlightId}`, 
+                `${url}/highlight/${highlightId}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -274,11 +297,13 @@ const BookReader = () => {
                     },
                 }
             );
-    
+
             if (response.status === 200) {
                 // Cập nhật lại state sau khi xoá highlight thành công
                 setHighlights((prevHighlights) =>
-                    prevHighlights.filter((highlight) => highlight.highlightId !== highlightId)
+                    prevHighlights.filter(
+                        (highlight) => highlight.highlightId !== highlightId
+                    )
                 );
                 console.log('Highlight deleted successfully!');
             } else {
@@ -288,7 +313,7 @@ const BookReader = () => {
             console.error('Error deleting highlight:', error);
         }
     };
-    
+
     console.log(highlights);
     const handleFullScreen = () => {
         setIsFullScreen(!!document.fullscreenElement);
@@ -329,34 +354,40 @@ const BookReader = () => {
             }
         }
     }, [selectedColor, size, selectedFont]);
+
     useEffect(() => {
+        console.log('Rect.left:', rendition);
         if (rendition) {
             function setRenderHighlights(cfiRange, contents) {
+                if (!user) {
+                    return;
+                }
                 if (rendition) {
                     const range = rendition.getRange(cfiRange);
-                    const rect = range.getBoundingClientRect();
-                    setColorPickerPosition({
-                        top: rect.top + window.scrollY + rect.height,
-                        left: rect.left + window.scrollX,
-                    });
+                    // Thêm highlight vào cơ sở dữ liệu hoặc state
                     const newHighlight = {
                         userId: user?.userId,
                         bookId: book?.bookId,
-                        text: rendition.getRange(cfiRange).toString(),
+                        text: range.toString(),
                         cfiRange,
                         date: new Date().toISOString(),
-                        color: '#FFFF00',
+                        color: '#FFFF00', // Màu vàng cho highlight
                     };
                     setSelectedHighlight(newHighlight); // Đặt highlight được chọn
-                    setIsColorPickerOpen(true);
+                    setIsColorPickerOpen(true); // Mở ColorPicker
                 }
             }
+
+            // Lắng nghe sự kiện khi người dùng chọn văn bản
             rendition.on('selected', setRenderHighlights);
+
             return () => {
+                // Hủy đăng ký sự kiện khi component bị unmount
                 rendition.off('selected', setRenderHighlights);
             };
         }
     }, [rendition, setHighlights]);
+
     function handleColorChange(newColor) {
         console.log(newColor);
         if (selectedHighlight) {
@@ -503,7 +534,7 @@ const BookReader = () => {
         }),
         []
     );
-    
+
     const handleSearch = async (text) => {
         console.log(text);
         const result = await searchBookContents(text);
@@ -547,7 +578,7 @@ const BookReader = () => {
                     getRendition={(rendition) => {
                         reactReaderRef.current = rendition;
                         setRendition(rendition);
-                         console.log(rendition);
+                        console.log(rendition);
                         updateTheme(reactReaderRef, selectedColor);
                         updateFontSize(size);
                         onShowHighlight(rendition);
@@ -591,35 +622,31 @@ const BookReader = () => {
             />
             {isColorPickerOpen && (
                 <div
-                    ref={colorPickerRef}
-                    style={{
-                        position: 'absolute',
-                        top: colorPickerPosition.top,
-                        left: colorPickerPosition.left,
-                        display: 'flex',
-                        gap: '10px',
-                        padding: '10px',
-                        backgroundColor: '#f9f9f9',
-                        border: '1px solid #ddd',
-                        borderRadius: '8px',
-                        zIndex: 1000,
-                    }}
+                    id="modal-overlay"
+                    onMouseDown={handleOutsideClick}
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
                 >
-                    {colors.map((color) => (
-                        <div
-                            key={color}
-                            onClick={() => handleColorChange(color)}
-                            style={{
-                                width: '30px',
-                                height: '30px',
-                                backgroundColor: color,
-                                cursor: 'pointer',
-                                border: '2px solid #fff',
-                                borderRadius: '50%',
-                                boxShadow: '0 0 5px rgba(0,0,0,0.3)',
-                            }}
-                        ></div>
-                    ))}
+                    <div
+                        id="modal-overlay"
+                        ref={colorPickerRef}
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-3 px-10 py-4 bg-slate-300 border rounded-t-xl z-50 "
+                    >
+                        {colors.map((color) => (
+                            <div
+                                key={color}
+                                onClick={() => handleColorChange(color)}
+                                style={{
+                                    width: '30px',
+                                    height: '30px',
+                                    backgroundColor: color,
+                                    cursor: 'pointer',
+                                    border: '2px solid #fff',
+                                    borderRadius: '50%',
+                                    boxShadow: '0 0 5px rgba(0,0,0,0.3)',
+                                }}
+                            ></div>
+                        ))}
+                    </div>
                 </div>
             )}
         </div>

@@ -41,7 +41,7 @@ function Posts() {
     // Chọn ngẫu nhiên một hình ảnh từ danh sách
     const randomImage = images[Math.floor(Math.random() * images.length)];
 
-    const fetchPostById = async (id) => {
+    const fetchPostById = async () => {
         try {
             const response = await fetch(url + `/post/${id}`, {
                 method: 'GET', // Phương thức GET
@@ -93,7 +93,7 @@ function Posts() {
         }
     };
 
-    const fetchSavedPostsByUserId = async (userId) => {
+    const fetchSavedPostsByUserId = async () => {
         try {
             const response = await fetch(url + `/post/saved/${id}`, {
                 method: 'GET', // Phương thức GET
@@ -105,8 +105,11 @@ function Posts() {
 
             if (response.ok) {
                 const data = await response.json();
-                const postMap = data.map((item) => item.post);
-                setPosts(postMap);
+                const approvedPosts = data.filter(
+                    (post) => post.state === 'approved'
+                );
+                // Gắn dữ liệu đã lọc vào state
+                setPosts(approvedPosts);
                 setLoading(false);
             } else {
                 console.error('Failed to fetch saved posts by user ID');
@@ -130,7 +133,7 @@ function Posts() {
         setLoading(true);
         setSelected('posts');
         // Gọi hàm với id cụ thể
-        fetchPostById(id);
+        fetchPostById();
     };
 
     const handleFindAllPost = () => {
@@ -285,7 +288,14 @@ function Posts() {
                                 />
                             </div>
                         ) : posts.length > 0 ? (
-                            posts.map((post) => <Post post={post} />)
+                            posts.map((post) => (
+                                <Post
+                                    post={post}
+                                    currentUserId={user.userId}
+                                    selected={selected}
+                                    fetchPostById={fetchPostById}
+                                />
+                            ))
                         ) : (
                             <div>
                                 <Lottie

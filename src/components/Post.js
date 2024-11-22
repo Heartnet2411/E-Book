@@ -11,8 +11,9 @@ import ReportModal from './ReportModal';
 import { url } from '../config/config';
 import axios from 'axios';
 import { formatDate } from '../utils/formatDate';
+import { MdDelete } from 'react-icons/md';
 
-function Post({ post }) {
+function Post({ post, currentUserId, selected, fetchPostById }) {
     const [savedPost, setSavedPost] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -22,6 +23,7 @@ function Post({ post }) {
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [selectedPostId, setSelectedPostId] = useState(null);
     const token = localStorage.getItem('token');
+
     const [showPicker, setShowPicker] = useState(false);
     const [comment, setCommnet] = useState('');
     const [comments, setCommnets] = useState([]);
@@ -90,6 +92,7 @@ function Post({ post }) {
             toast.warning(message, options);
         }
     }
+
     const handleCreateReport = async (reason) => {
         if (!selectedPostId) return;
 
@@ -146,19 +149,17 @@ function Post({ post }) {
             });
         }
     };
+
     const savePostForUser = async (postId, token) => {
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/saved/save',
-                {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ postId }),
-                }
-            );
+            const response = await fetch(url + '/post/saved/save', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ postId }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -176,17 +177,14 @@ function Post({ post }) {
 
     async function fetchUnsavePost(postId, token) {
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/saved/unsave',
-                {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ postId }),
-                }
-            );
+            const response = await fetch(url + '/post/saved/unsave', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ postId }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -205,7 +203,7 @@ function Post({ post }) {
     async function fetchSavedPost(postId, token) {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/post/saved/savedPosts/${postId}`,
+                url + `/post/saved/savedPosts/${postId}`,
                 {
                     method: 'GET', // Chuyển phương thức thành GET
                     headers: {
@@ -230,17 +228,14 @@ function Post({ post }) {
 
     const addFavoritePost = async (postId, token) => {
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/favorite/add',
-                {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ postId }),
-                }
-            );
+            const response = await fetch(url + '/post/favorite/add', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ postId }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -282,7 +277,7 @@ function Post({ post }) {
     const fetchFavoritePost = async (postId, token) => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/post/favorite/favoritePosts/${postId}`,
+                url + `/post/favorite/favoritePosts/${postId}`,
                 {
                     method: 'GET',
                     headers: {
@@ -303,12 +298,9 @@ function Post({ post }) {
 
     const fetchPostComment = async () => {
         try {
-            const response = await fetch(
-                `http://localhost:8080/api/post/comment/${post.postId}`,
-                {
-                    method: 'GET',
-                }
-            );
+            const response = await fetch(url + `/post/comment/${post.postId}`, {
+                method: 'GET',
+            });
 
             if (response.ok) {
                 const comments = await response.json();
@@ -349,21 +341,18 @@ function Post({ post }) {
     const handleSendComment = async () => {
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/comment',
-                {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        postId: post.postId,
-                        replyId: null,
-                        content: comment,
-                    }),
-                }
-            );
+            const response = await fetch(url + '/post/comment', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    postId: post.postId,
+                    replyId: null,
+                    content: comment,
+                }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -373,6 +362,34 @@ function Post({ post }) {
             } else {
                 showToast('error', 'Có lỗi xảy ra khi thêm bình luận');
                 setCommnet('');
+            }
+        } catch (error) {
+            console.error('Lỗi:', error);
+            showToast('error', 'Lỗi kết nối, vui lòng thử lại sau');
+            setCommnet('');
+        }
+    };
+
+    const handleRemovePostUser = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(
+                url + `/post/user-hidden/${post.postId}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                showToast('success', 'Xóa bài viết thành công');
+                fetchPostById();
+            } else {
+                showToast('error', 'Lỗi khi xóa bài viết');
             }
         } catch (error) {
             console.error('Lỗi:', error);
@@ -405,37 +422,60 @@ function Post({ post }) {
                     </div>
                     <div className="flex items-center">
                         <div className="relative group">
-                            {savedPost ? (
+                            {currentUserId === post.userId &&
+                            selected === 'posts' ? (
                                 <div>
                                     <button
-                                        onClick={() => handleRemoveSavePost()}
+                                        onClick={handleRemovePostUser}
                                         className="cursor-pointer"
                                     >
-                                        <FaBookmark
-                                            size={22}
-                                            className="text-base rounded-md text-yellow-400"
+                                        <MdDelete
+                                            size={28}
+                                            className="text-base rounded-md text-dark dark:text-white"
                                         />
                                     </button>
                                     <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 dark:bg-gray-200 dark:text-black text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        Bỏ lưu bài viết
+                                        Xóa bài viết
                                     </span>
                                 </div>
-                            ) : (
-                                <div>
-                                    <button
-                                        onClick={() => handleSavePost()}
-                                        className="cursor-pointer"
-                                    >
-                                        <FaRegBookmark
-                                            size={22}
-                                            className="text-base rounded-md text-black dark:text-white"
-                                        />
-                                    </button>
-                                    <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 dark:bg-gray-200 dark:text-black text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        Lưu bài viết
-                                    </span>
-                                </div>
-                            )}
+                            ) : null}
+                        </div>
+                        <div className="relative group">
+                            {currentUserId !== post.userId ? (
+                                savedPost ? (
+                                    <div>
+                                        <button
+                                            onClick={() =>
+                                                handleRemoveSavePost()
+                                            }
+                                            className="cursor-pointer"
+                                        >
+                                            <FaBookmark
+                                                size={22}
+                                                className="ml-4 text-base rounded-md text-yellow-400"
+                                            />
+                                        </button>
+                                        <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 dark:bg-gray-200 dark:text-black text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            Bỏ lưu bài viết
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <button
+                                            onClick={() => handleSavePost()}
+                                            className="cursor-pointer"
+                                        >
+                                            <FaRegBookmark
+                                                size={22}
+                                                className="ml-4 text-base rounded-md text-black dark:text-white"
+                                            />
+                                        </button>
+                                        <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 dark:bg-gray-200 dark:text-black text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            Lưu bài viết
+                                        </span>
+                                    </div>
+                                )
+                            ) : null}
                         </div>
                         <div className="relative group">
                             {' '}

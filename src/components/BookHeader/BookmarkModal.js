@@ -153,10 +153,16 @@ export default function BookmarkModal({
                                         </Typography>
                                     }
                                 />
-                                <IconButton onClick={(e) => {
+                                <IconButton
+                                    onClick={(e) => {
                                         e.stopPropagation();
-                                        handleDeleteHighlight(highlight.highlightId,highlight.cfiRange);
-                                    }} sx={{ color: 'red' }}>
+                                        handleDeleteHighlight(
+                                            highlight.highlightId,
+                                            highlight.cfiRange
+                                        );
+                                    }}
+                                    sx={{ color: 'red' }}
+                                >
                                     <IoTrashOutline />
                                 </IconButton>
                             </ListItem>
