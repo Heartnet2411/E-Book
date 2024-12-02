@@ -170,12 +170,12 @@ function Posts() {
             <div
                 className="w-4/5 mx-auto text-center mt-6 h-16 flex items-center justify-center rounded-xl"
                 style={{
-                    backgroundImage: `url(${randomImage})`,
+                    backgroundImage: `url(${images[8]})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                 }}
             >
-                <span className="text-xl font-medium text-white">
+                <span className="text-xl font-medium text-white custom-text-shadow">
                     {topicName}
                 </span>
             </div>
@@ -263,20 +263,22 @@ function Posts() {
 
                 {/* Right page */}
                 <div className="col-span-7 px-4 pr-24 h-auto">
-                    <div
-                        onClick={() => setIsCreatePostOpen(true)}
-                        className="bg-white cursor-pointer hover:bg-gray-100 border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-xl flex justify-between p-2 pl-6 items-center rounded-lg mt-6"
-                    >
-                        <span className="font-medium text-base dark:text-white">
-                            Thêm bài viết mới
-                        </span>
-                        <button className=" p-2 bg-blue-400 rounded-lg">
-                            <FaPlus
-                                size={20}
-                                className="text-white dark:text-white"
-                            />
-                        </button>
-                    </div>
+                    {selected === 'home' ? (
+                        <div
+                            onClick={() => setIsCreatePostOpen(true)}
+                            className="bg-white cursor-pointer hover:bg-gray-100 border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:shadow-gray-800 dark:shadow-md shadow-xl flex justify-between p-2 pl-6 items-center rounded-lg mt-6"
+                        >
+                            <span className="font-medium text-base dark:text-white">
+                                Thêm bài viết mới
+                            </span>
+                            <button className=" p-2 bg-blue-400 rounded-lg">
+                                <FaPlus
+                                    size={20}
+                                    className="text-white dark:text-white"
+                                />
+                            </button>
+                        </div>
+                    ) : null}
 
                     <div className="mt-4">
                         {loading ? (

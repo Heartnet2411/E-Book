@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Lottie from 'react-lottie';
 import loginanimation from '../lotties/register.json';
-import { FaFacebookSquare } from 'react-icons/fa';
+import { FaYahoo } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { IoMdEye } from 'react-icons/io';
 import { IoEyeOff } from 'react-icons/io5';
@@ -162,7 +162,7 @@ const Login = () => {
                     <button
                         disabled={isLoading}
                         onClick={handleLogin}
-                        className=" w-10/12 px-6 py-2 rounded-2xl bg-sky-600 hover:bg-sky-700 mt-4 text-white font-medium text-xl"
+                        className=" w-10/12 px-6 py-2 rounded-2xl bg-blue-500 hover:bg-sky-600 mt-4 text-white font-medium text-xl"
                     >
                         {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                     </button>
@@ -174,10 +174,10 @@ const Login = () => {
                         <div className="flex-grow border-t border-gray-300"></div>
                     </div>
                     <div className=" w-10/12 flex space-x-4 justify-around">
-                        <button className="bg-blue-600 py-2 px-4 rounded-xl hover:bg-blue-700 flex items-center w-1/3 justify-center">
-                            <FaFacebookSquare color="white" size={24} />
+                        <button className="bg-blue-700 py-2 px-4 rounded-xl hover:bg-blue-800 flex items-center w-1/3 justify-center">
+                            <FaYahoo color="white" size={24} />
                             <p className="text-white ml-2 text-xl font-medium ">
-                                Facebook
+                                Yahoo!
                             </p>
                         </button>
                         <button className="bg-white text-white py-2 px-4 rounded-xl hover:bg-red-700 flex items-center w-1/3 justify-center">

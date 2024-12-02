@@ -17,32 +17,71 @@ function Forum() {
     const [filteredTopics, setFilteredTopics] = useState(topics);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedFilter, setSelectedFilter] = useState('Tất cả'); // Bộ lọc
+
+    const filters = [
+        'Tất cả diễn đàn',
+        'Diễn đàn hoạt động nhiều nhất',
+        'Diễn đàn hoạt động mới nhất',
+    ];
+
+    // Loại bỏ dấu tiếng Việt
+    const removeVietnameseTones = (str) => {
+        return str
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // Xóa dấu
+            .replace(/đ/g, 'd')
+            .replace(/Đ/g, 'D')
+            .toLowerCase();
+    };
+
+    const handleSearch = () => {
+        const normalizedSearchTerm = removeVietnameseTones(
+            searchTerm.trim().toLowerCase()
+        );
+        let filtered = [...topics];
+
+        // Lọc theo từ khóa tìm kiếm
+        if (normalizedSearchTerm) {
+            filtered = filtered.filter((topic) => {
+                const normalizedTopicName = removeVietnameseTones(
+                    topic.name.toLowerCase()
+                );
+                return normalizedTopicName.includes(normalizedSearchTerm);
+            });
+        }
+
+        // Lọc theo bộ lọc
+        switch (selectedFilter) {
+            case 'Diễn đàn hoạt động nhiều nhất':
+                filtered.sort((a, b) => b.postsCount - a.postsCount); // Số bài đăng giảm dần
+                break;
+
+            case 'Diễn đàn hoạt động mới nhất':
+                filtered.sort(
+                    (a, b) => new Date(b.lastActive) - new Date(a.lastActive)
+                ); // Ngày gần đây giảm dần
+                break;
+
+            default:
+                break; // 'Tất cả' không cần sắp xếp thêm
+        }
+
+        setFilteredTopics(filtered);
+    };
 
     useEffect(() => {
-        if (searchTerm.trim() === '') {
-            // Nếu searchTerm rỗng, hiển thị tất cả topics
-            setFilteredTopics(topics);
-        }
-    }, [topics, searchTerm]);
-
-    // Hàm xử lý khi bấm nút "Tìm kiếm"
-    const handleSearch = () => {
-        if (searchTerm.trim() === '') {
-            setFilteredTopics(topics); // Hiển thị tất cả nếu searchTerm rỗng
-        } else {
-            const filtered = topics.filter((topic) =>
-                topic.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setFilteredTopics(filtered);
-        }
-    };
+        handleSearch(); // Tự động tìm kiếm lại khi bộ lọc hoặc từ khóa thay đổi
+    }, [searchTerm, selectedFilter]);
 
     const fetchTopics = async () => {
         try {
             const response = await fetch(url + '/topics/');
             if (response.ok) {
                 const data = await response.json();
+                console.log(data);
                 setTopics(data);
+                setFilteredTopics(data);
             } else {
                 console.error('Failed to fetch topics');
             }
@@ -83,20 +122,25 @@ function Forum() {
             <Header user={user} />
 
             {/* Ô tìm kiếm và nút tìm kiếm */}
-            <div className="flex justify-center mt-6">
+            <div className="flex flex-col md:flex-row justify-center items-center mt-6 gap-4">
                 <input
                     type="text"
-                    placeholder="Tìm kiếm diễn đàn..."
+                    placeholder="Nhập để tìm kiếm diễn đàn..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full max-w-md p-3 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 />
-                <button
-                    onClick={handleSearch}
-                    className="ml-3 py-2 px-6 bg-blue-500 text-white rounded-lg shadow-sm hover:bg-blue-600 focus:outline-none"
+                <select
+                    value={selectedFilter}
+                    onChange={(e) => setSelectedFilter(e.target.value)}
+                    className="p-3 py-2 rounded-lg border border-gray-300 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 >
-                    Tìm kiếm
-                </button>
+                    {filters.map((filter) => (
+                        <option key={filter} value={filter}>
+                            {filter}
+                        </option>
+                    ))}
+                </select>
             </div>
 
             <div className="flex justify-end w-4/5 mx-auto">

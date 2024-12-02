@@ -260,6 +260,8 @@ const CreatePostModal = ({ isOpen, onClose, topicId, topicName }) => {
                             onChange={handleEditorChange}
                             blockStyleFn={myBlockStyleFn}
                             placeholder="Thêm nội dung"
+                            editorKey="editor"
+                            className="draft-editor"
                         />
                     </div>
                 </div>

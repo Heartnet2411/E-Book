@@ -20,6 +20,11 @@ import AnnouncementIcon from '@mui/icons-material/Announcement';
 const mainListItems = [
     { text: 'Trang chủ', icon: <HomeRoundedIcon />, path: '/admin' },
     {
+        text: 'Thống kê',
+        icon: <GroupIcon />,
+        path: '/admin/statistic',
+    },
+    {
         text: 'Bài viết',
         icon: <ArticleIcon />,
         subMenu: [

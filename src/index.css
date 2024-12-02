@@ -51,20 +51,36 @@ html {
 
 /* Đảm bảo rằng không có viền hoặc bất kỳ loại outline nào làm mất thẩm mỹ */
 .editor-container {
-    border: 1px solid #ccc;
-    border-radius: 8px;
     background-color: #f9f9f9;
     min-height: 200px;
+    height: 200px;
 }
 
 /* Đây là phần chính của nội dung Editor, nơi văn bản được nhập */
 .public-DraftEditor-content {
-    max-height: 150px;
-    background-color: #ffffff;
-    border: none;
-    outline: none;
-    overflow: scroll;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333; /* Màu chữ mặc định */
+    min-height: 200px;
+    max-height: 250px;
+    overflow-y: scroll;
+    padding: 10px;
 }
+
+.draft-editor {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333; /* Màu chữ mặc định */
+    min-height: 200px;
+    max-height: 250px;
+    overflow-y: scroll;
+    padding: 10px;
+}
+
+.draft-editor:focus {
+    outline: none; /* Loại bỏ viền khi tập trung */
+}
+
 .react-confirm-alert-button.confirm {
     background-color: #4caf50; /* Màu nền cho nút xác nhận */
 }
@@ -78,4 +94,8 @@ html {
 
 .react-confirm-alert-button.cancel:hover {
     background-color: #e53935; /* Màu nền khi di chuột qua cho nút huỷ */
+}
+
+.custom-text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }

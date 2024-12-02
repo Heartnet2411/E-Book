@@ -58,7 +58,7 @@ function TopicCard({ name, id }) {
 
             // Kiểm tra xem phản hồi có phải là JSON
             const data = await response.json();
-
+            console.log(data);
             setLastPost(data.lastPost); // Cập nhật bài viết cuối cùng
             setPostCount(data.postCount); // Cập nhật tổng số bài viết
         } catch (error) {
@@ -80,18 +80,18 @@ function TopicCard({ name, id }) {
     return (
         <div
             onClick={handleClick}
-            className="w-full p-4 bg-white rounded-2xl shadow-md dark:bg-slate-800 dark:text-white cursor-pointer"
+            className="w-full p-4 bg-white rounded-2xl shadow-md dark:shadow-gray-700 dark:bg-gray-800 dark:text-white cursor-pointer"
         >
             {/* Header */}
             <div
                 className="flex items-center justify-between p-4 rounded-xl bg-gray-400"
                 style={{
-                    backgroundImage: `url(${randomImage})`,
+                    backgroundImage: `url(${images[4]})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                 }}
             >
-                <h2 className="text-white font-semibold text-lg dark:text-white line-clamp-1">
+                <h2 className="text-white font-semibold text-lg dark:text-white line-clamp-1 custom-text-shadow w-full">
                     {name}
                 </h2>
             </div>
@@ -108,7 +108,7 @@ function TopicCard({ name, id }) {
                         {lastPost
                             ? (() => {
                                   const createdAtDate = new Date(
-                                      lastPost.createdAt
+                                      lastPost.updatedAt
                                   );
                                   const today = new Date();
 
