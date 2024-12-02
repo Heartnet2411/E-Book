@@ -6,8 +6,52 @@ import {
     MenuItem,
     InputLabel,
     Select,
+    IconButton,
+    Stack,
 } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { url } from '../../config/config';
+import { DataGrid } from '@mui/x-data-grid';
+import { toast, Slide } from 'react-toastify';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import axios from 'axios';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 export default function ReportedComment() {
+    const [comments, setComments] = useState(null);
+    const [selectedComment, setSelectedComment] = useState(null);
+    const [filter, setFilter] = useState('all');
+    const token = localStorage.getItem('token');
+    // const fetchComments = async () => {
+    //     try {
+    //         let response;
+    //         response = await fetch(
+    //             url +
+    //                 `/admin/comments/${filter}?page=${
+    //                     pageState.page + 1
+    //                 }&pageSize=${pageState.pageSize}&sort=DESC`,
+    //             {
+    //                 headers: {
+    //                     method: 'GET',
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             }
+    //         );
+    //         const data = await response.json();
+    //         const comments = data.allComments;
+    //         const rowsData = comments.map((item, index) => ({
+    //             id: item.commentId,
+    //             ...item,
+    //         }));
+    //          setComments(rowsData);
+    //     } catch (error) {
+    //         console.error('Failed to fetch comments:', error);
+    //     }
+    // };
     return (
         <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
             <Grid2 container spacing={4} paddingTop={3}>
@@ -22,7 +66,7 @@ export default function ReportedComment() {
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Loại</InputLabel>
                         <Select label="Comment Type">
-                            <MenuItem value="All">Tất cả</MenuItem>
+                            <MenuItem value="all">Tất cả</MenuItem>
                             <MenuItem value="book-cmt">Bình luận sách</MenuItem>
                             <MenuItem value="post-cmt">
                                 Bình luận bài viết
