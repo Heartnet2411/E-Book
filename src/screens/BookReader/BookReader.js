@@ -14,6 +14,7 @@ import { url } from '../../config/config';
 import BookmarkModal from '../../components/BookHeader/BookmarkModal';
 import useBookContent from '../../hooks/useBookContent';
 import { toast, Slide } from 'react-toastify';
+import CloseIcon from '@mui/icons-material/Close';
 
 export const readerContext = React.createContext(null);
 
@@ -61,8 +62,7 @@ const BookReader = () => {
     const [selectedColor, setSelectedColor] = useState('light');
     const [highlights, setHighlights] = useState([]);
     const [selectedHighlight, setSelectedHighlight] = useState(null);
-    const [isColorPickerOpen, setIsColorPickerOpen] = useState(false); // Trạng thái để điều khiển hiển thị bảng chọn màu
-
+    const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [bookmarks, setBookmarks] = useState([]);
     const user = JSON.parse(localStorage.getItem('user'));
@@ -267,20 +267,12 @@ const BookReader = () => {
         highlights.forEach((highlight) => {
             console.log(highlight.color);
             const highlightColor = highlight.color;
-
             rendition.annotations.highlight(
                 highlight.cfiRange,
                 {}, // Không cần data bổ sung nếu không sử dụng callback
                 null, // Không cần callback
                 '', // Không cần className
-                highlight.cfiRange,
-                {}, // Không cần data bổ sung nếu không sử dụng callback
-                null, // Không cần callback
-                '', // Không cần className
                 {
-                    fill: highlightColor, // Màu nền của highlight
-                    opacity: 1, // Độ mờ
-                    'mix-blend-mode': 'multiply', // Hiệu ứng pha trộn
                     fill: highlightColor, // Màu nền của highlight
                     opacity: 1, // Độ mờ
                     'mix-blend-mode': 'multiply', // Hiệu ứng pha trộn
@@ -294,13 +286,10 @@ const BookReader = () => {
             if (rendition) {
                 console.log('deleted');
                 rendition?.annotations.remove(cfiRange, 'highlight');
-                console.log('deleted');
-                rendition?.annotations.remove(cfiRange, 'highlight');
             }
 
             // Xoá highlight khỏi database thông qua API
             const response = await axios.delete(
-                `${url}/highlight/${highlightId}`,
                 `${url}/highlight/${highlightId}`,
                 {
                     headers: {
@@ -422,22 +411,6 @@ const BookReader = () => {
             setIsColorPickerOpen(false); // Ẩn bảng chọn màu
         }
     }
-    // const handleClickOutside = (event) => {
-    //     if (
-    //         colorPickerRef.current &&
-    //         !colorPickerRef.current.contains(event.target)
-    //     ) {
-    //         setIsColorPickerOpen(false);
-    //         setSelectedColor(null); // Reset màu đã chọn khi nhấn ra ngoài
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     document.addEventListener('mousedown', handleClickOutside);
-    //     return () => {
-    //         document.removeEventListener('mousedown', handleClickOutside);
-    //     };
-    // }, []);
     const updateTheme = useCallback((rendition, theme) => {
         const themes = rendition.themes;
         switch (theme) {
@@ -642,23 +615,38 @@ const BookReader = () => {
                     <div
                         id="modal-overlay"
                         ref={colorPickerRef}
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-3 px-10 py-4 bg-slate-300 border rounded-t-xl z-50 "
+                        className="flex flex-col items-center gap-4 px-10 py-6 bg-slate-300 border rounded-lg z-50"
                     >
-                        {colors.map((color) => (
-                            <div
-                                key={color}
-                                onClick={() => handleColorChange(color)}
-                                style={{
-                                    width: '30px',
-                                    height: '30px',
-                                    backgroundColor: color,
-                                    cursor: 'pointer',
-                                    border: '2px solid #fff',
-                                    borderRadius: '50%',
-                                    boxShadow: '0 0 5px rgba(0,0,0,0.3)',
-                                }}
-                            ></div>
-                        ))}
+                        {/* <div
+                            onClick={() => setIsColorPickerOpen(false)}
+                        >
+                            <CloseIcon/>
+                        </div> */}
+                        <div className="flex justify-center gap-3">
+                            {colors.map((color) => (
+                                <div
+                                    key={color}
+                                    onClick={() => handleColorChange(color)}
+                                    style={{
+                                        width: '30px',
+                                        height: '30px',
+                                        backgroundColor: color,
+                                        cursor: 'pointer',
+                                        border: '2px solid #fff',
+                                        borderRadius: '50%',
+                                        boxShadow: '0 0 5px rgba(0,0,0,0.3)',
+                                    }}
+                                ></div>
+                            ))}
+                        </div>
+
+                        {/* Nút thêm ghi chú */}
+                        {/* <button
+                            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-blue-700"
+                            disabled={!selectedColor}
+                        >
+                            Thêm ghi chú
+                        </button> */}
                     </div>
                 </div>
             )}

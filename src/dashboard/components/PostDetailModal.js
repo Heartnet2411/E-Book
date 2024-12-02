@@ -752,6 +752,26 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
                         </Button>
                     </div>
                 )}
+                {post.state == 'approved' && (
+                    <div className="flex justify-end gap-4 mt-4">
+                        <Button
+                            color="secondary"
+                            variant="contained"
+                            startIcon={<VisibilityOffIcon />}
+                            onClick={() => hidePostConfirm(post.postId)}
+                        >
+                            Ẩn bài viết
+                        </Button>
+                        <Button
+                            color="error"
+                            variant="contained"
+                            startIcon={<DeleteOutlineIcon />}
+                            onClick={() => deletePostConfirm(post.postId)}
+                        >
+                            Xoá bài viết
+                        </Button>
+                    </div>
+                )}
                 {post.count && (
                     <div className="flex justify-end gap-4 mt-4">
                         <Button
