@@ -7,13 +7,15 @@ import { toast, Slide } from 'react-toastify';
 import ReplyComment from './ReplyComment';
 import ReportModal from './ReportModal';
 import { formatDate } from '../utils/formatDate';
-
+import axios from 'axios';
+import { url } from '../config/config';
 function Comment({ cmt, postId, fetchPostComment }) {
     const user = JSON.parse(localStorage.getItem('user'));
     const [showReply, setShowReply] = useState(false);
-
+    const token = localStorage.getItem('token');
     const [showReplies, setShowReplies] = useState(false);
     const [comment, setCommnet] = useState('');
+    const [selectedCommentId,setSelectedCommentId]=useState(null)
     const [showPicker, setShowPicker] = useState(false);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [selectedReason, setSelectedReason] = useState(null); // State lưu lý do đã chọn
@@ -36,12 +38,16 @@ function Comment({ cmt, postId, fetchPostComment }) {
         closeReportModal();
     };
 
-    const openReportModal = () => {
+    const openReportModal = (commentId) => {
+        setSelectedCommentId(commentId)
+        console.log(commentId)
         setIsReportModalOpen(true);
     };
 
     const closeReportModal = () => {
         setIsReportModalOpen(false);
+        setSelectedReason(null);
+        setSelectedCommentId(null)
     };
 
     const onEmojiClick = (emoji) => {
@@ -109,6 +115,62 @@ function Comment({ cmt, postId, fetchPostComment }) {
             setCommnet(''); // Sửa lại setComment thay vì setCommnet
         }
     };
+    const handleCreateReport = async (reason) => {
+        if (!selectedCommentId) return;
+
+        try {
+            const response = await axios.post(
+                url + `/report/create`,
+                {
+                    targetType: 'post_comment',
+                    targetId: selectedCommentId,
+                    reason: reason,
+                    userId: user?.userId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            console.log(response.status);
+            if (response.status == 201) {
+                // Kiểm tra xem phản hồi có thành công không
+                toast.success('Báo cáo thành công!', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                closeReportModal(); // Đóng modal sau khi báo cáo
+            } else {
+                toast.error('Bạn đã báo cáo bình luận này rồi', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                closeReportModal();
+            }
+        } catch (error) {
+            console.error('Error creating report:', error);
+            toast.error('Có lỗi xảy ra khi báo cáo!', {
+                position: 'top-right',
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
 
     return (
         <div key={cmt.commentId} className="flex-col pb-2">
@@ -125,7 +187,7 @@ function Comment({ cmt, postId, fetchPostComment }) {
                         {cmt.content}
                     </p>
                     <button
-                        onClick={() => setIsReportModalOpen(true)}
+                        onClick={() => openReportModal(cmt.commentId)}
                         className="absolute right-4 top-1/2 -translate-y-1/2"
                     >
                         <PiWarningOctagonBold
@@ -221,7 +283,8 @@ function Comment({ cmt, postId, fetchPostComment }) {
                 </div>
             )}
             {isReportModalOpen && (
-                <ReportModal onClose={() => setIsReportModalOpen(false)} />
+                <ReportModal onClose={closeReportModal}
+                onSubmit={handleCreateReport} />
             )}
         </div>
     );
