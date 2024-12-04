@@ -105,9 +105,11 @@ function Posts() {
 
             if (response.ok) {
                 const data = await response.json();
-                const approvedPosts = data.filter(
-                    (post) => post.state === 'approved'
-                );
+                console.log(data);
+                const approvedPosts = data
+                    .map((item) => item.post) // Trích xuất trường 'post' từ từng phần tử
+                    .filter((post) => post.state === 'approved'); // Lọc các post có trạng thái 'approved'
+
                 // Gắn dữ liệu đã lọc vào state
                 setPosts(approvedPosts);
                 setLoading(false);

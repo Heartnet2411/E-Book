@@ -383,7 +383,7 @@ function MyAccount() {
 
                             <div className="absolute bottom-0 w-3/5 translate-y-1/2 flex justify-between items-end">
                                 <img
-                                    src={avatar}
+                                    src="https://lh3.googleusercontent.com/a/ACg8ocKT7BznwQ67SdVaWpx7t3y1VOci2x9T-A73K0IZ7Bv7RmcUXLE=s96-c"
                                     className="w-40 h-40 object-cover rounded-full bg-white"
                                     alt="user avatar img"
                                 />

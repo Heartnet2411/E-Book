@@ -54,7 +54,9 @@ function Forum() {
         // Lọc theo bộ lọc
         switch (selectedFilter) {
             case 'Diễn đàn hoạt động nhiều nhất':
-                filtered.sort((a, b) => b.postsCount - a.postsCount); // Số bài đăng giảm dần
+                filtered.sort(
+                    (a, b) => b.approvedPostsCount - a.approvedPostsCount
+                ); // Số bài đăng giảm dần
                 break;
 
             case 'Diễn đàn hoạt động mới nhất':

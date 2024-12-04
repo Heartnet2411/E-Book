@@ -174,12 +174,6 @@ const Login = () => {
                         <div className="flex-grow border-t border-gray-300"></div>
                     </div>
                     <div className=" w-10/12 flex space-x-4 justify-around">
-                        <button className="bg-blue-700 py-2 px-4 rounded-xl hover:bg-blue-800 flex items-center w-1/3 justify-center">
-                            <FaYahoo color="white" size={24} />
-                            <p className="text-white ml-2 text-xl font-medium ">
-                                Yahoo!
-                            </p>
-                        </button>
                         <button className="bg-white text-white py-2 px-4 rounded-xl hover:bg-red-700 flex items-center w-1/3 justify-center">
                             <FcGoogle size={24} />
                             <p className="text-black ml-2 font-medium text-xl">

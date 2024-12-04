@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Lottie from 'react-lottie';
 import loginanimation from '../lotties/register.json';
@@ -14,8 +14,10 @@ import {
     signInWithPopup,
 } from 'firebase/auth';
 import { auth, googleProvider, facebookProvider } from '../utils/firebase';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+    const navigate = useNavigate();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -105,7 +107,7 @@ const Login = () => {
                         console.log('Người dùng đã xác thực.');
                         // Tiếp tục với chức năng login
                         setShowModal(false);
-                        userRegister();
+                        userRegister(firstName, lastName, email, password);
 
                         clearInterval(checkVerification); // Ngừng kiểm tra
                     } else {
@@ -130,37 +132,28 @@ const Login = () => {
 
             // Lấy tên và email từ user object
             const displayName = user.displayName;
-            const email = user.email;
+            const [firstNameg, ...lastNameParts] = displayName.split(' ');
+            const lastNameg = lastNameParts.join(' ');
+
+            const emailg = user.email;
 
             // Lưu thông tin người dùng vào state
 
-            console.log('Tên:', displayName);
+            console.log('Tên:', user.photoURL);
             console.log('Email:', email);
+            userRegister(firstNameg, lastNameg, emailg, '', user.photoURL);
         } catch (error) {
             console.error('Lỗi đăng nhập:', error);
         }
     };
 
-    const handleFacebookLogin = async () => {
-        try {
-            // Đăng nhập với tài khoản Facebook
-            const result = await signInWithPopup(auth, facebookProvider);
-            const user = result.user;
-
-            // Lấy tên và email từ user object
-            const displayName = user.displayName;
-            const email = user.email;
-
-            // Lưu thông tin người dùng vào state
-
-            console.log('Tên:', displayName);
-            console.log('Email:', email);
-        } catch (error) {
-            console.error('Lỗi đăng nhập:', error);
-        }
-    };
-
-    const userRegister = async () => {
+    const userRegister = async (
+        firstName,
+        lastName,
+        email,
+        password,
+        imageUrl
+    ) => {
         try {
             // Gửi yêu cầu đến API với dữ liệu người dùng
             const response = await fetch(
@@ -175,6 +168,7 @@ const Login = () => {
                         lastName,
                         email,
                         password,
+                        imageUrl,
                     }),
                 }
             );
@@ -191,6 +185,53 @@ const Login = () => {
             }
         } catch (error) {
             setModalMessage('Có lỗi xảy ra khi đăng ký!');
+            setShowModal(true);
+        } finally {
+            setIsLoading(false);
+            handleLogin(email, password);
+        }
+    };
+
+    const handleLogin = async (email, password) => {
+        setIsLoading(true);
+
+        try {
+            const response = await fetch(
+                'http://' + host + ':' + port + '/api/user/login',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                    }),
+                }
+            );
+
+            const result = await response.json();
+            console.log(result);
+
+            if (!response.ok) {
+                throw new Error('Đăng nhập thất bại: ' + result.message);
+            }
+
+            console.log('Đăng nhập thành công');
+            setModalMessage('Đăng nhập thành công!');
+            setShowModal(true);
+
+            // Xử lý tiếp theo sau khi đăng nhập thành công, ví dụ: lưu token hoặc chuyển hướng
+            localStorage.setItem('token', result.accessToken);
+            localStorage.setItem('user', JSON.stringify(result.user));
+            localStorage.setItem(
+                'refreshToken',
+                JSON.stringify(result.refreshToken)
+            );
+
+            navigate('/');
+        } catch (error) {
+            setModalMessage('Có lỗi xảy ra khi đăng nhập: ' + error.message);
             setShowModal(true);
         } finally {
             setIsLoading(false);
@@ -314,12 +355,6 @@ const Login = () => {
                         <div className="flex-grow border-t border-gray-300"></div>
                     </div>
                     <div className=" w-10/12 flex space-x-4 justify-around ml-20">
-                        <button className="bg-blue-700 py-2 px-4 rounded-xl hover:bg-blue-800 flex items-center w-1/3 justify-center">
-                            <FaYahoo color="white" size={24} />
-                            <p className="text-white ml-2 text-xl font-medium ">
-                                Yahoo!
-                            </p>
-                        </button>
                         <button
                             onClick={handleGoogleLogin}
                             className="bg-white text-white py-2 px-4 rounded-xl hover:bg-red-700 flex items-center w-1/3 justify-center"
