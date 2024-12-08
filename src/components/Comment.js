@@ -207,7 +207,7 @@ function Comment({ cmt, postId, fetchPostComment }) {
                 {formatDate(cmt.createdAt)}
             </span>
             <div className="ml-16 border-l-2 border-gray-300 pl-4">
-                {cmt.Replies.length > 0 ? (
+                {cmt.Replies?.length > 0 ? (
                     showReplies ? (
                         <>
                             {cmt.Replies.map((rly) => (

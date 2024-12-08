@@ -13,6 +13,7 @@ import CommentIcon from '@mui/icons-material/Comment';
 import GroupIcon from '@mui/icons-material/Group';
 import ArticleIcon from '@mui/icons-material/Article';
 import { useNavigate } from 'react-router-dom';
+import TopicIcon from '@mui/icons-material/Topic';
 import { useState } from 'react';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -20,7 +21,7 @@ import AnnouncementIcon from '@mui/icons-material/Announcement';
 const mainListItems = [
     { text: 'Trang chủ', icon: <HomeRoundedIcon />, path: '/admin' },
     {
-        text: 'Bài viết',
+        text: 'Diễn đàn',
         icon: <ArticleIcon />,
         subMenu: [
             {
@@ -61,6 +62,7 @@ const mainListItems = [
             },
         ],
     },
+    { text: 'Chủ đề', icon: <TopicIcon />, path: '/admin/topic' },
     { text: 'Độc giả', icon: <GroupIcon />, path: '/admin/users' },
 ];
 

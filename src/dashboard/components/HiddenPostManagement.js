@@ -105,7 +105,6 @@ export default function HiddenPostManagement() {
                 },
             });
             if (response.status === 204) {
-                // Nếu thành công thì cập nhật lại danh sách bài viết
                 setPosts((prevPosts) =>
                     prevPosts.filter((post) => post.id !== id)
                 );
