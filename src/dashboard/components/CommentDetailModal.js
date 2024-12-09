@@ -428,6 +428,30 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
             showToast('error', 'Có lỗi xảy ra khi giữ nguyên bình luận');
         }
     };
+    const fetchReportReasons = async (commentId) => {
+        try {
+            const response = await axios.get(
+                `${url}/report/get-reason-report/${commentId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            if (response.status === 200) {
+                setReportReasons(response.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch report reasons:', error);
+            showToast('error', 'Không thể tải lý do báo cáo');
+        }
+    };
+    useEffect(() => {
+        if (comment.commentId) {
+            fetchReportReasons(comment.commentId);
+            console.log(comment.commentId);
+        }
+    }, [comment.commentId]);
     return (
         <div
             id="modal-overlay"
@@ -466,26 +490,8 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
                         </p>
                     </div>
                 </div>
-                {comment.hiddenReason && reportReasons.length > 0 && (
+                { reportReasons.length > 0 && (
                     <div className="flex pb-2 border-b"></div>
-                )}
-                {comment.hiddenReason && (
-                    <List
-                        sx={{
-                            width: '100%',
-                            maxWidth: 600,
-                            bgcolor: 'background.paper',
-                            marginTop: 2,
-                            borderRadius: 2,
-                        }}
-                    >
-                        <ListItem alignItems="flex-start">
-                            {' '}
-                            <ListItemText>
-                                Lý do ẩn : {comment.hiddenReason}
-                            </ListItemText>
-                        </ListItem>
-                    </List>
                 )}
                 {reportReasons.length > 0 && (
                     <List

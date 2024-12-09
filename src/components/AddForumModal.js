@@ -4,6 +4,7 @@ import { toast, Slide } from 'react-toastify';
 
 const AddForumModal = ({ isOpen, onClose }) => {
     const [forum, setForum] = useState('');
+    const user = JSON.parse(localStorage.getItem('user'));
     console.log(forum);
     if (!isOpen) return null;
 
@@ -17,7 +18,7 @@ const AddForumModal = ({ isOpen, onClose }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name: forum }),
+                body: JSON.stringify({ name: forum, userId: user.userId }),
             });
 
             if (response.ok) {
