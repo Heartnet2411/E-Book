@@ -21,7 +21,7 @@ const AddForumModal = ({ isOpen, onClose }) => {
                 body: JSON.stringify({ name: forum, userId: user.userId }),
             });
 
-            if (response.ok) {
+            if (response.status === 201) {
                 toast.success(
                     'Thêm chủ đề thành công! Chủ đề sẽ được xuất hiện sau khi quản trị viên kiểm duyệt',
                     {
@@ -36,10 +36,10 @@ const AddForumModal = ({ isOpen, onClose }) => {
                         transition: Slide,
                     }
                 );
-            } else {
-                console.error('Failed to create forum');
+            }
+            if (response.status === 202) {
                 toast.error(
-                    'Có lỗi xảy ra khi thêm chủ đề. Xin vui lòng thử lại sau',
+                    'Tên chủ đề đã tồn tại. Vui lòng chọn một tên khác',
                     {
                         position: 'top-right',
                         autoClose: 4000,
@@ -51,22 +51,26 @@ const AddForumModal = ({ isOpen, onClose }) => {
                         theme: 'light',
                         transition: Slide,
                     }
-                );
-            }
+                );}
+
+                
         } catch (error) {
-            console.error('Error:', error);
-            toast.error('Lỗi kết nối', {
-                position: 'top-right',
-                autoClose: 4000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: 'light',
-                transition: Slide,
-            });
+            toast.error(
+                'Có lỗi xảy ra khi thêm chủ đề. Xin vui lòng thử lại sau',
+                {
+                    position: 'top-right',
+                    autoClose: 4000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Slide,
+                }
+            );
         }
+
     };
 
     return (

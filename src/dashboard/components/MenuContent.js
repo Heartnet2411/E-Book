@@ -62,7 +62,7 @@ const mainListItems = [
             },
         ],
     },
-    { text: 'Chủ đề', icon: <TopicIcon />, path: '/admin/topic' },
+    { text: 'Chủ đề', icon: <TopicIcon />, path: '/admin/topics' },
     { text: 'Độc giả', icon: <GroupIcon />, path: '/admin/users' },
 ];
 

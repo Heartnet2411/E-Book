@@ -24,7 +24,7 @@ const breadcrumbNameMap = {
   '/admin/hidden-posts': 'Bài viết bị ẩn',
   '/admin/hidden-comments': 'Bình luận bị ẩn',
   '/admin/report-posts': 'Bài viết bị báo cáo',
-  '/admin/topic': 'Chủ đề',
+  '/admin/topics': 'Chủ đề',
 };
 
 export default function NavbarBreadcrumbs() {
