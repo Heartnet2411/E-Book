@@ -13,6 +13,8 @@ import Lottie from 'react-lottie';
 import loadingAnimation from '../lotties/loading.json';
 import nothing from '../lotties/nothing.json';
 import { url } from '../config/config';
+import { TbReload } from 'react-icons/tb';
+
 function Posts() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -24,6 +26,27 @@ function Posts() {
     const [loading, setLoading] = useState(true);
     const { topicName } = location.state || {};
     const token = localStorage.getItem('token');
+
+    const [showRefreshButton, setShowRefreshButton] = useState(false);
+
+    const handleScroll = () => {
+        const scrollTop =
+            window.pageYOffset || document.documentElement.scrollTop;
+
+        // Kiểm tra nếu cuộn qua một khoảng (ví dụ 300px)
+        if (scrollTop > 300) {
+            setShowRefreshButton(true);
+        } else {
+            setShowRefreshButton(false);
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     const images = [
         'https://firebasestorage.googleapis.com/v0/b/datn-ed1fa.appspot.com/o/images%2FAurora%20-%2023.png?alt=media&token=7ad74141-6de1-4f8d-b7a2-2015e7469a4c',
@@ -68,6 +91,10 @@ function Posts() {
     };
 
     const fetchPostsByTopicId = async (topicId) => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth', // Cuộn mượt mà
+        });
         try {
             const response = await fetch(url + `/post/topic/${topicId}`, {
                 method: 'GET', // Phương thức GET
@@ -165,7 +192,7 @@ function Posts() {
     return (
         <div
             className="bg-gradient-to-b from-slate-50 via-slate-100 to-white 
-             dark:bg-gradient-to-b dark:from-gray-900 dark:via-slate-900 dark:to-black min-h-screen"
+             dark:bg-gradient-to-b dark:from-gray-900 dark:via-slate-900 dark:to-black min-h-screen relative"
         >
             <Header user={user} />
 
@@ -181,6 +208,15 @@ function Posts() {
                     {topicName}
                 </span>
             </div>
+
+            {showRefreshButton && (
+                <button
+                    onClick={() => fetchPostsByTopicId(id)}
+                    className="fixed top-0 translate-y-1/2 left-1/2 z-50 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600"
+                >
+                    <TbReload size={24} />
+                </button>
+            )}
 
             <div className="grid grid-cols-10 px-16 max-w-screen-2xl mx-auto">
                 {/* Left page */}

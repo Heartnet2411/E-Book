@@ -69,6 +69,13 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
 
     const user = JSON.parse(localStorage.getItem('user'));
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const handleOutsideClick = (event) => {
+        if (event.target.id === 'modal-overlay') {
+            setIsModalOpen(false);
+        }
+    };
+
     function showToast(type, message) {
         const options = {
             position: 'top-right',
@@ -384,6 +391,8 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
                 }
             );
 
+            setIsModalOpen(false);
+
             if (response.ok) {
                 const data = await response.json();
                 showToast('success', 'Xóa bài viết thành công');
@@ -426,7 +435,7 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
                             selected === 'posts' ? (
                                 <div>
                                     <button
-                                        onClick={handleRemovePostUser}
+                                        onClick={() => setIsModalOpen(true)}
                                         className="cursor-pointer"
                                     >
                                         <MdDelete
@@ -478,21 +487,24 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
                             ) : null}
                         </div>
                         <div className="relative group">
-                            {' '}
-                            <button
-                                onClick={() => {
-                                    openReportModal(post.postId);
-                                }}
-                                className="cursor-pointer"
-                            >
-                                <PiWarningOctagonBold
-                                    size={26}
-                                    className="ml-4 text-base rounded-md text-red-500 "
-                                />
-                            </button>
-                            <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 text-white dark:bg-gray-200 dark:text-black text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                Báo cáo bài viết
-                            </span>
+                            {currentUserId !== post.userId ? (
+                                <>
+                                    <button
+                                        onClick={() => {
+                                            openReportModal(post.postId);
+                                        }}
+                                        className="cursor-pointer"
+                                    >
+                                        <PiWarningOctagonBold
+                                            size={26}
+                                            className="ml-4 text-base rounded-md text-red-500 "
+                                        />
+                                    </button>
+                                    <span className="absolute left-0 top-8 w-max p-2 bg-gray-800 text-white dark:bg-gray-200 dark:text-black text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        Báo cáo bài viết
+                                    </span>{' '}
+                                </>
+                            ) : null}
                         </div>
                     </div>
                 </div>
@@ -648,6 +660,39 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
                     onClose={closeReportModal}
                     onSubmit={handleCreateReport}
                 />
+            )}
+
+            {/* Modal xác nhận */}
+            {isModalOpen && (
+                <div
+                    id="modal-overlay"
+                    onMouseDown={handleOutsideClick}
+                    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                >
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
+                        <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+                            Xác nhận xóa
+                        </h2>
+
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                            Bạn có chắc chắn muốn xóa bài viết này không?
+                        </p>
+                        <div className="flex justify-end gap-4 mt-4">
+                            <button
+                                onClick={() => setIsModalOpen(false)} // Đóng modal
+                                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={handleRemovePostUser} // Gọi hàm xóa
+                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md"
+                            >
+                                Xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

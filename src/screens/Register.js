@@ -13,8 +13,9 @@ import {
     sendEmailVerification,
     signInWithPopup,
 } from 'firebase/auth';
-import { auth, googleProvider, facebookProvider } from '../utils/firebase';
+import { auth, googleProvider } from '../utils/firebase';
 import { useNavigate } from 'react-router-dom';
+import { toast, Slide } from 'react-toastify';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -177,8 +178,17 @@ const Login = () => {
             const result = await response.json();
 
             if (response.ok) {
-                setModalMessage('Đăng ký thành công!');
-                setShowModal(true);
+                toast.success('Đăng ký thành công!', {
+                    position: 'top-right',
+                    autoClose: 4000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Slide,
+                });
             } else {
                 setModalMessage('Đăng ký thất bại: ' + result.message);
                 setShowModal(true);

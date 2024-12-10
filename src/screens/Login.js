@@ -9,6 +9,9 @@ import { IoEyeOff } from 'react-icons/io5';
 import Notification from '../components/Notification';
 import { host, port } from '../utils/constatn';
 import { useNavigate } from 'react-router-dom';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '../utils/firebase';
+import { toast, Slide } from 'react-toastify';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -72,10 +75,6 @@ const Login = () => {
             // Xử lý tiếp theo sau khi đăng nhập thành công, ví dụ: lưu token hoặc chuyển hướng
             localStorage.setItem('token', result.accessToken);
             localStorage.setItem('user', JSON.stringify(result.user));
-            localStorage.setItem(
-                'refreshToken',
-                JSON.stringify(result.refreshToken)
-            );
 
             navigate('/');
         } catch (error) {
@@ -83,6 +82,67 @@ const Login = () => {
             setShowModal(true);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const loginWithGoogle = async () => {
+        try {
+            // Đăng nhập với Google
+            const result = await signInWithPopup(auth, googleProvider);
+
+            // Lấy thông tin người dùng
+            const user = result.user;
+            console.log('User info:', user);
+
+            return user; // Trả về thông tin người dùng
+        } catch (error) {
+            console.error('Error during Google login:', error);
+            throw error;
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        try {
+            const user = await loginWithGoogle();
+            const response = await fetch(
+                'http://' + host + ':' + port + '/api/user/login',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: user.email,
+                        password: '',
+                    }),
+                }
+            );
+
+            const result = await response.json();
+            console.log(result);
+
+            if (!response.ok) {
+                throw new Error('Đăng nhập thất bại: ' + result.message);
+            }
+
+            toast.success('Đăng nhập thành công!', {
+                position: 'top-right',
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+                transition: Slide,
+            });
+
+            // Xử lý tiếp theo sau khi đăng nhập thành công, ví dụ: lưu token hoặc chuyển hướng
+            localStorage.setItem('token', result.accessToken);
+            localStorage.setItem('user', JSON.stringify(result.user));
+            navigate('/');
+        } catch (error) {
+            alert('Đăng nhập thất bại. Vui lòng thử lại.');
         }
     };
 
@@ -174,7 +234,10 @@ const Login = () => {
                         <div className="flex-grow border-t border-gray-300"></div>
                     </div>
                     <div className=" w-10/12 flex space-x-4 justify-around">
-                        <button className="bg-white text-white py-2 px-4 rounded-xl hover:bg-red-700 flex items-center w-1/3 justify-center">
+                        <button
+                            onClick={handleGoogleLogin}
+                            className="bg-white text-white py-2 px-4 rounded-xl hover:bg-red-700 flex items-center w-1/3 justify-center"
+                        >
                             <FcGoogle size={24} />
                             <p className="text-black ml-2 font-medium text-xl">
                                 Google

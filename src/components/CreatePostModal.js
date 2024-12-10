@@ -59,7 +59,7 @@ const CreatePostModal = ({ isOpen, onClose, topicId, topicName }) => {
         setEditorState(RichUtils.toggleBlockType(editorState, blockType));
     };
 
-    const handleSubmit = async (event) => {
+    const handleSubmitPost = async (event) => {
         event.preventDefault();
 
         if (!editorState.getCurrentContent().hasText()) {
@@ -312,7 +312,7 @@ const CreatePostModal = ({ isOpen, onClose, topicId, topicName }) => {
                     <button
                         type="submit"
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                        onClick={handleSubmit}
+                        onClick={handleSubmitPost}
                     >
                         Đăng bài viết
                     </button>
