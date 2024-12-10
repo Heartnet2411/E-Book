@@ -185,7 +185,6 @@ export default function PostManagement() {
     }, [filter]);
     const handleShowPostModal = async (post) => {
         setSelectedPost(post);
-        console.log(post);
         setShowPostModal(true);
     };
     const postColumns = [

@@ -18,6 +18,7 @@ import PostManagement from './components/PostManagement';
 import ReportPostManagement from './components/ReportPostManagement';
 import HiddenPostManagement from './components/HiddenPostManagement';
 import HiddenCommentManagement from './components/HiddenCommentManagement';
+import TopicManagement from './components/TopicManagement';
 
 
 export default function Dashboard(props) {
@@ -106,6 +107,10 @@ export default function Dashboard(props) {
                             <Route
                                 path="/users"
                                 element={<UserManagement/>}
+                            />
+                            <Route
+                            path="/topics"
+                            element={<TopicManagement/>}
                             />
                         </Routes>
                     </Stack>

@@ -12,7 +12,6 @@ import {
     TableRow,
     Button,
     IconButton,
-    Stack,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { url } from '../../config/config';
@@ -27,18 +26,21 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import PostDetailModal from './PostDetailModal';
+import TopicDetailModal from './TopicDetailModal';
 
-export default function HiddenPostManagement() {
-    const [posts, setPosts] = useState(null);
+export default function TopicManagement(){
+    const [topics, setTopics] = useState(null);
+    const [selectedTopic,setSelectedTopic] = useState(null)
     const token = localStorage.getItem('token');
-    const [filter, setFilter] = useState('hidden');
-    const [showPostModal, setShowPostModal] = useState(false);
-    const [selectedPost, setSelectedPost] = useState(null);
-
-    const getPosts = async () => {
+    const [filter, setFilter] = useState('pending');
+    const [showTopicModal, setShowTopicModal] = useState(false);
+    const handleFilter = (event) => {
+        setFilter(event.target.value);
+    };
+    const getTopics = async ()=>{
+        let response;
         try {
-            let response;
-            response = await fetch(url + `/post/list/${filter}`, {
+            response = await fetch(url + `/topics/list/${filter}`, {
                 headers: {
                     method: 'GET',
                     Authorization: `Bearer ${token}`,
@@ -46,13 +48,17 @@ export default function HiddenPostManagement() {
             });
             const data = await response.json();
             const rowsData = data.map((item, index) => ({
-                id: item.targetId ? item.targetId : item.postId,
+                id: item.topicId,
                 ...item,
             }));
-            setPosts(rowsData);
+            setTopics(rowsData);
         } catch (error) {
-            console.error('Failed to fetch posts:', error);
+            console.error('Failed to fetch topics:', error);
         }
+    };
+    const handleShowTopicModal = async (topic) => {
+        setSelectedTopic(topic);
+        setShowTopicModal(true);
     };
     const convertState = (state) => {
         switch (state) {
@@ -77,81 +83,28 @@ export default function HiddenPostManagement() {
         // Trả về định dạng "DD/MM/YYYY"
         return `${day}/${month}/${year}`;
     };
-
-    const deletePostConfirm = (id) => {
-        confirmAlert({
-            title: 'Xoá bài viết',
-            message: 'Bạn có chắc chắn muốn xoá bài viết này?',
-            buttons: [
-                {
-                    label: 'Huỷ',
-                    className: 'react-confirm-alert-button cancel',
-                    onClick: () => {},
-                },
-                {
-                    label: 'Xác nhận',
-                    className: 'react-confirm-alert-button confirm',
-                    onClick: () => deletePost(id),
-                },
-            ],
-            closeOnClickOutside: false,
-        });
-    };
-    const deletePost = async (id) => {
-        try {
-            const response = await axios.delete(url + `/post/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (response.status === 204) {
-                setPosts((prevPosts) =>
-                    prevPosts.filter((post) => post.id !== id)
-                );
-                toast.success('Xoá thành công', {
-                    position: 'top-right',
-                    autoClose: 4000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-            }
-        } catch (error) {
-            console.error('Failed to delete posts:', error);
-        }
-    };
-    const handleUpdatePosts = (postId) => {
-        setPosts((prevPosts) =>
-            prevPosts.filter((post) => post.postId !== postId)
+    const handleUpdateTopics = (topicId) => {
+        setTopics((prevTopics) =>
+            prevTopics.filter((topic) => topic.topicId !== topicId)
         );
     };
-    const handleShowPostModal = async (post) => {
-        setSelectedPost(post);
-        console.log(post);
-        setShowPostModal(true);
-    };
     useEffect(() => {
-        getPosts();
+        getTopics();
     }, [filter]);
-    const postColumns = [
+    //===========Table===================
+    const topicColumns = [
         { field: 'id', headerName: 'ID', width: 100 },
         {
-            field: 'topic',
-            headerName: 'Chủ đề',
+            field: 'name',
+            headerName: 'Tên chủ đề',
             width: 300,
-            renderCell: (params) => {
-                const { name } = params?.value || {};
-                return <div>{name}</div>;
-            },
         },
         {
             field: 'createdAt',
             headerName: 'Ngày đăng',
             width: 150,
             renderCell: (params) => {
-                const date = params.row.createdAt;
+                const date = params?.row?.createdAt;
                 return <div>{convertDate(date)}</div>;
             },
         },
@@ -175,18 +128,14 @@ export default function HiddenPostManagement() {
             },
         },
         {
-            field: 'actions',
+            field: 'action',
             headerName: 'Hành động',
-            width: 280,
+            width: 120,
             renderCell: (params) => {
                 return (
-                    <Stack direction="row" spacing={2}>
-                        <IconButton
-                            onClick={() => handleShowPostModal(params.row)}
-                        >
-                            <VisibilityIcon />
-                        </IconButton>
-                    </Stack>
+                    <IconButton onClick={() => handleShowTopicModal(params.row)}>
+                        <VisibilityIcon />
+                    </IconButton>
                 );
             },
         },
@@ -202,26 +151,42 @@ export default function HiddenPostManagement() {
                     >
                         Bộ lọc
                     </Typography>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Loại</InputLabel>
+                        <Select
+                            label="Comment Type"
+                            value={filter}
+                            onChange={handleFilter}
+                        >
+                             
+                            <MenuItem value="pending">
+                                Chờ duyệt
+                            </MenuItem>
+                            <MenuItem value="approved">
+                                Đã duyệt
+                            </MenuItem>
+                        </Select>
+                    </FormControl>
                 </Grid2>
             </Grid2>
             <Grid2 marginTop={3}>
                 <DataGrid
-                    columns={postColumns}
-                    rows={posts}
+                    columns={topicColumns}
+                    rows={topics}
                     rowHeight={50}
                     disableRowSelectionOnClick
                 />
-                {showPostModal && (
-                    <PostDetailModal
-                        key={selectedPost.postId}
-                        post={selectedPost}
-                        onUpdatePosts={handleUpdatePosts}
+                {showTopicModal && (
+                    <TopicDetailModal
+                        key={selectedTopic.topicId}
+                        topic={selectedTopic}
+                         onUpdateTopics={handleUpdateTopics}
                         onClose={() => {
-                            setShowPostModal(false);
+                            setShowTopicModal(false);
                         }}
                     />
                 )}
             </Grid2>
-        </Box>
-    );
+            </Box>
+    )
 }

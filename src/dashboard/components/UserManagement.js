@@ -155,16 +155,7 @@ export default function UserManagement() {
                                 >
                                     Khóa
                                 </Button>
-                                {user.role.roleName === 'User' && (
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        // onClick={() => handlePromoteToAdmin(user.id)}
-                                        sx={{ ml: 2 }}
-                                    >
-                                        Cấp quyền admin
-                                    </Button>
-                                )}
+                                
                             </TableCell>
                         </TableRow>
                     ))}

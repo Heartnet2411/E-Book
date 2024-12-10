@@ -6,8 +6,13 @@ import {
     MenuItem,
     InputLabel,
     Select,
+    Table,
+    TableCell,
+    TableHead,
+    TableRow,
+    Button,
     IconButton,
-    Stack,
+    Stack
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { url } from '../../config/config';
@@ -21,10 +26,12 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import CommentDetailModal from './CommentDetailModal';
 export default function CommentManagement() {
     const [comments, setComments] = useState(null);
     const [selectedComment, setSelectedComment] = useState(null);
     const [filter, setFilter] = useState('all');
+    const [showCommentModal, setShowCommentModal] = useState(false);
     const token = localStorage.getItem('token');
     const [rowCount, setRowCount] = useState(0); // Tổng số bản ghi
     const [pageState, setPageState] = useState({
@@ -57,7 +64,7 @@ export default function CommentManagement() {
                 id: item.commentId,
                 ...item,
             }));
-            // setComments(rowsData);
+             setComments(rowsData);
             setPageState(old=>({
                 ...old,
                 isLoading: false,
@@ -132,7 +139,7 @@ export default function CommentManagement() {
                 return (
                     <Stack direction="row" spacing={2}>
                         <IconButton
-                        // onClick={() => handleShowPostModal(params.row)}
+                        onClick={() => handleShowCommentModal(params.row)}
                         >
                             <VisibilityIcon />
                         </IconButton>
@@ -143,6 +150,11 @@ export default function CommentManagement() {
     ];
     const handlePaginationModelChange = (newPaginationModel) => {
         setPageState(newPaginationModel);
+    };
+    const handleShowCommentModal = async (comment) => {
+        setSelectedComment(comment);
+        console.log(comment);
+        setShowCommentModal(true);
     };
     useEffect(() => {
         fetchComments();
@@ -177,7 +189,7 @@ export default function CommentManagement() {
             <Grid2 marginTop={3}>
                 <DataGrid
                     columns={commentColumns}
-                    rows={pageState.data}
+                    rows={comments}
                     rowCount={pageState.total}
                     loading={pageState.isLoading}
                     pagination
@@ -190,6 +202,16 @@ export default function CommentManagement() {
                     disableRowSelectionOnClick
                 />
             </Grid2>
+            {showCommentModal && (
+                    <CommentDetailModal
+                        key={selectedComment.commentId}
+                        comment={selectedComment}
+                        onUpdateComments={handleUpdateComments}
+                        onClose={() => {
+                            setShowCommentModal(false);
+                        }}
+                    />
+                )}
         </Box>
     );
 }
