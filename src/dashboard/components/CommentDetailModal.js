@@ -569,7 +569,7 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
                                 )
                             }
                         >
-                            Xoá bài viết
+                            Xoá bình luận
                         </Button>
                     </div>
                 )}

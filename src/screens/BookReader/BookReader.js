@@ -594,7 +594,7 @@ const BookReader = () => {
                 onClose={() => setIsBookmarkModalOpen(false)}
                 bookmarks={bookmarks}
                 onJump={(bookmark) => {
-                    setLocation(bookmark.location);
+                    rendition?.display(bookmark.location);
                     setIsBookmarkModalOpen(false);
                     setIsBookmarked(true);
                 }}
