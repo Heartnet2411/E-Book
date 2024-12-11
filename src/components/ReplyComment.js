@@ -6,6 +6,7 @@ import { BsEmojiSmile } from 'react-icons/bs';
 import { toast, Slide } from 'react-toastify';
 import ReportModal from './ReportModal';
 import { formatDate } from '../utils/formatDate';
+import { url } from '../config/config';
 
 function ReplyComment({ cmt, postId, fetchPostComment, replyId }) {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -73,21 +74,18 @@ function ReplyComment({ cmt, postId, fetchPostComment, replyId }) {
     const handleSendComment = async () => {
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/comment',
-                {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        postId: postId,
-                        replyId: replyId,
-                        content: comment,
-                    }),
-                }
-            );
+            const response = await fetch(url + '/post/comment', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    postId: postId,
+                    replyId: replyId,
+                    content: comment,
+                }),
+            });
 
             if (response.ok) {
                 const data = await response.json();

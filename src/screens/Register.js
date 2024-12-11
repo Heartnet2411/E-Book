@@ -7,7 +7,6 @@ import { FcGoogle } from 'react-icons/fc';
 import { IoMdEye } from 'react-icons/io';
 import { IoEyeOff } from 'react-icons/io5';
 import Notification from '../components/Notification';
-import { host, port } from '../utils/constatn';
 import {
     createUserWithEmailAndPassword,
     sendEmailVerification,
@@ -16,6 +15,7 @@ import {
 import { auth, googleProvider } from '../utils/firebase';
 import { useNavigate } from 'react-router-dom';
 import { toast, Slide } from 'react-toastify';
+import { url } from '../config/config';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -157,22 +157,19 @@ const Login = () => {
     ) => {
         try {
             // Gửi yêu cầu đến API với dữ liệu người dùng
-            const response = await fetch(
-                'http://' + host + ':' + port + '/api/user/register',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        firstName,
-                        lastName,
-                        email,
-                        password,
-                        imageUrl,
-                    }),
-                }
-            );
+            const response = await fetch(url + '/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                    imageUrl,
+                }),
+            });
 
             // Kiểm tra xem API trả về kết quả thành công hay không
             const result = await response.json();
@@ -206,19 +203,16 @@ const Login = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch(
-                'http://' + host + ':' + port + '/api/user/login',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password,
-                    }),
-                }
-            );
+            const response = await fetch(url + '/user/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                }),
+            });
 
             const result = await response.json();
             console.log(result);
@@ -228,8 +222,17 @@ const Login = () => {
             }
 
             console.log('Đăng nhập thành công');
-            setModalMessage('Đăng nhập thành công!');
-            setShowModal(true);
+            toast.success('Đăng nhập thành công!', {
+                position: 'top-right',
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+                transition: Slide,
+            });
 
             // Xử lý tiếp theo sau khi đăng nhập thành công, ví dụ: lưu token hoặc chuyển hướng
             localStorage.setItem('token', result.accessToken);
@@ -241,8 +244,17 @@ const Login = () => {
 
             navigate('/');
         } catch (error) {
-            setModalMessage('Có lỗi xảy ra khi đăng nhập: ' + error.message);
-            setShowModal(true);
+            toast.error('Đăng nhập thất bại!', {
+                position: 'top-right',
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'light',
+                transition: Slide,
+            });
         } finally {
             setIsLoading(false);
         }

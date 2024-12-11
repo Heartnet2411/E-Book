@@ -15,7 +15,7 @@ function Comment({ cmt, postId, fetchPostComment }) {
     const token = localStorage.getItem('token');
     const [showReplies, setShowReplies] = useState(false);
     const [comment, setCommnet] = useState('');
-    const [selectedCommentId,setSelectedCommentId]=useState(null)
+    const [selectedCommentId, setSelectedCommentId] = useState(null);
     const [showPicker, setShowPicker] = useState(false);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [selectedReason, setSelectedReason] = useState(null); // State lưu lý do đã chọn
@@ -39,15 +39,15 @@ function Comment({ cmt, postId, fetchPostComment }) {
     };
 
     const openReportModal = (commentId) => {
-        setSelectedCommentId(commentId)
-        console.log(commentId)
+        setSelectedCommentId(commentId);
+        console.log(commentId);
         setIsReportModalOpen(true);
     };
 
     const closeReportModal = () => {
         setIsReportModalOpen(false);
         setSelectedReason(null);
-        setSelectedCommentId(null)
+        setSelectedCommentId(null);
     };
 
     const onEmojiClick = (emoji) => {
@@ -82,22 +82,19 @@ function Comment({ cmt, postId, fetchPostComment }) {
     const handleSendComment = async () => {
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/comment',
-                {
-                    method: 'POST',
-                    headers: {
-                        // Sửa lại cách thêm Bearer token
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        postId: postId,
-                        replyId: cmt.commentId,
-                        content: comment, // Đảm bảo rằng `comment` là biến đúng
-                    }),
-                }
-            );
+            const response = await fetch(url + '/post/comment', {
+                method: 'POST',
+                headers: {
+                    // Sửa lại cách thêm Bearer token
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    postId: postId,
+                    replyId: cmt.commentId,
+                    content: comment, // Đảm bảo rằng `comment` là biến đúng
+                }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -283,8 +280,10 @@ function Comment({ cmt, postId, fetchPostComment }) {
                 </div>
             )}
             {isReportModalOpen && (
-                <ReportModal onClose={closeReportModal}
-                onSubmit={handleCreateReport} />
+                <ReportModal
+                    onClose={closeReportModal}
+                    onSubmit={handleCreateReport}
+                />
             )}
         </div>
     );

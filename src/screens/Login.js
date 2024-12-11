@@ -7,11 +7,11 @@ import { FcGoogle } from 'react-icons/fc';
 import { IoMdEye } from 'react-icons/io';
 import { IoEyeOff } from 'react-icons/io5';
 import Notification from '../components/Notification';
-import { host, port } from '../utils/constatn';
 import { useNavigate } from 'react-router-dom';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../utils/firebase';
 import { toast, Slide } from 'react-toastify';
+import { url } from '../config/config';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -47,19 +47,16 @@ const Login = () => {
         }
 
         try {
-            const response = await fetch(
-                'http://' + host + ':' + port + '/api/user/login',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password,
-                    }),
-                }
-            );
+            const response = await fetch(url + '/user/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                }),
+            });
 
             const result = await response.json();
             console.log(result);
@@ -104,19 +101,16 @@ const Login = () => {
     const handleGoogleLogin = async () => {
         try {
             const user = await loginWithGoogle();
-            const response = await fetch(
-                'http://' + host + ':' + port + '/api/user/login',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: user.email,
-                        password: '',
-                    }),
-                }
-            );
+            const response = await fetch(url + '/user/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: user.email,
+                    password: '',
+                }),
+            });
 
             const result = await response.json();
             console.log(result);

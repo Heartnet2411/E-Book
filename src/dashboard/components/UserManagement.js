@@ -17,6 +17,7 @@ import {
     FormControl,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { url } from '../../config/config';
 
 export default function UserManagement() {
     const navigate = useNavigate();
@@ -25,15 +26,12 @@ export default function UserManagement() {
     console.log(token);
     const fetchUsers = async () => {
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/admin/users',
-                {
-                    headers: {
-                        method: 'GET',
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const response = await fetch(url + '/admin/users', {
+                headers: {
+                    method: 'GET',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             const data = await response.json();
             setUsers(data);
         } catch (error) {
@@ -43,7 +41,7 @@ export default function UserManagement() {
 
     // const handleBlockUser = async (userId) => {
     //     try {
-    //         const response = await fetch(`http://localhost:8080/api/users/block/${userId}`, {
+    //         const response = await fetch(url + `/users/block/${userId}`, {
     //             method: 'POST',
     //             headers: {
     //                 Authorization: `Bearer ${token}`,
@@ -61,7 +59,7 @@ export default function UserManagement() {
 
     // const handlePromoteToAdmin = async (userId) => {
     //     try {
-    //         const response = await fetch(`http://localhost:8080/api/users/promote/${userId}`, {
+    //         const response = await fetch(url + `/users/promote/${userId}`, {
     //             method: 'POST',
     //             headers: {
     //                 Authorization: `Bearer ${token}`,
@@ -81,22 +79,22 @@ export default function UserManagement() {
     }, []);
     console.log(users);
     return (
-        <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' }}}>
+        <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
             <Grid2 container spacing={4} paddingTop={3}>
-                <Grid2 size={{ xs:12, sm:6 ,md:2 }}>
+                <Grid2 size={{ xs: 12, sm: 6, md: 2 }}>
                     <TextField fullWidth label="User Name" variant="outlined" />
                 </Grid2>
-                <Grid2 size={{ xs:12, sm:6 ,md:3}}>
+                <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
                     <TextField
                         fullWidth
                         label="Phone Number"
                         variant="outlined"
                     />
                 </Grid2>
-                <Grid2 size={{ xs:12, sm:6 ,md:3}}>
+                <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
                     <TextField fullWidth label="Email" variant="outlined" />
                 </Grid2>
-               
+
                 {/* <Grid2 item xs={12} sm={6} md={4}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Status</InputLabel>
@@ -109,8 +107,8 @@ export default function UserManagement() {
                         </Select>
                     </FormControl>
                 </Grid2> */}
-            
-                <Grid2 size={{ xs:12, sm:6 ,md:2}}>
+
+                <Grid2 size={{ xs: 12, sm: 6, md: 2 }}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>User Type</InputLabel>
                         <Select label="User Type">
@@ -122,17 +120,22 @@ export default function UserManagement() {
                         </Select>
                     </FormControl>
                 </Grid2>
-               
+
                 <Grid2 item xs={12} sm={6} md={2} container alignItems="center">
-                    <Button variant="contained" color="primary" fullWidth startIcon={<SearchIcon/>}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        startIcon={<SearchIcon />}
+                    >
                         Search
                     </Button>
                 </Grid2>
             </Grid2>
-            <Table className='mt-10'>
+            <Table className="mt-10">
                 <TableHead>
                     <TableRow>
-                        <TableCell >ID</TableCell>
+                        <TableCell>ID</TableCell>
                         <TableCell>Tên</TableCell>
                         <TableCell>Email</TableCell>
                         <TableCell>Quyền</TableCell>
@@ -155,7 +158,6 @@ export default function UserManagement() {
                                 >
                                     Khóa
                                 </Button>
-                                
                             </TableCell>
                         </TableRow>
                     ))}

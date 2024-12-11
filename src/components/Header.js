@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import { CgMenu } from 'react-icons/cg';
 import { IoLogOutOutline } from 'react-icons/io5';
+import { url } from '../config/config';
 
 const Header = ({ user }) => {
     const navigate = useNavigate();
@@ -15,16 +16,13 @@ const Header = ({ user }) => {
 
         // Kiểm tra nếu refreshToken tồn tại
         if (refreshToken) {
-            const response = await fetch(
-                'http://localhost:8080/api/auth/refresh',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ refreshToken: refreshToken }),
-                }
-            );
+            const response = await fetch(url + '/auth/refresh', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refreshToken: refreshToken }),
+            });
 
             if (response.ok) {
                 console.log('API called successfully with refresh token');

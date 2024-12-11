@@ -14,6 +14,7 @@ import EmojiPicker from 'emoji-picker-react';
 import { BsEmojiSmile } from 'react-icons/bs';
 import Comment from './Comment';
 import ReportModal from './ReportModal';
+import { url } from '../config/config';
 
 function PostModal({ post, onClose }) {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -85,17 +86,14 @@ function PostModal({ post, onClose }) {
 
     const savePostForUser = async (postId, token) => {
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/saved/save',
-                {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ postId }),
-                }
-            );
+            const response = await fetch(url + '/post/saved/save', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ postId }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -113,17 +111,14 @@ function PostModal({ post, onClose }) {
 
     async function fetchUnsavePost(postId, token) {
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/saved/unsave',
-                {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ postId }),
-                }
-            );
+            const response = await fetch(url + '/post/saved/unsave', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ postId }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -142,7 +137,7 @@ function PostModal({ post, onClose }) {
     async function fetchSavedPost(postId, token) {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/post/saved/savedPosts/${postId}`,
+                url + `/post/saved/savedPosts/${postId}`,
                 {
                     method: 'GET', // Chuyển phương thức thành GET
                     headers: {
@@ -167,17 +162,14 @@ function PostModal({ post, onClose }) {
 
     const addFavoritePost = async (postId, token) => {
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/favorite/add',
-                {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ postId }),
-                }
-            );
+            const response = await fetch(url + '/post/favorite/add', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ postId }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -194,17 +186,14 @@ function PostModal({ post, onClose }) {
 
     const removeFavoritePost = async (postId, token) => {
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/favorite/remove',
-                {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ postId }),
-                }
-            );
+            const response = await fetch(url + '/post/favorite/remove', {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ postId }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
@@ -222,7 +211,7 @@ function PostModal({ post, onClose }) {
     const fetchFavoritePost = async (postId, token) => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/post/favorite/favoritePosts/${postId}`,
+                url + `/post/favorite/favoritePosts/${postId}`,
                 {
                     method: 'GET',
                     headers: {
@@ -243,12 +232,9 @@ function PostModal({ post, onClose }) {
 
     const fetchPostComment = async () => {
         try {
-            const response = await fetch(
-                `http://localhost:8080/api/post/comment/${post.postId}`,
-                {
-                    method: 'GET',
-                }
-            );
+            const response = await fetch(url + `/post/comment/${post.postId}`, {
+                method: 'GET',
+            });
 
             if (response.ok) {
                 const comments = await response.json();
@@ -295,21 +281,18 @@ function PostModal({ post, onClose }) {
     const handleSendComment = async () => {
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(
-                'http://localhost:8080/api/post/comment',
-                {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        postId: post.postId,
-                        replyId: null,
-                        content: comment,
-                    }),
-                }
-            );
+            const response = await fetch(url + '/post/comment', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    postId: post.postId,
+                    replyId: null,
+                    content: comment,
+                }),
+            });
 
             if (response.ok) {
                 const data = await response.json();

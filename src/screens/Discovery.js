@@ -132,9 +132,7 @@ function Discovery() {
         // Hàm để lấy danh sách thể loại từ API
         const fetchCategories = async () => {
             try {
-                const response = await axios.get(
-                    'http://localhost:8080/api/category'
-                );
+                const response = await axios.get(url + '/category');
                 setCategories(response.data); // Giả sử dữ liệu trả về là mảng các thể loại
             } catch (error) {
                 console.error('Error fetching categories:', error);

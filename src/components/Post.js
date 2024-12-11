@@ -26,6 +26,8 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
 
     const [showPicker, setShowPicker] = useState(false);
     const [comment, setCommnet] = useState('');
+    const [totalLike, setTotalLike] = useState(0);
+    const [totalComment, setTotalComment] = useState(0);
     const [comments, setCommnets] = useState([]);
     const [visibleComments, setVisibleComments] = useState(4); // Số lượng bình luận được hiển thị
 
@@ -97,6 +99,52 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
             toast.info(message, options);
         } else if (type === 'warning') {
             toast.warning(message, options);
+        }
+    }
+
+    async function fetchTotalLike(postId) {
+        try {
+            const response = await fetch(
+                url + `/post/favorite/${postId}/total`,
+                {
+                    method: 'GET', // Chuyển phương thức thành GET
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    `Error: ${response.status} ${response.statusText}`
+                );
+            }
+
+            const totalLikes = await response.json();
+
+            setTotalLike(totalLikes.totalFavorites);
+        } catch (error) {
+            console.error('Failed to fetch saved post:', error);
+        }
+    }
+
+    async function fetchTotalComment(postId) {
+        try {
+            const response = await fetch(
+                url + `/post/comment/${postId}/total`,
+                {
+                    method: 'GET', // Chuyển phương thức thành GET
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    `Error: ${response.status} ${response.statusText}`
+                );
+            }
+
+            const totalComments = await response.json();
+
+            setTotalComment(totalComments.totalComments);
+        } catch (error) {
+            console.error('Failed to fetch saved post:', error);
         }
     }
 
@@ -304,6 +352,7 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
     };
 
     const fetchPostComment = async () => {
+        fetchTotalComment(post.postId);
         try {
             const response = await fetch(url + `/post/comment/${post.postId}`, {
                 method: 'GET',
@@ -323,6 +372,8 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
         fetchSavedPost(post.postId, token);
         fetchFavoritePost(post.postId, token);
         fetchPostComment();
+        fetchTotalLike(post.postId);
+        fetchTotalComment(post.postId);
     }, [post.postId]);
 
     const handleSavePost = () => {
@@ -336,11 +387,13 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
     };
 
     const handleSaveFavoritePost = () => {
+        setTotalLike(totalLike + 1);
         const token = localStorage.getItem('token');
         addFavoritePost(post.postId, token);
     };
 
     const handleRemoveFavoritePost = () => {
+        setTotalLike(totalLike - 1);
         const token = localStorage.getItem('token');
         removeFavoritePost(post.postId, token);
     };
@@ -549,7 +602,7 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
                                 className=" text-base rounded-md  text-red-500"
                             />
                             <span className="ml-2 dark:text-white">
-                                Bỏ Thích
+                                {totalLike}
                             </span>
                         </button>
                     ) : (
@@ -561,7 +614,9 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
                                 size={24}
                                 className=" text-base rounded-md  text-black dark:text-white"
                             />
-                            <span className="ml-2 dark:text-white">Thích</span>
+                            <span className="ml-2 dark:text-white">
+                                {totalLike}
+                            </span>
                         </button>
                     )}
 
@@ -571,10 +626,10 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
                     >
                         <FaRegComment
                             size={24}
-                            className="ml-4 text-base rounded-md  text-black dark:text-white"
+                            className=" text-base rounded-md  text-black dark:text-white"
                         />
                         <span className="ml-2 dark:text-white">
-                            Thêm bình luận
+                            {totalComment}
                         </span>
                     </button>
                 </div>

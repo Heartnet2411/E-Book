@@ -627,7 +627,9 @@ export default function BookDetails() {
 
                                         {myComments.length === 0 &&
                                             otherComments.length === 0 && (
-                                                <p>Chưa có bình luận nào.</p>
+                                                <p className="dark:text-white mb-2 font-medium">
+                                                    Chưa có bình luận nào.
+                                                </p>
                                             )}
                                     </div>
                                 </div>

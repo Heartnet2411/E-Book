@@ -1,6 +1,7 @@
 // AddForumModal.js
 import React, { useState } from 'react';
 import { toast, Slide } from 'react-toastify';
+import { url } from '../config/config';
 
 const AddForumModal = ({ isOpen, onClose }) => {
     const [forum, setForum] = useState('');
@@ -13,7 +14,7 @@ const AddForumModal = ({ isOpen, onClose }) => {
             return;
         }
         try {
-            const response = await fetch('http://localhost:8080/api/topics/', {
+            const response = await fetch(url + '/topics/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,9 +52,8 @@ const AddForumModal = ({ isOpen, onClose }) => {
                         theme: 'light',
                         transition: Slide,
                     }
-                );}
-
-                
+                );
+            }
         } catch (error) {
             toast.error(
                 'Có lỗi xảy ra khi thêm chủ đề. Xin vui lòng thử lại sau',
@@ -70,7 +70,6 @@ const AddForumModal = ({ isOpen, onClose }) => {
                 }
             );
         }
-
     };
 
     return (
