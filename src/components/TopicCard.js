@@ -99,11 +99,11 @@ function TopicCard({ name, id }) {
             {/* Stats */}
             <div className="flex justify-between mt-4 text-gray-600 dark:text-gray-300">
                 <div>
-                    <p className="text-xs font-medium">POSTS</p>
+                    <p className="text-xs font-medium">BÀI VIẾT</p>
                     <p className="text-lg font-semibold">{postCount}</p>
                 </div>
                 <div>
-                    <p className="text-xs font-medium">LAST ACTIVITY</p>
+                    <p className="text-xs font-medium">HOẠT ĐỘNG LẦN CUỐI</p>
                     <p className="text-lg font-semibold">
                         {lastPost
                             ? (() => {
@@ -146,7 +146,7 @@ function TopicCard({ name, id }) {
             {/* Last Topic */}
             <div className="mt-4 flex-col items-start ">
                 <p className="text-xs text-gray-500 dark:text-white">
-                    LAST POST
+                    BÀI VIẾT CUỐI CÙNG
                 </p>
                 <div className="mt-2 flex items-center h-10">
                     {lastPost ? (

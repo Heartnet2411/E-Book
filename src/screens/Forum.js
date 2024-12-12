@@ -81,9 +81,11 @@ function Forum() {
             const response = await fetch(url + '/topics/');
             if (response.ok) {
                 const data = await response.json();
-                console.log(data);
-                setTopics(data);
-                setFilteredTopics(data);
+                const approvedPosts = data.filter(
+                    (topic) => topic.state === 'approved'
+                );
+                setTopics(approvedPosts);
+                setFilteredTopics(approvedPosts);
             } else {
                 console.error('Failed to fetch topics');
             }

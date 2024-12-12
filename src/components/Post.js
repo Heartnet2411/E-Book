@@ -361,6 +361,7 @@ function Post({ post, currentUserId, selected, fetchPostById }) {
             if (response.ok) {
                 const comments = await response.json();
                 setCommnets(comments);
+                console.log(comments);
             }
         } catch (error) {
             console.error('Failed to fetch comments post:', error);
