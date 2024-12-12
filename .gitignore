@@ -4,14 +4,11 @@
 /node_modules/*
 /.pnp
 .pnp.js
-/src/config/
-src/utils/firebase.js
 
 # testing
 /coverage
 
 # production
-/build
 # Ignore Firebase Admin SDK JSON file
 adminsdk.json
 # misc
