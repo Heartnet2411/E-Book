@@ -9,6 +9,7 @@ import loadingAnimation from '../lotties/loading.json';
 import nothing from '../lotties/nothing.json';
 import { url } from '../config/config';
 import AddForumModal from '../components/AddForumModal';
+import { refreshAccessToken } from '../utils/refreshToken.js';
 
 function Forum() {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -97,6 +98,7 @@ function Forum() {
     };
 
     useEffect(() => {
+        refreshAccessToken();
         fetchTopics();
     }, []);
 

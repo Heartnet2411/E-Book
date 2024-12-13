@@ -51,6 +51,27 @@ export default function BookDetails() {
         setSelectedCommentId(null);
     };
 
+    const handleCopy = async () => {
+        try {
+            const currentUrl = window.location.href; // Lấy URL hiện tại của trang
+            await navigator.clipboard.writeText(currentUrl); // Sao chép URL vào clipboard
+            toast.success(
+                'Đường dẫn sách được sao chép vào bộ nhớ tạm thành công!',
+                {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                }
+            );
+        } catch (err) {
+            console.error('Không thể sao chép link: ', err);
+        }
+    };
+
     useEffect(() => {
         if (!book) {
             fetchBook(id);
@@ -475,7 +496,10 @@ export default function BookDetails() {
                                 </button>
 
                                 {/* Chia sẻ Button */}
-                                <button className="bg-gray-700 text-white flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-500 cursor-pointer transition">
+                                <button
+                                    onClick={handleCopy}
+                                    className="bg-gray-700 text-white flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-500 cursor-pointer transition"
+                                >
                                     <FaShareAlt size={20} />
                                 </button>
                             </div>

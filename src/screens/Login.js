@@ -71,6 +71,7 @@ const Login = () => {
 
             // Xử lý tiếp theo sau khi đăng nhập thành công, ví dụ: lưu token hoặc chuyển hướng
             localStorage.setItem('token', result.accessToken);
+            localStorage.setItem('refreshToken', result.refreshToken);
             localStorage.setItem('user', JSON.stringify(result.user));
 
             navigate('/');

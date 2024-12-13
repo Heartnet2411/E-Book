@@ -12,6 +12,7 @@ import { FaCameraRotate } from 'react-icons/fa6';
 import { toast, Slide } from 'react-toastify';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from '../utils/cropImage';
+import { refreshAccessToken } from '../utils/refreshToken.js';
 
 function MyAccount() {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -120,6 +121,7 @@ function MyAccount() {
     };
 
     useEffect(() => {
+        refreshAccessToken();
         const user = JSON.parse(localStorage.getItem('user'));
 
         if (user) {

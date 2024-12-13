@@ -11,6 +11,7 @@ import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io';
 import '../Home.css';
 import SkeletonBook from '../components/SkeletonBook';
 import WeeklyTopBooks from '../components/WeeklyTopBooks';
+import { refreshAccessToken } from '../utils/refreshToken.js';
 
 import { url } from '../config/config';
 
@@ -62,10 +63,6 @@ export default function Home() {
     const [historyBooks, setHistoryBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const token = localStorage.getItem('token');
-
-    console.log('week', mostReadOfWeek);
-    console.log('books', books);
-
     const fetchBook = () => {
         axios
             .get(url + `/recommend/recommend-book/most-read-of-week`)
@@ -115,6 +112,7 @@ export default function Home() {
     };
 
     useEffect(() => {
+        refreshAccessToken();
         const loadData = new Promise(() => {
             fetchBook();
         });
