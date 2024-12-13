@@ -209,6 +209,11 @@ export default function HiddenPostManagement() {
                     columns={postColumns}
                     rows={posts}
                     rowHeight={50}
+                    initialState={{
+                        pagination: {
+                          paginationModel: { pageSize: 10, page: 0 },
+                        },
+                      }}
                     disableRowSelectionOnClick
                 />
                 {showPostModal && (
