@@ -581,7 +581,21 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
             onMouseDown={handleOutsideClick}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
         >
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 w-2/4 px-8 h-fit max-h-[90vh] flex flex-col relative">
+            <Box
+                sx={{
+                    backgroundColor: 'background.paper',
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    p: 2,
+                    width: '50%',
+                    px: 4,
+                    maxHeight: '90vh',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    height: 'fit-content',
+                }}
+            >
                 {/* Header */}
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center">
@@ -595,15 +609,14 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
                         </span>
                     </div>
                 </div>
-
                 {/* Nội dung bài viết */}
                 <div className="flex-1 overflow-y-auto">
                     <div className="my-4">
                         <div
                             ref={contentRef}
                             dangerouslySetInnerHTML={{ __html: post.content }}
-                            className={`transition-max-height duration-300 overflow-hidden dark:text-white ${
-                                isExpanded ? 'max-h-full' : `max-h-36`
+                            className={`transition-max-height duration-300 overflow-y-scroll dark:text-white ${
+                                isExpanded ? 'max-h-full' : `max-h-96`
                             }`}
                             style={{
                                 WebkitMaskImage:
@@ -715,7 +728,6 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
                         </List>
                     )}
                 </div>
-
                 <div className="flex pb-2 border-b"></div>
                 {/* Nút Duyệt và Từ chối */}
                 {post.state == 'pending' && (
@@ -859,7 +871,7 @@ function PostDetailModal({ post, onClose, onUpdatePosts }) {
                         </div>
                     </Box>
                 </Modal>
-            </div>
+            </Box>
         </div>
     );
 }
