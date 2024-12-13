@@ -214,7 +214,7 @@ export default function BookDetails() {
 
     const truncatedDescription = book?.description.substring(0, 542) + '...';
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className="dark:bg-gray-800">Loading...</div>;
     }
 
     const handleCommentSubmit = async () => {

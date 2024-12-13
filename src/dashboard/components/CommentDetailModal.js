@@ -293,21 +293,27 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
         });
     };
     const deleteComment = async (id, type) => {
-        console.log(type)
+        console.log(type);
         try {
             let response;
             if (type === 'book') {
-                response = await axios.delete(url + `/book/comments/delete-by-admin/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                response = await axios.delete(
+                    url + `/book/comments/delete-by-admin/${id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
             } else {
-                response = await axios.delete(url + `/post/comment/delete-by-admin/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                response = await axios.delete(
+                    url + `/post/comment/delete-by-admin/${id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
             }
             if (response.status === 204) {
                 showToast('success', 'Xoá thành công');
@@ -458,12 +464,30 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
             onMouseDown={handleOutsideClick}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
         >
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 w-2/4 px-8 h-fit max-h-[90vh] flex flex-col relative">
+            <Box
+                sx={{
+                    backgroundColor: 'background.paper',
+                    color: 'text.primary',
+                    borderRadius: '8px',
+                    boxShadow: 3,
+                    padding: '16px',
+                    width: '50%',
+                    paddingX: '32px',
+                    maxHeight: '90vh',
+                    height: 'fit-content',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    '&.dark': {
+                        backgroundColor: 'grey.900',
+                    },
+                }}
+            >
                 <div className="flex justify-between items-center mb-4">
                     <Typography
                         variant="h6"
                         component="h2"
-                        className="text-gray-800 dark:text-white font-bold"
+                        className=" font-bold"
                     >
                         Chi tiết bình luận
                     </Typography>
@@ -479,7 +503,7 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
                         src={comment.user.avatar}
                         className="w-10 h-10 rounded-full object-cover ml-4 mr-2"
                     />
-                    <div className="w-full bg-gray-200 rounded-xl relative dark:bg-gray-800">
+                    <div className="w-full rounded-xl relative border ">
                         <p className="text-base font-medium px-4 w-11/12 dark:text-white">
                             {comment.user.firstname +
                                 ' ' +
@@ -490,7 +514,7 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
                         </p>
                     </div>
                 </div>
-                { reportReasons.length > 0 && (
+                {reportReasons.length > 0 && (
                     <div className="flex pb-2 border-b"></div>
                 )}
                 {reportReasons.length > 0 && (
@@ -546,7 +570,7 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
                 )}
                 {comment.status && <div className="flex pb-2 border-b"></div>}
                 {/* Nút Ẩn và xoá */}
-                {comment.status ==true && (
+                {comment.status == true && (
                     <div className="flex justify-end gap-4 mt-4">
                         <Button
                             color="secondary"
@@ -556,20 +580,7 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
                                 hideCommentConfirm(comment.commentId)
                             }
                         >
-                            Ẩn bài viết
-                        </Button>
-                        <Button
-                            color="error"
-                            variant="contained"
-                            startIcon={<DeleteOutlineIcon />}
-                            onClick={() =>
-                                deleteCommentConfirm(
-                                    comment.commentId,
-                                    comment.type
-                                )
-                            }
-                        >
-                            Xoá bình luận
+                            Ẩn bình luận
                         </Button>
                     </div>
                 )}
@@ -586,7 +597,7 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
                                 )
                             }
                         >
-                            Xoá bài viết
+                            Xoá bình luận
                         </Button>
                     </div>
                 )}
@@ -596,7 +607,9 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
                             color="error"
                             variant="contained"
                             startIcon={<VisibilityOffIcon />}
-                            onClick={() => hideCommentConfirm(comment.commentId)}
+                            onClick={() =>
+                                hideCommentConfirm(comment.commentId)
+                            }
                         >
                             Ẩn bình luận
                         </Button>
@@ -604,13 +617,15 @@ function CommentDetailModal({ comment, onClose, onUpdateComments }) {
                             color="secondary"
                             variant="contained"
                             startIcon={<CloseIcon />}
-                            onClick={() => declinePostConfirm(comment.commentId)}
+                            onClick={() =>
+                                declinePostConfirm(comment.commentId)
+                            }
                         >
                             Giữ nguyên
                         </Button>
                     </div>
                 )}
-            </div>
+            </Box>
         </div>
     );
 }
