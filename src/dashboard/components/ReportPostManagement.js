@@ -270,6 +270,11 @@ export default function ReportPostManagement() {
                 <DataGrid
                     columns={reportColumns}
                     rows={posts}
+                    initialState={{
+                        pagination: {
+                          paginationModel: { pageSize: 10, page: 0 },
+                        },
+                      }}
                     disableRowSelectionOnClick
                 />
                 {showPostModal && (
